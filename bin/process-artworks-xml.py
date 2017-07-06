@@ -7,8 +7,9 @@ import simplejson as json
 from bs4 import BeautifulSoup
 from elasticsearch import Elasticsearch
 import ArtisinalInts
+import certifi
 
-es = Elasticsearch() # defaults to localhost:9200
+es = Elasticsearch(host='', port='9243', http_auth='', use_ssl=True, verify_certs=True, ca_certs=certifi.where()) # defaults to localhost:9200
 
 def formatArtwork(obj):
 
