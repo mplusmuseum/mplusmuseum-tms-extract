@@ -9,8 +9,7 @@ from elasticsearch import Elasticsearch
 import ArtisinalInts
 import certifi
 
-es = Elasticsearch(host='', port='9243', http_auth='', use_ssl=True, verify_certs=True, ca_certs=certifi.where()) # defaults to localhost:9200
-
+es = Elasticsearch() # defaults to localhost:9200
 def formatArtwork(obj):
 
     artwork = {}
@@ -100,6 +99,55 @@ def formatArtwork(obj):
             cat['name'].append({a['lang']:a.text})
 
         artwork['categories'].append(cat)
+
+    # authors...
+    authors = obj.authors.find_all('author')
+    artwork['authors'] = []
+
+    for a in authors:
+        author = {}
+        roles = a.find_all('role')
+        author['roles'] = []
+
+        for r in roles:
+            author['roles'].append({r['lang']:r.text})
+
+        try:
+            author['author'] = a['author']
+        except KeyError:
+            print("Author doesn't have an author")
+
+        try:
+            author['authornameid'] = a['authornameid']
+        except KeyError:
+            print("Author doesn't have an authornameid")
+
+        try:
+            author['birthyear_yearformed'] = a['birthyear_yearformed']
+        except KeyError:
+            print("Author doesn't have a birthyear_yearformed")
+
+        try:
+            author['deathyear'] = a['deathyear']
+        except KeyError:
+            print("Author doesn't have a deathyear")
+
+        try:
+            author['name'] = a['name']
+        except KeyError:
+            print("Author doesn't have a name")
+
+        try:
+            author['nationality'] = a['nationality']
+        except KeyError:
+            print("Author doesn't have a nationality")
+
+        try:
+            author['rank'] = a['rank']
+        except KeyError:
+            print("Author doesn't have a rank")
+
+        artwork['authors'].append(author)
 
     return artwork
 
