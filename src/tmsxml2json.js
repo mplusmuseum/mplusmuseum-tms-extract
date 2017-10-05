@@ -94,6 +94,11 @@ getStdin()
     })
   })
   .catch(err => {
-    console.log(`usage:`)
-    console.log(`  yarn start < ../data/ExportForDAM_Objects_UCS.xml`)
+    console.log(`tmsxml2json
+
+takes a TMS-XML file from stdin and prints it via stdout as json
+
+usage:
+
+    yarn start < ../data/ExportForDAM_Objects_UCS.xml`)
   })
