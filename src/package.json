@@ -5,7 +5,9 @@
   "author": "Jonathan Dahan <hi@jonathan.is>",
   "license": "MIT",
   "dependencies": {
+    "elasticsearch": "^13.3.1",
     "get-stdin": "^5.0.1",
+    "request": "^2.83.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -13,6 +15,8 @@
   },
   "scripts": {
     "start": "node --harmony tmsxml2json.js",
+    "tmsxml2json": "node --harmony tmsxml2json.js",
+    "json2elasticsearch": "node --harmony json2elasticsearch.js",
     "test": "standard tmsxml2json.js && node --harmony tmsxml2json.js < ../data/ExportForDAM_Objects_UCS.xml > /dev/null"
   }
 }

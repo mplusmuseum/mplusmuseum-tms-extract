@@ -94,6 +94,7 @@ getStdin()
     })
   })
   .catch(err => {
+    console.log(err)
     console.log(`tmsxml2json
 
 takes a TMS-XML file from stdin and prints it via stdout as json

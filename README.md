@@ -13,3 +13,13 @@ Tools for extracting data from TMS
     usage:
 
       yarn start < ../data/ExportForDAM_Objects_UCS.xml
+
+[src/json2elasticsearch.js](src/json2elasticsearch.js)
+
+    json2elasticsearch
+
+    takes a json object or objects from stdin, adds an artisinal id, and updates in elasticsearch
+
+    usage:
+
+    yarn run tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml | yarn run json2elasticsearch
