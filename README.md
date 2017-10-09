@@ -4,22 +4,50 @@ Tools for extracting data from TMS
 
 [bin/process-artworks-xml.py](bin/process-artworks-xml.py) extracts the data in the TMS-XML file and saves or updates the data in elasticsearch
 
-[src/tmsxml2json.js](src/tmsxml2json.js)
 
-    tmsxml2json
+## alchemia
 
-    takes a TMS-XML file and converts it to json via stdin/stdout
+alchemia is a tool to work with tms-xml files, which lives in the [src/](src/) directory
 
-    usage:
+    cd src
 
-      yarn start < ../data/ExportForDAM_Objects_UCS.xml
 
-[src/json2elasticsearch.js](src/json2elasticsearch.js)
+### help
 
-    json2elasticsearch
+Using `yarn start` or `yarn start --help` will show the help
 
-    takes a json object or objects from stdin, adds an artisinal id, and updates in elasticsearch
+    $ yarn start
 
-    usage:
+    Usage: alchemia [options] [command]
 
-    yarn run tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml | yarn run json2elasticsearch
+    Tools for working with tms-xml and elastic search
+
+
+    Options:
+
+      -V, --version        output the version number
+      -i, --input <path>   file to work with
+      -o, --output <path>  file to write to instead of stdout
+      -h, --help           output usage information
+
+
+    Commands:
+
+      convert   Convert TMS-XML to json
+      ingest    Ingest json to elasticsearch
+
+To use a command, just `yarn start [command]`.
+
+### Convert tms-xml to json
+
+To convert a tms-xml to json, try
+
+    $ yarn start --silent convert < ../data/ExportForDAM_Objects_UCS.xml > objects.json
+
+*Note*: the `--silent` is important, because yarn outputs a bit too much info normally
+
+### Ingest json to elasticsearch
+
+Lets say you are happy with the output, maybe ingest it to an elasticsearch instance
+
+    $ yarn start injest < objects.json
