@@ -16,7 +16,7 @@
     "standard": "^10.0.3"
   },
   "bin": {
-    "alchemia": "node --harmony cli/index.js"
+    "alchemia": "cli/index.js"
   },
   "scripts": {
     "start": "node --harmony cli/index.js",
