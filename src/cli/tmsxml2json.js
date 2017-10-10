@@ -83,22 +83,27 @@ const tmsxmljson2cleanjson = (tmsxmljson, callback) => {
   callback(null, cleanjson)
 }
 
-getStdin()
-  .then(tmsxml => {
-    parser.parseString(tmsxml, (err, tmsxmljson) => {
-      if (err) console.error(err)
-      tmsxmljson2cleanjson(tmsxmljson, (err, cleanjson) => {
-        if (err) console.error(err)
-        console.log(JSON.stringify(cleanjson))
+module.exports = {
+  tmsxml2json: function () {
+    getStdin()
+      .then(tmsxml => {
+        parser.parseString(tmsxml, (err, tmsxmljson) => {
+          if (err) console.error(err)
+          tmsxmljson2cleanjson(tmsxmljson, (err, cleanjson) => {
+            if (err) console.error(err)
+            console.log(JSON.stringify(cleanjson))
+          })
+        })
       })
-    })
-  })
-  .catch(err => {
-    console.log(`tmsxml2json
+      .catch(err => {
+        console.log(err)
+        console.log(`tmsxml2json
 
-takes a TMS-XML file from stdin and prints it via stdout as json
+    takes a TMS-XML file from stdin and prints it via stdout as json
 
-usage:
+    usage:
 
-    yarn start < ../data/ExportForDAM_Objects_UCS.xml`)
-  })
+        yarn start < ../data/ExportForDAM_Objects_UCS.xml`)
+      })
+  }
+}
