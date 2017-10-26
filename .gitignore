@@ -4,3 +4,4 @@
 /data
 connection-note.md
 node_modules
+config/*.json

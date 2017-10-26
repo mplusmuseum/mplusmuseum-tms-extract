@@ -9,5 +9,6 @@ program
 
 program
     .command('harvest', 'Harvest object data from XML file')
+    .command('index', 'Update and import data to an ElasticSearch index')
 
 program.parse(process.argv);
