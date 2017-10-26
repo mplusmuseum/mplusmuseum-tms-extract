@@ -23,8 +23,11 @@ class Harvest {
 	    this.parser.parseString(this.data, (err, tmsxmljson) => {
 		if (err) console.error(err)
 		this._tmsxmljson2cleanjson(tmsxmljson, (err, cleanjson) => {
-		    if (err) console.error(err)
-		    console.log(JSON.stringify(cleanjson))
+		    if (err) {
+			reject(err)
+		    } else {
+			resolve(JSON.stringify(cleanjson))
+		    }
 		})
 	    })	    
 	});

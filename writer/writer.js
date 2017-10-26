@@ -14,7 +14,7 @@ class Writer {
 
     writeJson() {
 
-	var file = "./" + this.config.json + "/" + this.filename + ".json"; 
+	var file = "./" + this.config.json + "/" + this.filename; 
 	fs.writeFile(file, JSON.stringify(this.data, null, 4), (err) => {
 	    if (err) {
 		console.error(err);
