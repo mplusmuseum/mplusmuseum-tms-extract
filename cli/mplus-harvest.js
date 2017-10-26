@@ -13,7 +13,7 @@ const writerConfig = config.get('data');
 
 program
     .option('-c, --count', 'Retrieve a count of object records in the XML file')
-    .option('-o, --outfile <filename>', 'Filename to write data to')
+    .option('-s, --save', 'Save individual JSON objects to disk')
     .parse(process.argv);
 
 
@@ -21,9 +21,14 @@ getStdin().then(data => {
 	
     var harvest = new Harvest(data, config);
     harvest.harvestObjects().then((res) => {
-	if (program.outfile){
-	    var writer = new Writer(res, program.outfile, writerConfig);
-	    writer.writeJson();
+	if (program.save){
+	    json = JSON.parse(res);
+	    
+	    for (var i = 0, len = json.length; i < len; ++i) {
+		var writer = new Writer(json[i], json[i]['id']+'.json', writerConfig);
+		writer.writeJson();
+	    }
+
 	} else if (program.count) {
 	    console.log(chalk.bold.green("There are %s objects."), JSON.parse(res).length);
 	} else {
