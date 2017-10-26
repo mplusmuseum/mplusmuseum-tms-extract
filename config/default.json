@@ -3,5 +3,9 @@
 	"host": "localhost",
 	"port": "9200",
 	"index": "collection"
+    },
+    
+    "data": {
+	"json": "data/json"
     }
 }
