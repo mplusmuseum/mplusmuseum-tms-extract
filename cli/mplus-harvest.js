@@ -16,26 +16,22 @@ program
     .option('-o, --outfile <filename>', 'Filename to write data to')
     .parse(process.argv);
 
-if (program.count){
-    console.log("Counting");
-}
 
-else {
-
-    getStdin().then(data => {
+getStdin().then(data => {
 	
-	var h = new Harvest(data, config);
-	h.harvestObjects().then((res) => {
-	    if (program.outfile){
-		var writer = new Writer(res, program.outfile, writerConfig);
-		writer.writeJson();
-	    } else {
-		console.log(res);
-	    }
-	}).catch((err) => {
-	    console.log(err);
-	});
-
+    var harvest = new Harvest(data, config);
+    harvest.harvestObjects().then((res) => {
+	if (program.outfile){
+	    var writer = new Writer(res, program.outfile, writerConfig);
+	    writer.writeJson();
+	} else if (program.count) {
+	    console.log(chalk.bold.green("There are %s objects."), JSON.parse(res).length);
+	} else {
+	    console.log(res);
+	}
+    }).catch((err) => {
+	console.log(err);
     });
     
-}
+});
+
