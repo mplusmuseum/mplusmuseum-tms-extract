@@ -3,18 +3,21 @@
 Tools for extracting data from TMS
 
 ## Getting Started
+---
 
 Copy `config/default.json.example` to `config/default.json`. For now, you don't need to edit anything.
 
 Run `npm install -g` to install the `mplus` package globally.
 
 ## Usage
+---
 
 Run `mplus` to read the help.
 
 Run `mplus harvest -h` or `mplus index -h` to read command-specific help.
 
-##### Outdated Below!
+## Outdated Below!
+---
 
 [bin/process-artworks-xml.py](bin/process-artworks-xml.py) extracts the data in the TMS-XML file and saves or updates the data in elasticsearch
 
