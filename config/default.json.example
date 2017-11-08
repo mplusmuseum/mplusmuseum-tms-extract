@@ -1,10 +1,10 @@
 {
-    "elasticsearch": {
+  "elasticsearch": {
     "host": "localhost",
     "port": "9200",
     "index": "objects"
-    },
-    "data": {
+  },
+  "data": {
     "json": "data/json"
-    }
+  }
 }
