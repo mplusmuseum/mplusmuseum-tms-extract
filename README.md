@@ -12,9 +12,7 @@ Run `npm install -g` to install the `mplus` package globally.
 
 Run `mplus` to read the help.
 
-### `mplus harvest`
-
-### `mplus index`
+Run `mplus harvest -h` or `mplus index -h` to read command-specific help.
 
 ##### Outdated Below!
 
