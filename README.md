@@ -4,7 +4,7 @@ Tools for extracting data from TMS
 
 ## Getting Started
 
-Copy `config/default.json.example` to `config/default.json`. For now, you don't need to edit anything.
+Copy `config/default.json.example` to `config/default.json`. You don't need to edit anything, but you can.
 
 Run `npm install -g` to install the `mplus` package globally.
 
@@ -13,6 +13,23 @@ Run `npm install -g` to install the `mplus` package globally.
 Run `mplus` to read the help.
 
 Run `mplus harvest -h` or `mplus index -h` to read command-specific help.
+
+### mplus index
+
+To create a new index, without ingesting any of the data:
+```
+$ mplus index --create <index_name>
+```
+
+To delete an index:
+```
+$ mplus index --drop <index_name>
+```
+
+Check to see whether the index has been created or deleted successfully with this query against your ES instance:
+```
+http://localhost:9200/_cat/indices?v
+```
 
 ## Outdated Below!
 
