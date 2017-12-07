@@ -5,15 +5,15 @@ const getStdin = require('get-stdin')
 const elasticsearch = require('elasticsearch')
 const esclient = new elasticsearch.Client({host: 'localhost:9200'})
 
-const artisinalints = require('../lib/artisinalints')
+const artisanalints = require('../lib/artisanalints')
 
-async function getArtisinalIdFromTmsId (tmsid) {
+async function getArtisanalIdFromTmsId (tmsid) {
   const object = await esclient.search({q: `tmsid: ${tmsid}`})
   if (object.id) {
     console.log(`found id ${object.id}`)
     return object.id
   } else {
-    const id = await artisinalints.createArtisinalInt()
+    const id = await artisanalints.createArtisanalInt()
     console.log(`created id ${id}`)
     return id
   }
@@ -26,7 +26,7 @@ async function addToElasticSearch (object) {
     return console.error(`object missing id, not adding`)
   }
 
-  const id = await getArtisinalIdFromTmsId(tmsid)
+  const id = await getArtisanalIdFromTmsId(tmsid)
   console.log(`tmsid ${tmsid} => id ${id}`)
 
   const index = 'mplusmuseum'
@@ -61,7 +61,7 @@ module.exports = {
         console.error(error)
         console.log(`json2elasticsearch
 
-                    takes a json object or objects, adds an artisinal id, and updates in elasticsearch
+                    takes a json object or objects, adds an artisanal id, and updates in elasticsearch
     usage:
 
         yarn run tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml | yarn run json2elasticsearch`)

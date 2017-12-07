@@ -1,6 +1,6 @@
-// artisinalints
+// artisanalints
 //
-// request an artisinal int
+// request an artisanal int
 
 const rp = require('request-promise-native')
 
@@ -25,7 +25,7 @@ async function requestWithRetry (options, maxRetries = 10) {
   }
 }
 
-async function createArtisinalInt () {
+async function createArtisanalInt () {
   const json = await requestWithRetry({
     method: 'POST',
     uri: 'http://api.brooklynintegers.com/rest/',
@@ -36,4 +36,4 @@ async function createArtisinalInt () {
   return json.integers[0].integer
 }
 
-module.exports = { createArtisinalInt }
+module.exports = { createArtisanalInt }
