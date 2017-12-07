@@ -1,108 +1,99 @@
 #!/usr/bin/env node
 
-var config = require('config');
-var chalk = require('chalk');
-var program = require('commander');
-var fs = require('fs');
-var path = require("path");
-var elasticsearch = require('elasticsearch');
-var async = require("async");
+const config = require('config')
+const chalk = require('chalk')
+const program = require('commander')
+const fs = require('fs')
+const path = require("path")
+const elasticsearch = require('elasticsearch')
+const async = require("async")
 
-const writerConfig = config.get('data');
+const writerConfig = config.get('data')
 const esConfig = config.get('elasticsearch')
 
-const p = "data/json/";
-
 program
-    .option('-c, --create <name>', 'Create a new index')
-    .option('-d, --drop <name>', 'Delete an index')
-    .option('-r, --reindex <name>', 'Reindex all objects to the specified index')
-    .parse(process.argv);
+  .option('-c, --create <name>', 'Create a new index')
+  .option('-d, --drop <name>', 'Delete an index')
+  .option('-r, --reindex <name>', 'Reindex all objects to the specified index')
+  .parse(process.argv)
 
 const esHost = esConfig.host+':'+esConfig.port
 const client = new elasticsearch.Client({
     host: esHost
 })
 
-
 if (program.create) {
+  client.indices.create({
+    index: program.create
 
-    client.indices.create({
-	index: program.create
-    }).then(function (body) {
-	console.log(chalk.bold.green(JSON.stringify(body)));
-    }, function (error) {
-	console.trace(error.message);
-    });
+  }).then((body) => {
+    console.log(chalk.bold.green(JSON.stringify(body)))
 
+  }, (error) => {
+    console.trace(error.message)
+  })
 }
 
-
 if (program.drop) {
+  client.indices.delete({
+    index: program.drop
 
-    client.indices.delete({
-	index: program.drop
-    }).then(function (body) {
-	console.log(chalk.bold.red(JSON.stringify(body)));
-    }, function (error) {
-	console.trace(error.message);
-    });
+  }).then((body) => {
+    console.log(chalk.bold.red(JSON.stringify(body)))
 
+  }, (error) => {
+    console.trace(error.message)
+  })
 }
 
 if (program.reindex) {
+  client.indices.delete({
+    index: program.reindex
 
-    client.indices.delete({
-	index: program.reindex
-    }).then(function (body) {
-	console.log(chalk.bold.red(JSON.stringify(body)));
+  }).then((body) => {
+    console.log(chalk.bold.red(JSON.stringify(body)))
 
-	client.indices.create({
-	    index: program.reindex
-	}).then(function (body) {
-	    console.log(chalk.bold.green(JSON.stringify(body)));
+    client.indices.create({
+      index: program.reindex
 
-	    fs.readdir(p, function (err, files) {
-		if (err) {
-		    throw err;
-		}
+    }).then((body) => {
+      console.log(chalk.bold.green(JSON.stringify(body)))
 
+      fs.readdir(writerConfig.json, function (err, files) {
+        if (err) throw err
 
-		    files.map(function (file) {
-			return path.join(p, file);
-		    }).filter(function (file) {
-			return fs.statSync(file).isFile();
-		    }).forEach(function (file) {
+        files.map((file) => {
+          return path.join(writerConfig.json, file)
 
-			console.log("%s (%s)", file, path.extname(file));
+        }).filter((file) => {
+          return fs.statSync(file).isFile()
 
-			fs.readFile(file, 'utf-8', function (err, data) {
-			    if (err) throw err;
-			    console.log("Read file %s", file);
+        }).forEach((file) => {
+          console.log("%s (%s)", file, path.extname(file))
+
+          fs.readFile(file, 'utf-8', (err, data) => {
+			    if (err) throw err
+
+			    console.log("Read file %s", file)
 
 			    client.index({
-			        index: 'micah',
-			        type: 'object',
+			        index: esConfig.index,
+			        type: 'artwork',
 			        id: path.basename(file, '.json'),
 			        body: data
-			    }).then(function (body) {
-			        console.log(chalk.bold.green(JSON.stringify(body)));
-			    }, function (error) {
-			        console.trace(error.message);
-			    });
+			    }).then((body) => {
+			        console.log(chalk.bold.green(JSON.stringify(body)))
 
-
-			});;
-		    });
-
-	    });
-
-	}, function (error) {
-	    console.trace(error.message);
-	});
-
-    }, function (error) {
-	console.trace(error.message);
-    });
-
+			    }, (error) => {
+			        console.trace(error.message)
+			    })
+          })
+        })
+      })
+    }, (error) => {
+      console.trace(error.message)
+    })
+  }, (error) => {
+    console.trace(error.message)
+  })
 }
