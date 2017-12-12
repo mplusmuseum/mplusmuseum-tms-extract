@@ -8,6 +8,8 @@ Copy `config/default.json.example` to `config/default.json`. You don't need to e
 
 Run `npm install -g` to install the `mplus` package globally.
 
+Copy [`config/default.json.example`](/config/default.json.example) to a new file `config/default.json`. Adjust config variables as needed.
+
 ## Usage
 
 Run `mplus` to read the help.
