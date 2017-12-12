@@ -35,6 +35,16 @@ Check to see whether the index has been created or deleted successfully with thi
 http://localhost:9200/_cat/indices?v
 ```
 
+To ingest all JSON documents from `data/json` into your ES instance:
+```
+$ mplus index --reindex <index_name>
+```
+
+Check to see the count of objects in your ES instance:
+```
+http://localhost:9200/objects/artwork/_count
+```
+
 ## Outdated Below!
 
 [bin/process-artworks-xml.py](bin/process-artworks-xml.py) extracts the data in the TMS-XML file and saves or updates the data in elasticsearch
