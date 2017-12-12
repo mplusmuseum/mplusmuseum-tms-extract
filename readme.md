@@ -4,6 +4,7 @@ alchemia is a tool to work with tms-xml files
 
 ### tldr
 
+    $ cp config.json.example config.json
     $ yarn
     $ yarn start --silent convert < ExportForDAM_Objects_UCS.xml > objects.json
     $ yarn start ingest < objects.json

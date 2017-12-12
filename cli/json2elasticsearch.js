@@ -2,8 +2,9 @@
 
 const getStdin = require('get-stdin')
 
+const config = require('../config.json')
 const elasticsearch = require('elasticsearch')
-const esclient = new elasticsearch.Client({host: 'localhost:9200'})
+const esclient = new elasticsearch.Client(config.elasticsearch)
 
 const artisanalints = require('../lib/artisanalints')
 
