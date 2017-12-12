@@ -23,6 +23,8 @@ To create a new index, without ingesting any of the data:
 $ mplus index --create <index_name>
 ```
 
+Right now, it's important to create an index with the name that you set in your config file under `elasticsearch.index`. (We should set this up better.)
+
 To delete an index:
 ```
 $ mplus index --drop <index_name>
