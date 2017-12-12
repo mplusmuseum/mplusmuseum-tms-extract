@@ -1,8 +1,2 @@
 .DS_Store
-*#
-*~
-/data
-connection-note.md
 node_modules
-config/*.json
-README.html

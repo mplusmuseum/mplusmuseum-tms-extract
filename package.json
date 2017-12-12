@@ -1,27 +1,27 @@
 {
-   "name": "mplus-data-tool",
-   "version": "1.0.0",
-   "description": "Suite of tools for managing collections data and images at M+",
-   "main": "index.js",
-   "bin": {
-      "mplus": "./cli/index.js"
-   },
-   "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-   },
-   "author": "Micah Walter Studio",
-   "license": "MIT",
-   "dependencies": {
-      "async": "^2.5.0",
-      "chalk": "^2.1.0",
-      "commander": "^2.11.0",
-      "config": "^1.26.2",
-      "elasticsearch": "^13.3.1",
-      "get-stdin": "^5.0.1",
-      "xml2js": "^0.4.19"
-   },
-   "repository": {
-      "type": "git",
-      "url": "git+https://github.com/mplusmuseum/mplusmuseum-data-tool.git"
-   }
+  "name": "alchemia",
+  "version": "1.1.0",
+  "main": "cli/index.js",
+  "author": "Jonathan Dahan <hi@jonathan.is>",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "elasticsearch": "^13.3.1",
+    "get-stdin": "^5.0.1",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "standard": "^10.0.3"
+  },
+  "bin": {
+    "alchemia": "cli/index.js"
+  },
+  "scripts": {
+    "start": "node --harmony cli/index.js",
+    "tmsxml2json": "node --harmony cli/tmsxml2json.js",
+    "json2elasticsearch": "node --harmony cli/json2elasticsearch.js",
+    "test": "standard"
+  }
 }

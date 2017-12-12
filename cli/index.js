@@ -1,14 +1,35 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --harmony
 
-var config = require('config');
-var chalk = require('chalk');
-var program = require('commander');
-
-program
-    .version('1.0.0')
+const program = require('commander')
+const chalk = require('chalk')
 
 program
-    .command('harvest', 'Harvest object data from XML file')
-    .command('index', 'Update and import data to an ElasticSearch index')
+  .name(process.env.npm_package_name)
+  .version(process.env.npm_package_version)
+  .description('Tools for working with tms-xml and elastic search')
+  .option('-i, --input <path>', 'file to work with')
+  .option('-o, --output <path>', 'file to write to instead of stdout')
 
-program.parse(process.argv);
+program
+  .command('convert')
+  .description('Convert TMS-XML to json')
+  .action(() => {
+    require('./tmsxml2json.js').tmsxml2json(
+      arguments
+    )
+  })
+
+program
+  .command('ingest')
+  .description('Ingest json to elasticsearch')
+  .action(() => {
+    require('./json2elasticsearch.js').json2elasticsearch(
+      arguments
+    )
+  })
+
+if (!process.argv.slice(2).length) {
+  program.outputHelp(chalk.red)
+}
+
+program.parse(process.argv)
