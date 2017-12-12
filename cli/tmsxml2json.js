@@ -32,16 +32,18 @@ const parseAuthors = authors => {
   return parseObjectOrArray(authors, parseAuthor)
 }
 
-const parseAuthor = author => ({
-  rank: parseInt(author.rank),
-  author: parseInt(author.author),
-  authornameid: parseInt(author.authornameid),
-  nationality: author.nationality,
-  name: author.name,
-  birthyear_yearformed: parseInt(author.birthyear_yearformed),
-  deathyear: parseInt(author.deathyear),
-  roles: parseObjectOrArray(author.roles, parseText)
-})
+const parseAuthor = author => {
+  return {
+    rank: parseInt(author.rank),
+    author: parseInt(author.author),
+    authornameid: parseInt(author.authornameid),
+    nationality: author.nationality,
+    name: author.name,
+    birthyear_yearformed: parseInt(author.birthyear_yearformed),
+    deathyear: parseInt(author.deathyear),
+    roles: parseObjectOrArray(author.roles, parseText)
+  }
+}
 
 const parseDate = date => new Date(date)
 
@@ -60,25 +62,39 @@ const parseExhibition = exhibition => ({
   venues: parseObjectOrArray(exhibition.venues, parseVenues)
 })
 
+const parseObject = o => ({
+  id: parseInt(o.id),
+  objectnumber: o.objectnumber,
+  datebegin: parseFloat(o.datebegin),
+  dateend: parseFloat(o.dateend),
+  objectstatus: parseObjectOrArray(o.objectstatus.objectstatus, parseText),
+  creditlines: parseObjectOrArray(o.creditlines, parseText),
+  mediums: parseObjectOrArray(o.mediums, parseText),
+  dimensions: parseObjectOrArray(o.dimensions, parseText),
+  areacategories: parseObjectOrArray(o.areacategories.areacategory, parseAreaCategory),
+  authors: parseObjectOrArray(o.authors, parseAuthors)[0],
+  medias: parseObjectOrArray(o.medias, parseMedia),
+  titles: parseObjectOrArray(o.titles, parseText),
+  dated: o.dated,
+  exhibitions: parseObjectOrArray(o.exhibitions, parseExhibition),
+  copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
+  summaries: parseObjectOrArray(o.summaries, parseText)
+})
+
+const parseJsonObject = (type, jsonobject) => {
+  switch (type) {
+    case 'object':
+      return parseObject(jsonobject)
+  }
+}
+
 const tmsxmljson2cleanjson = (tmsxmljson, callback) => {
-  const cleanjson = tmsxmljson.objects.object.map(o => ({
-    id: parseInt(o.id),
-    objectnumber: parseFloat(o.objectnumber),
-    datebegin: parseFloat(o.datebegin),
-    dateend: parseFloat(o.dateend),
-    objectstatus: parseObjectOrArray(o.objectstatus.objectstatus, parseText),
-    creditlines: parseObjectOrArray(o.creditlines, parseText),
-    mediums: parseObjectOrArray(o.mediums, parseText),
-    dimensions: parseObjectOrArray(o.dimensions, parseText),
-    areacategories: parseObjectOrArray(o.areacategories.areacategory, parseAreaCategory),
-    authors: parseObjectOrArray(o.authors, parseAuthors)[0],
-    medias: parseObjectOrArray(o.medias, parseMedia),
-    titles: parseObjectOrArray(o.titles, parseText),
-    dated: o.dated,
-    exhibitions: parseObjectOrArray(o.exhibitions, parseExhibition),
-    copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
-    summaries: parseObjectOrArray(o.summaries, parseText)
-  }))
+  const index = Object.keys(tmsxmljson)[0]
+  const [type, objects] = Object.entries(tmsxmljson[index])[0]
+
+  const cleanjson = {
+    [index]: objects.map(object => ({ [type]: parseJsonObject(type, object) }))
+  }
 
   callback(null, cleanjson)
 }

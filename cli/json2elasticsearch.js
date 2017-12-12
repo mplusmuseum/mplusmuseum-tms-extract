@@ -20,7 +20,8 @@ async function getArtisanalIdFromTmsId (tmsid) {
   }
 }
 
-async function addToElasticSearch (object) {
+async function addToElasticSearch (index, type, object) {
+  console.log(object)
   const tmsid = object.id
 
   if (!tmsid) {
@@ -30,21 +31,11 @@ async function addToElasticSearch (object) {
   const id = await getArtisanalIdFromTmsId(tmsid)
   console.log(`tmsid ${tmsid} => id ${id}`)
 
-  const index = 'mplusmuseum'
-  const type = 'artwork'
-
   object.tmsid = tmsid
   object.id = id
 
-  const exists = await esclient.exists({index, type, id})
-
-  if (exists) {
-    esclient.upsert({index, type, id, doc: object, doc_as_upsert: true})
-      .then(console.log('upserted'))
-  } else {
-    esclient.create({index, type, id, body: object})
-      .then(console.log('created'))
-  }
+  esclient.update({index, type, id, body: { doc: object, doc_as_upsert: true }})
+    .then('updated')
 }
 
 module.exports = {
@@ -52,11 +43,26 @@ module.exports = {
     getStdin()
       .then(jsonstring => {
         const json = JSON.parse(jsonstring)
-        if (Array.isArray(json)) {
-          json.forEach(addToElasticSearch)
-        } else if (json.id) {
-          addToElasticSearch(json)
-        }
+        const index = Object.keys(json)[0]
+        const objects = json[index]
+        const type = Object.keys(objects[0])[0]
+
+        addToElasticSearch(index, type, objects[0].object)
+          /*
+        esclient.indices.exists({index}).then(exists => {
+          if (exists) {
+            objects.forEach(object => {
+              addToElasticSearch(index, type, object.object)
+            })
+          } else {
+            esclient.indices.create({index}).then(() => {
+              objects.forEach(object => {
+                addToElasticSearch(index, type, object.object)
+              })
+            })
+          }
+        })
+        */
       })
       .catch(error => {
         console.error(error)
