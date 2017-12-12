@@ -21,7 +21,6 @@ async function getArtisanalIdFromTmsId (tmsid) {
 }
 
 async function addToElasticSearch (index, type, object) {
-  console.log(object)
   const tmsid = object.id
 
   if (!tmsid) {
@@ -47,8 +46,6 @@ module.exports = {
         const objects = json[index]
         const type = Object.keys(objects[0])[0]
 
-        addToElasticSearch(index, type, objects[0].object)
-          /*
         esclient.indices.exists({index}).then(exists => {
           if (exists) {
             objects.forEach(object => {
@@ -62,7 +59,6 @@ module.exports = {
             })
           }
         })
-        */
       })
       .catch(error => {
         console.error(error)
