@@ -6,8 +6,8 @@ alchemia is a tool to work with tms-xml files
 
     $ cp config.json.example config.json
     $ yarn
-    $ yarn start --silent convert < ExportForDAM_Objects_UCS.xml > objects.json
-    $ yarn start ingest < objects.json
+    $ yarn run --silent convert < ExportForDAM_Objects_UCS.xml > objects.json
+    $ yarn run start ingest < objects.json
 
 ### elasticsearch
 

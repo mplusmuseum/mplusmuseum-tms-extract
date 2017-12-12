@@ -1,7 +1,7 @@
 {
   "elasticsearch": {
-    "host": "localhost",
-    "port": "9200",
-    "index": "objects"
-  }
+    "client": {
+      "host": "localhost",
+      "port": "9200",
+    }
 }
