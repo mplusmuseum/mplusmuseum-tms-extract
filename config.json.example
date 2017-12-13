@@ -1,7 +1,6 @@
 {
   "elasticsearch": {
     "client": {
-      "host": "localhost",
-      "port": "9200",
+      "host": "localhost:9200"
     }
 }
