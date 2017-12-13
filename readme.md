@@ -45,6 +45,7 @@ To convert a tms-xml to json, try
 
 ### Ingest json to elasticsearch
 
-Lets say you are happy with the output, maybe ingest it to an elasticsearch instance
+Lets say you are happy with the output, maybe ingest it to an elasticsearch instance.
+The index will be deleted and recreated, and is named the same as whatever collection is in `<exportForDAM>`.
 
     $ yarn start ingest < objects.json
