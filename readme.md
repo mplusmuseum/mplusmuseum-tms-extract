@@ -9,6 +9,17 @@ alchemia is a tool to work with tms-xml files
     $ yarn run --silent convert < ExportForDAM_Objects_UCS.xml > objects.json
     $ yarn run start ingest < objects.json
 
+### design
+
+We expect one collection type per XML file, and will create a new index for each collection type.
+For example
+```xml
+  <exportForDAM><objects><object id=123>blah</object><object id=876>bloo</object></objects></exportForDAM>`
+```
+
+Will create an elasticsearch index named `objects`, with type `object`.
+
+
 ### help
 
 Using `yarn start` or `yarn start --help` will show the help
