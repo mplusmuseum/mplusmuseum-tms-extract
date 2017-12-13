@@ -46,18 +46,20 @@ module.exports = {
         const objects = json[index]
         const type = Object.keys(objects[0])[0]
 
-        esclient.indices.exists({index}).then(exists => {
-          if (exists) {
-            objects.forEach(object => {
-              addToElasticSearch(index, type, object.object)
-            })
-          } else {
-            esclient.indices.create({index}).then(() => {
-              objects.forEach(object => {
-                addToElasticSearch(index, type, object.object)
+        esclient.indices.delete({index}).then(_ => {
+          esclient.indices.create({index}).then(_ => {
+            const body = [].concat.apply([],
+              objects.map(object => {
+                return [
+                  { update: { _id: object.object.id } },
+                  { doc: object.object, doc_as_upsert: true }
+                ]
               })
+            )
+            esclient.bulk({body, type, index}).then((err, resp) => {
+              if (err) { console.error(err) }
             })
-          }
+          })
         })
       })
       .catch(error => {

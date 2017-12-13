@@ -9,13 +9,6 @@ alchemia is a tool to work with tms-xml files
     $ yarn run --silent convert < ExportForDAM_Objects_UCS.xml > objects.json
     $ yarn run start ingest < objects.json
 
-### elasticsearch
-
-macOS only allows 256 open files at once, lets give elasticsearch more:
-
-    $ launchctl limit maxfiles 64000 524288
-    $ ES_JAVA_OPTS="-XX:-MaxFDLimit" elasticsearch
-
 ### help
 
 Using `yarn start` or `yarn start --help` will show the help
