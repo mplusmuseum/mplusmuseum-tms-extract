@@ -69,7 +69,7 @@ module.exports = {
                     takes a json object or objects, adds an artisanal id, and updates in elasticsearch
     usage:
 
-        yarn run tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml | yarn run json2elasticsearch`)
+        yarn run --silent start tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml | yarn run start json2elasticsearch`)
       })
   }
 }

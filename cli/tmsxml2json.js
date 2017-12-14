@@ -119,7 +119,7 @@ module.exports = {
 
     usage:
 
-        yarn start < ../data/ExportForDAM_Objects_UCS.xml`)
+        yarn run --silent start tmsxml2json < ../data/ExportForDAM_Objects_UCS.xml`)
       })
   }
 }
