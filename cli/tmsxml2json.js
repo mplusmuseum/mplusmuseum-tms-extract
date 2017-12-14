@@ -11,7 +11,7 @@ const parser = new xml2js.Parser({
 const parseText = text => ({text: text._, lang: text.lang})
 
 const parseObjectOrArray = (obj, fn) => {
-  if (obj === null) return null
+  if (obj === null || obj === undefined) return null
   if (Array.isArray(obj)) return obj.map(fn)
   if (typeof obj === 'object') return Object.values(obj).map(fn)
 }
@@ -30,6 +30,14 @@ const parseMedia = media => ({
 
 const parseAuthors = authors => {
   return parseObjectOrArray(authors, parseAuthor)
+}
+
+const parseTitles = titles => {
+  if (Array.isArray(titles)) {
+    return parseObjectOrArray(titles, parseText)
+  } else {
+    return parseText(titles)
+  }
 }
 
 const parseAuthor = author => {
@@ -74,7 +82,7 @@ const parseObject = o => ({
   areacategories: parseObjectOrArray(o.areacategories.areacategory, parseAreaCategory),
   authors: parseObjectOrArray(o.authors, parseAuthors),
   medias: parseObjectOrArray(o.medias, parseMedia),
-  titles: parseObjectOrArray(o.titles, parseText),
+  titles: parseObjectOrArray(o.titles, parseTitles),
   dated: o.dated,
   exhibitions: parseObjectOrArray(o.exhibitions, parseExhibition),
   copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
