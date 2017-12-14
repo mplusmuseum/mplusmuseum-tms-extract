@@ -72,7 +72,7 @@ const parseObject = o => ({
   mediums: parseObjectOrArray(o.mediums, parseText),
   dimensions: parseObjectOrArray(o.dimensions, parseText),
   areacategories: parseObjectOrArray(o.areacategories.areacategory, parseAreaCategory),
-  authors: parseObjectOrArray(o.authors, parseAuthors)[0],
+  authors: parseObjectOrArray(o.authors, parseAuthors),
   medias: parseObjectOrArray(o.medias, parseMedia),
   titles: parseObjectOrArray(o.titles, parseText),
   dated: o.dated,
