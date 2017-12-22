@@ -46,7 +46,15 @@ module.exports = {
         const objects = json[index]
         const type = Object.keys(objects[0])[0]
 
-        esclient.indices.delete({index}).then(_ => {
+        esclient.indices.exists({index}).then(exists => {
+          if (exists) {
+            esclient.indices.delete({index}).then(createIndex(index, type))
+          } else {
+            createIndex(index, type)
+          }
+        })
+
+        const createIndex = function (index, type) {
           esclient.indices.create({index}).then(_ => {
             const body = [].concat.apply([],
               objects.map(object => {
@@ -60,7 +68,7 @@ module.exports = {
               if (err) { console.error(err) }
             })
           })
-        })
+        }
       })
       .catch(error => {
         console.error(error)
