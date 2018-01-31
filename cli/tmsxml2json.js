@@ -24,7 +24,7 @@ const parseAreaCategory = areacategory => ({
 
 const parseMedia = media => ({
   rank: parseInt(media.rank),
-  primarydisplay: parseInt(media.primarydisplay),
+  primarydisplay: parseInt(media.primarydisplay) === 1,
   filename: media.filename
 })
 
