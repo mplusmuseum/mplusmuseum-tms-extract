@@ -61,11 +61,13 @@ Using `yarn start` or `yarn start --help` will show the help
 
 ### Admin web page
 
-There is the very start of a stub of a web admin page. It currently doesn't do anything, but you get it up and running you'll need to run the following commands.
+There is the very start of a stub of a web admin page. It currently doesn't do anything, but you get it up and running you'll need to run the following commands. You'll also need to create a htpasswd file to add auth to the site.
 
 ```bash
 npm install
 npm run init
+npm install -g htpasswd
+htpasswd -bc htpasswd [username] [password]
 ```
 
 That will run the initial build, after that on your development machine run...

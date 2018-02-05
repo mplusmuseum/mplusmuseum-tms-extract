@@ -18,3 +18,5 @@ app/public/stylesheets/*.css
 ExportForMPlus_Objects_UCS.xml
 
 config.json
+
+htpasswd
