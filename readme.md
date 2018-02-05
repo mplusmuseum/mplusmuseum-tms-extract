@@ -13,6 +13,7 @@ alchemia is a tool to work with tms-xml files
 
 We expect one collection type per XML file, and will create a new index for each collection type.
 For example
+
 ```xml
   <exportForDAM><objects><object id=123>blah</object><object id=876>bloo</object></objects></exportForDAM>`
 ```
@@ -25,7 +26,7 @@ To convert a tms-xml to json, try
 
     $ yarn run --silent start convert < ../data/ExportForDAM_Objects_UCS.xml > objects.json
 
-*Note*: the `--silent` is important, because yarn outputs a bit too much info normally
+_Note_: the `--silent` is important, because yarn outputs a bit too much info normally
 
 ### Ingest json to elasticsearch
 
@@ -58,3 +59,16 @@ Using `yarn start` or `yarn start --help` will show the help
       convert   Convert TMS-XML to json
       ingest    Ingest json to elasticsearch
 
+### Admin web page
+
+There is the very start of a stub of a web admin page. It currently doesn't do anything, but you get it up and running you'll need to run the following commands.
+
+```npm install
+npm run init
+```
+
+That will run the initial build, after that on your development machine run...
+
+`npm run go`
+
+When deploying to production use the `npm install` & `npm run init` commands the 1st time, and use PM2 to run the site. After that `git pull`, `npm run build:prod` and `pm2 restart [name]` to rebuild the code and restart it with pm2.
