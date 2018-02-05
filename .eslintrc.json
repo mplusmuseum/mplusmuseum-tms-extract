@@ -1,0 +1,22 @@
+{
+  "env": {
+    "es6": true,
+    "browser": true,
+    "jquery": true
+  },
+  "extends": "airbnb-base",
+  "rules": {
+    "no-console": 0,
+    "max-len": [2, 80, 2],
+    "import/extensions": ["off", "never"]
+  },
+  "plugins": ["html", "node"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".es"],
+        "moduleDirectory": ["./src", "node_modules"]
+      }
+    }
+  }
+}

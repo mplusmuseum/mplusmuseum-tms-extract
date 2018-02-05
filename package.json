@@ -5,15 +5,37 @@
   "author": "Jonathan Dahan <hi@jonathan.is>",
   "license": "MIT",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "colors": "^1.1.2",
     "commander": "^2.11.0",
+    "compass": "^0.1.1",
+    "del": "^3.0.0",
+    "dotenv": "^5.0.0",
     "elasticsearch": "^13.3.1",
+    "express": "^4.14.0",
+    "express-handlebars": "^3.0.0",
     "get-stdin": "^5.0.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0",
+    "gulp-cli": "^1.4.0",
+    "http-auth": "^3.2.3",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "standard": "^10.0.3"
+    "babel-preset-airbnb": "^2.4.0",
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-html": "^4.0.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "nodemon": "^1.14.10",
+    "parallelshell": "^3.0.2",
+    "run-sequence": "^2.2.0",
+    "standard": "^10.0.3",
+    "watch-run": "^1.2.5"
   },
   "bin": {
     "alchemia": "cli/index.js"
@@ -22,6 +44,15 @@
     "start": "node --harmony cli/index.js",
     "tmsxml2json": "node --harmony cli/tmsxml2json.js",
     "json2elasticsearch": "node --harmony cli/json2elasticsearch.js",
-    "test": "standard"
+    "test": "standard",
+    "gulp": "gulp",
+    "init": "babel gulpfile.es -o gulpfile.js && npm run build:prod",
+    "build:prod": "npm run gulp && npm run build:prod:css",
+    "build:prod:css": "compass compile",
+    "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
+    "build:dev:css": "compass watch",
+    "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
+    "start:dev": "nodemon server.js -i app/public/scripts",
+    "go": "parallelshell 'npm run build:dev' 'npm run start:dev'"
   }
 }
