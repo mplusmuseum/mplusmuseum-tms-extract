@@ -63,7 +63,8 @@ Using `yarn start` or `yarn start --help` will show the help
 
 There is the very start of a stub of a web admin page. It currently doesn't do anything, but you get it up and running you'll need to run the following commands.
 
-```npm install
+```bash
+npm install
 npm run init
 ```
 
