@@ -183,10 +183,5 @@ const processXML = async (xml) => {
 };
 
 const tmsxml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
-try {
-  processXML(tmsxml);
-  console.log('Done');
-} catch (er) {
-  console.error('Something went wrong while parsing!');
-  console.error(er);
-}
+processXML(tmsxml);
+console.log('Done');
