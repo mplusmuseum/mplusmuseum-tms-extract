@@ -10,6 +10,8 @@ app/helpers
 app/routes
 app/modules
 app/cli
+app/data/objects/ingest
+app/data/objects/json
 server.js
 
 app/public/stylesheets/*.css
