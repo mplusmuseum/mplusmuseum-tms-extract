@@ -1,6 +1,7 @@
 const xml2js = require('xml2js');
 const colours = require('colors');
 const fs = require('fs');
+const config = require('../../../config.json');
 
 colours.setTheme({
   info: 'green',
@@ -27,18 +28,12 @@ scratch disk.
 */
 const dataDir = `${rootDir}/app/data`;
 const xmlDir = `${dataDir}/xml`;
-const objectsDir = `${dataDir}/objects`;
-const jsonDir = `${objectsDir}/json`;
-const ingestDir = `${objectsDir}/ingest`;
+const tsmDir = `${dataDir}/tsm`;
+
 // Make sure all the folders we need to use exist
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 if (!fs.existsSync(xmlDir)) fs.mkdirSync(xmlDir);
-if (!fs.existsSync(objectsDir)) fs.mkdirSync(objectsDir);
-if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir);
-if (!fs.existsSync(ingestDir)) fs.mkdirSync(ingestDir);
-
-//  TODO: the source file may be fed in or fetched from somewhere else
-const sourceFile = 'ExportForMPlus_Objects_UCS.xml';
+if (!fs.existsSync(tsmDir)) fs.mkdirSync(tsmDir);
 
 /*
 These are all the cool parse functions to get the data into the right format
@@ -132,56 +127,91 @@ const parseJsonObject = (type, jsonobject) => {
   }
 };
 
-/*
-This is where we check to see if the directory that the source XML files
-should be put in.
-*/
-console.log('Checking for XML directory'.info);
-if (!fs.existsSync(xmlDir)) {
-  console.log('There is no /app/data/xml folder.'.alert);
-  console.log('Create the folder and add the XML files'.alert);
-  process.exit(1);
-}
-console.log('We have the source directory'.info);
+/**
+ * This converts an xml chunk into the JSON format we want
+ * @param {string} xml the xml text we want to have parsed
+ * @return {Object} the JSON obeject representation of the xml
+ */
+const parseString = async (xml) => {
+  try {
+    const json = await new Promise((resolve, reject) =>
+      parser.parseString(xml, (err, result) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(result);
+      }));
+    const index = Object.keys(json)[0];
+    const [type, objects] = Object.entries(json[index])[0];
+    const cleanjson = {
+      [index]: objects.map(object => ({
+        [type]: parseJsonObject(type, object),
+      })),
+    };
+    return cleanjson;
+  } catch (err) {
+    return null;
+  }
+  /*
+  */
+};
 
-/*
-Now we check to see if we have the XML file in there.
-*/
-console.log('Checking for XML file'.info);
-if (!fs.existsSync(`${xmlDir}/${sourceFile}`)) {
-  console.log(`Missing file: ${sourceFile}`.alert);
-  process.exit(1);
-}
-console.log('We have the source XML file'.info);
+/**
+ * This is going to split the json into individual item to dump down to disk.
+ * Actually it's going to do a bit more than that, so we should probably rename
+ * it at some point. This takes the JSON and breaks it down into each item,
+ * which we _will_ check to see if we already have. If we don't it'll be new,
+ * and need to be ingested. If it's different it'll need to be updated. But
+ * if we already have it we don't have to ingest it.
+ * @param {string} source   the string defining the source type (from config)
+ * @param {Object} items    the collection of items to be split up
+ */
+const splitJson = (source, items) => {
+  //  We need to make sure the folder we are going to spit these out into
+  //  exists
+  const outputDir = `${tsmDir}/${source}`;
+  const jsonDir = `${outputDir}/json`;
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+  if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir);
 
-/*
-Here we read in the XML file and spit out individual converted JSON files
-*/
-const processXML = async (xml) => {
-  const tmsxmljson = await new Promise((resolve, reject) =>
-    parser.parseString(xml, (err, result) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(result);
-    }));
-  const index = Object.keys(tmsxmljson)[0];
-  const [type, objects] = Object.entries(tmsxmljson[index])[0];
-  const cleanjson = {
-    [index]: objects.map(object => ({ [type]: parseJsonObject(type, object) })),
-  };
-
-  //  Now I want to write out the files
-  cleanjson.objects.forEach((object) => {
-    const objectJSONPretty = JSON.stringify(object.object, null, 4);
+  //  Now loop through the items writing out the XML files
+  //  TODO: Here I'm hardcoding the name of the node we want to pull out
+  //  as we start dealing with other collections we'll define this based
+  //  on the source
+  const seekRoot = 'object';
+  items.forEach((item) => {
+    const objectJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     fs.writeFileSync(
-      `${jsonDir}/object_${object.object.id}.json`,
+      `${jsonDir}/id_${item[seekRoot].id}.json`,
       objectJSONPretty,
       'utf-8',
     );
   });
 };
 
-const tmsxml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
-processXML(tmsxml);
+/**
+ * This kicks off the process of looking for the XML and converting it
+ * to json.
+ * @return {Boolean}
+ */
+const processXML = async () => {
+  //  Check that we have the xml defined in the config
+  if (!('xml' in config)) {
+    console.error("No 'xml' element defined in config");
+    return false;
+  }
+
+  //  Loop through them doing the xml conversion for each one
+  const sources = Object.entries(config.xml);
+  sources.forEach(async (s) => {
+    const source = s[0];
+    const sourceFile = s[1];
+    const xml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
+    const json = await parseString(xml);
+    splitJson(source, json.objects);
+  });
+  return true;
+};
+
+processXML();
 console.log('Done');

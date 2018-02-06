@@ -1,5 +1,8 @@
 {
   "elasticsearch": {
     "host": "localhost:9200"
+  },
+  "xml": {
+    "objects": "objects_xml_file.xml"
   }
 }
