@@ -1,4 +1,5 @@
 const xml2js = require('xml2js');
+const { pd } = require('pretty-data');
 const colours = require('colors');
 const fs = require('fs');
 const config = require('../../../config.json');
@@ -48,7 +49,7 @@ if (config.onLambda) {
 /**
  * This converts an xml chunk into the JSON format we want
  * @param {string} xml the xml text we want to have parsed
- * @return {Object} the JSON obeject representation of the xml
+ * @returns {Object} the JSON obeject representation of the xml
  */
 const parseString = async (source, xml) => {
   try {
@@ -94,13 +95,14 @@ const parseString = async (source, xml) => {
  * if we already have it we don't have to ingest it.
  * @param {string} source   the string defining the source type (from config)
  * @param {Object} items    the collection of items to be split up
+ * @returns {number}        how many json items we found
  */
 const splitJson = (source, items) => {
   //  We need to make sure the folder we are going to spit these out into
   //  exists
   if (config.onLambda) {
     console.error('We need Lambda code here');
-    return;
+    return 0;
   }
   const outputDir = `${tsmDir}/${source}`;
   const jsonDir = `${outputDir}/json`;
@@ -112,6 +114,7 @@ const splitJson = (source, items) => {
   //  as we start dealing with other collections we'll define this based
   //  on the source
   const seekRoot = 'object';
+  let counter = 0;
   items.forEach((item) => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     fs.writeFileSync(
@@ -119,13 +122,55 @@ const splitJson = (source, items) => {
       itemJSONPretty,
       'utf-8',
     );
+    counter += 1;
   });
+  return counter;
 };
 
 /**
+ * This splits the XML into individual parts and saves them to disk, using
+ * _very_ ropey splits rather than anything clever. It should be good enough
+ * for the moment
+ * @param {string} source   the string defining the source type (from config)
+ * @param {string} xml      the xml to split up
+ * @returns {number}        how many xml items we found
+ */
+const splitXml = (source, xml) => {
+  //  We need to make sure the folder we are going to spit these out into
+  //  exists
+  if (config.onLambda) {
+    console.error('We need Lambda code here');
+    return 0;
+  }
+  const outputDir = `${tsmDir}/${source}`;
+  const outxmlDir = `${outputDir}/xml`;
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+  if (!fs.existsSync(outxmlDir)) fs.mkdirSync(outxmlDir);
+
+  //  THIS IS BAD HARDCODED CODE BASED ON EXTERNAL SPECIFICATIONS
+  const trimmedXml = xml
+    .trim()
+    .replace('<ExportForMPlus><objects>', '')
+    .replace('</objects></ExportForMPlus>', '')
+    .replace('<?xml version="1.0" encoding="utf-8"?>', '');
+  const xmls = trimmedXml.split('</object>').map(chunk => `${chunk}</object>`);
+
+  //  Now dump all the xml files
+  let counter = 0;
+  xmls.forEach((fragment) => {
+    //  Because this is easier than REGEX ;)
+    const id = fragment.split('"')[1];
+    if (id) {
+      fs.writeFileSync(`${outxmlDir}/id_${id}.xml`, pd.xml(fragment), 'utf-8');
+      counter += 1;
+    }
+  });
+  return counter;
+};
+/**
  * This kicks off the process of looking for the XML and converting it
  * to json.
- * @return {Boolean}
+ * @return {Object} contains counts of converted files
  */
 const processXML = async () => {
   //  Check that we have the xml defined in the config
@@ -135,18 +180,40 @@ const processXML = async () => {
   }
 
   //  Loop through them doing the xml conversion for each one
-  const sources = Object.entries(config.xml);
-  sources.forEach(async (s) => {
-    const source = s[0];
-    const sourceFile = s[1];
-    const xml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
-    const json = await parseString(source, xml);
-    //  TODO: This may not be "json.objects" when we start using different
-    //  xml imports
-    splitJson(source, json.objects);
-  });
-  return true;
+  //  NOTE: we are looping this way because we are firing off an `await`
+  //  which modifies our counts object, so we're going to "sequentially"
+  //  await the responses
+  const sources = Object.entries(config.xml).map(v => v[0]);
+  const counts = {};
+  /* eslint-disable no-await-in-loop */
+  for (let i = 0; i < sources.length; i += 1) {
+    const source = sources[i];
+    const sourceFile = config.xml[source];
+    counts[source] = {
+      file: sourceFile,
+    };
+
+    //  TODO: Error check that the file actually exists
+    if (fs.existsSync(`${xmlDir}/${sourceFile}`)) {
+      const xml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
+      const json = await parseString(source, xml);
+      //  TODO: This may not be "json.objects" when we start using different
+      //  xml imports
+      counts[source].jsonCount = splitJson(source, json.objects);
+      counts[source].xmlCount = splitXml(source, xml);
+    } else {
+      counts[source].jsonCount = -1;
+      counts[source].xmlCount = -1;
+    }
+  }
+  /* eslint-enable no-await-in-loop */
+
+  return counts;
 };
 
-processXML();
-console.log('Done');
+const start = async () => {
+  const counts = await processXML();
+  console.log('Done:');
+  console.log(counts);
+};
+start();

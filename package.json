@@ -20,6 +20,7 @@
     "gulp-babel": "^7.0.0",
     "gulp-cli": "^1.4.0",
     "http-auth": "^3.2.3",
+    "pretty-data": "^0.40.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "xml2js": "^0.4.19"
@@ -49,8 +50,7 @@
     "init": "babel gulpfile.es -o gulpfile.js && npm run build:prod",
     "build:prod": "npm run gulp && npm run build:prod:css",
     "build:prod:css": "compass compile",
-    "build:dev":
-      "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
+    "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
     "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
     "start:dev": "nodemon server.js -i app/public/scripts -i app/data",
