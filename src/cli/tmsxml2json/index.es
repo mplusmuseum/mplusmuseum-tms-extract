@@ -2,6 +2,7 @@ const xml2js = require('xml2js');
 const colours = require('colors');
 const fs = require('fs');
 const config = require('../../../config.json');
+const parseObject = require('./parsers/object');
 
 colours.setTheme({
   info: 'green',
@@ -26,113 +27,30 @@ const rootDir = process.cwd();
 TODO: If we are using AWS Lambda then all of this has to go into the /tmp
 scratch disk.
 */
-const dataDir = `${rootDir}/app/data`;
-const xmlDir = `${dataDir}/xml`;
-const tsmDir = `${dataDir}/tsm`;
+let dataDir = null;
+let xmlDir = null;
+let tsmDir = null;
 
-// Make sure all the folders we need to use exist
-if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
-if (!fs.existsSync(xmlDir)) fs.mkdirSync(xmlDir);
-if (!fs.existsSync(tsmDir)) fs.mkdirSync(tsmDir);
+if (config.onLambda) {
+  console.error('We need Lambda code here');
+  process.exit(1);
+} else {
+  dataDir = `${rootDir}/app/data`;
+  xmlDir = `${dataDir}/xml`;
+  tsmDir = `${dataDir}/tsm`;
 
-/*
-These are all the cool parse functions to get the data into the right format
-*/
-const parseText = text => ({ text: text._, lang: text.lang });
-
-const parseObjectOrArray = (obj, fn) => {
-  if (obj === null || obj === undefined) return null;
-  if (Array.isArray(obj)) return obj.map(fn);
-  if (typeof obj === 'object') return Object.values(obj).map(fn);
-  return null;
-};
-
-const parseAreaCategory = areacategory => ({
-  rank: parseInt(areacategory.rank, 10),
-  type: areacategory.type,
-  areacat: areacategory.areacat ? areacategory.areacat.map(parseText) : null,
-});
-
-const parseMedia = media => ({
-  rank: parseInt(media.rank, 10),
-  primarydisplay: parseInt(media.primarydisplay, 10) === 1,
-  filename: media.filename,
-});
-
-const parseTitles = (titles) => {
-  if (Array.isArray(titles)) {
-    return parseObjectOrArray(titles, parseText);
-  }
-  return parseText(titles);
-};
-
-const parseAuthor = author => ({
-  rank: parseInt(author.rank, 10),
-  author: parseInt(author.author, 10),
-  authornameid: parseInt(author.authornameid, 10),
-  nationality: author.nationality,
-  name: author.name,
-  birthyear_yearformed: parseInt(author.birthyear_yearformed, 10),
-  deathyear: parseInt(author.deathyear, 10),
-  roles: parseObjectOrArray(author.roles, parseText),
-});
-
-const parseAuthors = authors => parseObjectOrArray(authors, parseAuthor);
-
-const parseDate = date => new Date(date);
-
-const parseVenue = venue => ({
-  begindate: parseDate(venue.begindate),
-  enddate: parseDate(venue.enddate),
-  name: parseObjectOrArray(venue.name, parseText),
-});
-
-const parseVenues = venues => parseObjectOrArray(venues, parseVenue);
-
-const parseExhibition = exhibition => ({
-  begindate: parseDate(exhibition.begindate),
-  enddate: parseDate(exhibition.enddate),
-  title: exhibition.title ? parseText(exhibition.title.title) : null,
-  venues: parseObjectOrArray(exhibition.venues, parseVenues),
-});
-
-const parseObject = o => ({
-  id: parseInt(o.id, 10),
-  objectnumber: o.objectnumber,
-  datebegin: parseFloat(o.datebegin),
-  dateend: parseFloat(o.dateend),
-  objectstatus: parseObjectOrArray(o.objectstatus.objectstatus, parseText),
-  creditlines: parseObjectOrArray(o.creditlines, parseText),
-  mediums: parseObjectOrArray(o.mediums, parseText),
-  dimensions: parseObjectOrArray(o.dimensions, parseText),
-  areacategories: parseObjectOrArray(
-    o.areacategories.areacategory,
-    parseAreaCategory,
-  ),
-  authors: parseObjectOrArray(o.authors, parseAuthors),
-  medias: parseObjectOrArray(o.medias, parseMedia),
-  titles: parseObjectOrArray(o.titles, parseTitles),
-  dated: o.dated,
-  exhibitions: parseObjectOrArray(o.exhibitions, parseExhibition),
-  copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
-  summaries: parseObjectOrArray(o.summaries, parseText),
-});
-
-const parseJsonObject = (type, jsonobject) => {
-  switch (type) {
-    case 'object':
-      return parseObject(jsonobject);
-    default:
-      return null;
-  }
-};
+  // Make sure all the folders we need to use exist
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+  if (!fs.existsSync(xmlDir)) fs.mkdirSync(xmlDir);
+  if (!fs.existsSync(tsmDir)) fs.mkdirSync(tsmDir);
+}
 
 /**
  * This converts an xml chunk into the JSON format we want
  * @param {string} xml the xml text we want to have parsed
  * @return {Object} the JSON obeject representation of the xml
  */
-const parseString = async (xml) => {
+const parseString = async (source, xml) => {
   try {
     const json = await new Promise((resolve, reject) =>
       parser.parseString(xml, (err, result) => {
@@ -141,11 +59,22 @@ const parseString = async (xml) => {
         }
         resolve(result);
       }));
+
+    //  Select the parser to use based on the source
+    let parserLib = null;
+    switch (source) {
+      case 'object':
+        parserLib = parseObject;
+        break;
+      default:
+        parserLib = parseObject;
+    }
+
     const index = Object.keys(json)[0];
     const [type, objects] = Object.entries(json[index])[0];
     const cleanjson = {
       [index]: objects.map(object => ({
-        [type]: parseJsonObject(type, object),
+        [type]: parserLib.parseJson(object),
       })),
     };
     return cleanjson;
@@ -169,6 +98,10 @@ const parseString = async (xml) => {
 const splitJson = (source, items) => {
   //  We need to make sure the folder we are going to spit these out into
   //  exists
+  if (config.onLambda) {
+    console.error('We need Lambda code here');
+    return;
+  }
   const outputDir = `${tsmDir}/${source}`;
   const jsonDir = `${outputDir}/json`;
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
@@ -180,10 +113,10 @@ const splitJson = (source, items) => {
   //  on the source
   const seekRoot = 'object';
   items.forEach((item) => {
-    const objectJSONPretty = JSON.stringify(item[seekRoot], null, 4);
+    const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     fs.writeFileSync(
       `${jsonDir}/id_${item[seekRoot].id}.json`,
-      objectJSONPretty,
+      itemJSONPretty,
       'utf-8',
     );
   });
@@ -207,7 +140,9 @@ const processXML = async () => {
     const source = s[0];
     const sourceFile = s[1];
     const xml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
-    const json = await parseString(xml);
+    const json = await parseString(source, xml);
+    //  TODO: This may not be "json.objects" when we start using different
+    //  xml imports
     splitJson(source, json.objects);
   });
   return true;

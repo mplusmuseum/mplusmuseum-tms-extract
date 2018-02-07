@@ -4,5 +4,6 @@
   },
   "xml": {
     "objects": "objects_xml_file.xml"
-  }
+  },
+  "onLambda": false,
 }
