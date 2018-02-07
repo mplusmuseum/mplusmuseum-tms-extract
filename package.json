@@ -49,10 +49,11 @@
     "init": "babel gulpfile.es -o gulpfile.js && npm run build:prod",
     "build:prod": "npm run gulp && npm run build:prod:css",
     "build:prod:css": "compass compile",
-    "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
+    "build:dev":
+      "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
     "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
-    "start:dev": "nodemon server.js -i app/public/scripts",
+    "start:dev": "nodemon server.js -i app/public/scripts -i app/data",
     "go": "parallelshell 'npm run build:dev' 'npm run start:dev'"
   }
 }
