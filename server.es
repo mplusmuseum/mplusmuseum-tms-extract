@@ -5,6 +5,7 @@ const exphbs = require('express-handlebars');
 const routes = require('./app/routes');
 const helpers = require('./app/helpers');
 const http = require('http');
+const bodyParser = require('body-parser');
 
 const auth = require('http-auth');
 
@@ -35,11 +36,15 @@ app.engine('html', hbs.engine);
 app.set('view engine', 'html');
 app.set('views', `${__dirname}/app/templates`);
 app.use(express.static(`${__dirname}/app/public`, { 'no-cache': true }));
-
-// app.use express.favicon __dirname + '/public/img/favicon.ico'
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+  extended: true,
+})); // app.use express.favicon __dirname + '/public/img/favicon.ico'
 // app.use express.logger 'dev'
 
 app.get('/', routes.main.index);
+app.post('/', routes.main.index);
+app.get('/object/:id', routes.object.index);
 
 app.use((request, response) => {
   console.error('ERROR!!');

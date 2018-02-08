@@ -2,6 +2,9 @@
   "elasticsearch": {
     "host": "localhost:9200"
   },
+  "graphql": {
+    "host": "localhost:3000"
+  },
   "xml": {
     "objects": "objects_xml_file.xml"
   },
