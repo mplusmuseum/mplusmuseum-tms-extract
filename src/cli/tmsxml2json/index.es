@@ -2,6 +2,7 @@ const xml2js = require('xml2js');
 const { pd } = require('pretty-data');
 const colours = require('colors');
 const fs = require('fs');
+const crypto = require('crypto');
 const config = require('../../../config.json');
 const parseObject = require('./parsers/object');
 
@@ -87,6 +88,46 @@ const parseString = async (source, xml) => {
 };
 
 /**
+ * This goes and fetches the hash table for this source type, if there is
+ * no hash table it creates one
+ *
+ * @param {string} source   the string defining the source type (from config)
+ * @returns {Object}        The Hash fetchHashTable
+ */
+const fetchHashTable = async (source) => {
+  if (config.onLambda) {
+    //  TODO: Fetch hash table from remote source
+    return {};
+  }
+  const sourceDir = `${tsmDir}/${source}`;
+  const hsFile = `${sourceDir}/hash_table.json`;
+  if (fs.existsSync(hsFile)) {
+    const hashTable = fs.readFileSync(hsFile, 'utf-8');
+    return JSON.parse(hashTable);
+  }
+
+  return {};
+};
+
+/**
+ * This stores the hash table for this source type.
+ *
+ * @param {string} source     the string defining the source type (from config)
+ * @param {Object} hashTable  The hasTable to store
+ */
+const storeHashTable = async (source, hashTable) => {
+  if (config.onLambda) {
+    //  TODO: Fetch hash table from remote source
+  } else {
+    const sourceDir = `${tsmDir}/${source}`;
+    const hsFile = `${sourceDir}/hash_table.json`;
+    const hashTableJSONPretty = JSON.stringify(hashTable, null, 4);
+    if (!fs.existsSync(sourceDir)) fs.mkdirSync(sourceDir);
+    fs.writeFileSync(hsFile, hashTableJSONPretty, 'utf-8');
+  }
+};
+
+/**
  * This is going to split the json into individual item to dump down to disk.
  * Actually it's going to do a bit more than that, so we should probably rename
  * it at some point. This takes the JSON and breaks it down into each item,
@@ -97,7 +138,7 @@ const parseString = async (source, xml) => {
  * @param {Object} items    the collection of items to be split up
  * @returns {number}        how many json items we found
  */
-const splitJson = (source, items) => {
+const splitJson = async (source, items) => {
   //  We need to make sure the folder we are going to spit these out into
   //  exists
   if (config.onLambda) {
@@ -106,24 +147,72 @@ const splitJson = (source, items) => {
   }
   const outputDir = `${tsmDir}/${source}`;
   const jsonDir = `${outputDir}/json`;
+  const ingestDir = `${outputDir}/ingest`;
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
   if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir);
+  if (!fs.existsSync(ingestDir)) fs.mkdirSync(ingestDir);
+
+  //  Now we need to fetch the hash table for this source
+  const hashTable = await fetchHashTable(source);
 
   //  Now loop through the items writing out the XML files
   //  TODO: Here I'm hardcoding the name of the node we want to pull out
   //  as we start dealing with other collections we'll define this based
   //  on the source
   const seekRoot = 'object';
-  let counter = 0;
+  const counter = {
+    total: 0,
+    new: 0,
+    modified: 0,
+  };
   items.forEach((item) => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
-    fs.writeFileSync(
-      `${jsonDir}/id_${item[seekRoot].id}.json`,
-      itemJSONPretty,
-      'utf-8',
-    );
-    counter += 1;
+    const itemHash = crypto
+      .createHash('md5')
+      .update(itemJSONPretty)
+      .digest('hex');
+
+    //  Check in the hashtable to see if this item already exist.
+    //  If it doesn't already exist then we need to add it to the hashTable
+    //  and write it into the `ingest` folder.
+    const itemId = item[seekRoot].id;
+    if (!(itemId in hashTable)) {
+      counter.new += 1;
+      hashTable[itemId] = {
+        hash: itemHash,
+        brlyInt: null,
+        discovered: new Date().getTime(),
+        updated: new Date().getTime(),
+      };
+      fs.writeFileSync(
+        `${ingestDir}/id_${itemId}.json`,
+        itemJSONPretty,
+        'utf-8',
+      );
+    }
+
+    //  Now we check to see if the hash is different, if so then it's been
+    //  updated and we need to send the file to be ingested
+    if (itemHash !== hashTable[itemId].hash) {
+      counter.modified += 1;
+      //  update the hash_table
+      hashTable[itemId].hash = itemHash;
+      hashTable[itemId].updated = new Date().getTime();
+      //  Put the file into the `ingest` folder.
+      fs.writeFileSync(
+        `${ingestDir}/id_${itemId}.json`,
+        itemJSONPretty,
+        'utf-8',
+      );
+    }
+
+    //  Now write out the file to the json directory
+    fs.writeFileSync(`${jsonDir}/id_${itemId}.json`, itemJSONPretty, 'utf-8');
+    counter.total += 1;
   });
+
+  await storeHashTable(source, hashTable);
+
   return counter;
 };
 
@@ -199,7 +288,7 @@ const processXML = async () => {
       const json = await parseString(source, xml);
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
-      counts[source].jsonCount = splitJson(source, json.objects);
+      counts[source].jsonCount = await splitJson(source, json.objects);
       counts[source].xmlCount = splitXml(source, xml);
     } else {
       counts[source].jsonCount = -1;
