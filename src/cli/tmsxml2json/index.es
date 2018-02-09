@@ -60,8 +60,7 @@ const parseString = async (source, xml) => {
           reject(err);
         }
         resolve(result);
-      }),
-    );
+      }));
 
     //  Select the parser to use based on the source
     let parserLib = null;
@@ -95,7 +94,7 @@ const parseString = async (source, xml) => {
  * @param {string} source   the string defining the source type (from config)
  * @returns {Object}        The Hash fetchHashTable
  */
-const fetchHashTable = async source => {
+const fetchHashTable = async (source) => {
   if (config.onLambda) {
     //  TODO: Fetch hash table from remote source
     return {};
@@ -166,7 +165,7 @@ const splitJson = async (source, items) => {
     new: 0,
     modified: 0,
   };
-  items.forEach(item => {
+  items.forEach((item) => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     const itemHash = crypto
       .createHash('md5')
@@ -247,7 +246,7 @@ const splitXml = (source, xml) => {
 
   //  Now dump all the xml files
   let counter = 0;
-  xmls.forEach(fragment => {
+  xmls.forEach((fragment) => {
     //  Because this is easier than REGEX ;)
     const id = fragment.split('"')[1];
     if (id) {
@@ -273,27 +272,25 @@ const processXML = async () => {
   //  NOTE: we are looping this way because we are firing off an `await`
   //  which modifies our counts object, so we're going to "sequentially"
   //  await the responses
-  const sources = Object.entries(config.xml).map(v => v[0]);
   const counts = {};
   /* eslint-disable no-await-in-loop */
-  for (let i = 0; i < sources.length; i += 1) {
-    const source = sources[i];
-    const sourceFile = config.xml[source];
-    counts[source] = {
-      file: sourceFile,
+  for (let i = 0; i < config.xml.length; i += 1) {
+    const { file, index } = config.xml[i];
+    counts[index] = {
+      file,
     };
 
     //  TODO: Error check that the file actually exists
-    if (fs.existsSync(`${xmlDir}/${sourceFile}`)) {
-      const xml = fs.readFileSync(`${xmlDir}/${sourceFile}`, 'utf-8');
-      const json = await parseString(source, xml);
+    if (fs.existsSync(`${xmlDir}/${file}`)) {
+      const xml = fs.readFileSync(`${xmlDir}/${file}`, 'utf-8');
+      const json = await parseString(index, xml);
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
-      counts[source].jsonCount = await splitJson(source, json.objects);
-      counts[source].xmlCount = splitXml(source, xml);
+      counts[index].jsonCount = await splitJson(index, json.objects);
+      counts[index].xmlCount = splitXml(index, xml);
     } else {
-      counts[source].jsonCount = -1;
-      counts[source].xmlCount = -1;
+      counts[index].jsonCount = -1;
+      counts[index].xmlCount = -1;
     }
   }
   /* eslint-enable no-await-in-loop */
@@ -301,8 +298,17 @@ const processXML = async () => {
   return counts;
 };
 
+/**
+ * This looks into the ingest folders to see if anything needs to be uploaded
+ */
+const upsertItems = async () => {
+  //  Keep tabs on if we found an item to upsert
+  const foundItem = false;
+};
+
 const start = async () => {
   const counts = await processXML();
+  // upsertItems();
   console.log('Done:');
   console.log(counts);
 };
