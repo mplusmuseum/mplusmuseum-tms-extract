@@ -5,8 +5,17 @@
   "graphql": {
     "host": "localhost:3000"
   },
-  "xml": {
-    "objects": "objects_xml_file.xml"
-  },
+  "xml": [
+    {
+      "file": "[filename].xml",
+      "index": "objects",
+      "type": "object"
+    },
+    {
+      "file": "[filename2].xml",
+      "index": "artists",
+      "type": "artist"
+    }
+  ],
   "onLambda": false,
 }
