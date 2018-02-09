@@ -4,6 +4,7 @@ const colours = require('colors');
 const fs = require('fs');
 const crypto = require('crypto');
 const config = require('../../../config.json');
+const artisanalints = require('../../../lib/artisanalints');
 const parseObject = require('./parsers/object');
 const elasticsearch = require('elasticsearch');
 
@@ -306,7 +307,7 @@ const processXML = async () => {
 /**
  * This looks into the ingest folders to see if anything needs to be uploaded
  */
-const upsertItems = async () => {
+const upsertItems = async (counts) => {
   //  Reset the messy globals so we can keep track of how long it may take
   //  to upsert all the items
   let itemsToUpload = 0;
@@ -326,6 +327,7 @@ const upsertItems = async () => {
     console.log('itemsToUpload: ', itemsToUpload);
     foundItem = true;
     //  Go and grab the first item we can find
+    /* eslint-disable no-await-in-loop */
     for (let i = 0; i < config.xml.length; i += 1) {
       const { index, type } = config.xml[i];
       const ingestDir = `${tmsDir}/${index}/ingest`;
@@ -337,6 +339,19 @@ const upsertItems = async () => {
           const item = fs.readFileSync(`${ingestDir}/${files[0]}`);
           const itemJSON = JSON.parse(item);
           const { id } = itemJSON;
+
+          //  Now we need to check to look in the hashTable for an artisanal
+          //  integer. If there isn't one, we go fetch one and update the table
+          //  If there is one, then we can just use that.
+          const hashTable = await fetchHashTable(index);
+          if (hashTable[id].brlyInt === null) {
+            const brlyInt = await artisanalints.createArtisanalInt();
+            hashTable[id].brlyInt = brlyInt;
+            await storeHashTable(index, hashTable);
+          }
+          itemJSON.artInt = hashTable[id].brlyInt;
+
+          //  Now update ES
           esclient
             .update({
               index,
@@ -346,14 +361,19 @@ const upsertItems = async () => {
             })
             .then(() => {
               fs.unlinkSync(`${ingestDir}/${files[0]}`);
-              upsertItems();
+              setTimeout(() => {
+                upsertItems(counts);
+              }, 100);
             });
+
           break;
         }
       }
     }
+    /* eslint-enable no-await-in-loop */
   } else {
     console.log('We have finished!');
+    console.log(counts);
   }
 };
 
@@ -362,7 +382,6 @@ const start = async () => {
   // reset the start time
   startTime = new Date().getTime();
   console.log('Starting to upsert items');
-  upsertItems();
-  console.log(counts);
+  upsertItems(counts);
 };
 start();
