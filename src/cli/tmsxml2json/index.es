@@ -305,13 +305,61 @@ const processXML = async () => {
 };
 
 /**
+ * This triggers a rebuild of indexes
+ * @param {Object} counts An object that holds the counts to be displayed
+ */
+const triggerIndexRebuilds = async (counts) => {
+  /* eslint-disable no-await-in-loop */
+  /* eslint-disable no-loop-func */
+  // TODO: Turn this into awaits and promises
+  for (let i = 0; i < config.xml.length; i += 1) {
+    const { index } = config.xml[i];
+    esclient.indices.exists({ index }).then((exists) => {
+      if (exists) {
+        esclient.indices.delete({ index }).then(() => {
+          /*
+          TODO: check that the response means it worked
+          Response should be: `{ acknowledged: true }`
+          */
+          console.log(`Deleted index for ${index}`);
+          esclient.indices.create({ index }).then(() => {
+            /*
+            TODO: check that the response means it worked
+            Response should be:
+            { acknowledged: true,
+              shards_acknowledged: true,
+              index: '[index]' }
+            */
+            console.log(`Index recreated for ${index}`);
+          });
+        });
+      } else {
+        esclient.indices.create({ index }).then(() => {
+          /*
+          TODO: check that the response means it worked
+          Response should be:
+          { acknowledged: true,
+            shards_acknowledged: true,
+            index: '[index]' }
+          */
+          console.log(`Index created for ${index}`);
+        });
+      }
+    });
+  }
+  /* eslint-disable no-loop-func */
+  /* eslint-disable no-await-in-loop */
+  console.log(counts);
+};
+
+/**
  * This looks into the ingest folders to see if anything needs to be uploaded
+ * @param {Object} counts An object that holds the counts to be displayed
  */
 const upsertItems = async (counts) => {
   //  Reset the messy globals so we can keep track of how long it may take
   //  to upsert all the items
   let itemsToUpload = 0;
-  let foundItem = false;
   for (let i = 0; i < config.xml.length; i += 1) {
     const { index } = config.xml[i];
     const ingestDir = `${tmsDir}/${index}/ingest`;
@@ -325,7 +373,6 @@ const upsertItems = async (counts) => {
 
   if (itemsToUpload > 0) {
     console.log('itemsToUpload: ', itemsToUpload);
-    foundItem = true;
     //  Go and grab the first item we can find
     /* eslint-disable no-await-in-loop */
     for (let i = 0; i < config.xml.length; i += 1) {
@@ -372,8 +419,7 @@ const upsertItems = async (counts) => {
     }
     /* eslint-enable no-await-in-loop */
   } else {
-    console.log('We have finished!');
-    console.log(counts);
+    triggerIndexRebuilds(counts);
   }
 };
 
