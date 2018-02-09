@@ -5,6 +5,9 @@ const fs = require('fs');
 const crypto = require('crypto');
 const config = require('../../../config.json');
 const parseObject = require('./parsers/object');
+const elasticsearch = require('elasticsearch');
+
+const esclient = new elasticsearch.Client(config.elasticsearch);
 
 colours.setTheme({
   info: 'green',
@@ -24,6 +27,8 @@ const parser = new xml2js.Parser({
 });
 
 const rootDir = process.cwd();
+let startTime = new Date().getTime();
+const itemsUploaded = 0;
 
 /*
 TODO: If we are using AWS Lambda then all of this has to go into the /tmp
@@ -302,14 +307,62 @@ const processXML = async () => {
  * This looks into the ingest folders to see if anything needs to be uploaded
  */
 const upsertItems = async () => {
-  //  Keep tabs on if we found an item to upsert
-  const foundItem = false;
+  //  Reset the messy globals so we can keep track of how long it may take
+  //  to upsert all the items
+  let itemsToUpload = 0;
+  let foundItem = false;
+  for (let i = 0; i < config.xml.length; i += 1) {
+    const { index } = config.xml[i];
+    const ingestDir = `${tmsDir}/${index}/ingest`;
+    if (fs.existsSync(ingestDir)) {
+      const files = fs
+        .readdirSync(ingestDir)
+        .filter(file => file.split('.')[1] === 'json');
+      itemsToUpload += files.length;
+    }
+  }
+
+  if (itemsToUpload > 0) {
+    console.log('itemsToUpload: ', itemsToUpload);
+    foundItem = true;
+    //  Go and grab the first item we can find
+    for (let i = 0; i < config.xml.length; i += 1) {
+      const { index, type } = config.xml[i];
+      const ingestDir = `${tmsDir}/${index}/ingest`;
+      if (fs.existsSync(ingestDir)) {
+        const files = fs
+          .readdirSync(ingestDir)
+          .filter(file => file.split('.')[1] === 'json');
+        if (files.length > 0) {
+          const item = fs.readFileSync(`${ingestDir}/${files[0]}`);
+          const itemJSON = JSON.parse(item);
+          const { id } = itemJSON;
+          esclient
+            .update({
+              index,
+              type,
+              id,
+              body: { doc: itemJSON, doc_as_upsert: true },
+            })
+            .then(() => {
+              fs.unlinkSync(`${ingestDir}/${files[0]}`);
+              upsertItems();
+            });
+          break;
+        }
+      }
+    }
+  } else {
+    console.log('We have finished!');
+  }
 };
 
 const start = async () => {
   const counts = await processXML();
-  // upsertItems();
-  console.log('Done:');
+  // reset the start time
+  startTime = new Date().getTime();
+  console.log('Starting to upsert items');
+  upsertItems();
   console.log(counts);
 };
 start();
