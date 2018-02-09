@@ -31,7 +31,7 @@ scratch disk.
 */
 let dataDir = null;
 let xmlDir = null;
-let tsmDir = null;
+let tmsDir = null;
 
 if (config.onLambda) {
   console.error('We need Lambda code here');
@@ -39,12 +39,12 @@ if (config.onLambda) {
 } else {
   dataDir = `${rootDir}/app/data`;
   xmlDir = `${dataDir}/xml`;
-  tsmDir = `${dataDir}/tsm`;
+  tmsDir = `${dataDir}/tms`;
 
   // Make sure all the folders we need to use exist
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
   if (!fs.existsSync(xmlDir)) fs.mkdirSync(xmlDir);
-  if (!fs.existsSync(tsmDir)) fs.mkdirSync(tsmDir);
+  if (!fs.existsSync(tmsDir)) fs.mkdirSync(tmsDir);
 }
 
 /**
@@ -60,7 +60,8 @@ const parseString = async (source, xml) => {
           reject(err);
         }
         resolve(result);
-      }));
+      }),
+    );
 
     //  Select the parser to use based on the source
     let parserLib = null;
@@ -94,12 +95,12 @@ const parseString = async (source, xml) => {
  * @param {string} source   the string defining the source type (from config)
  * @returns {Object}        The Hash fetchHashTable
  */
-const fetchHashTable = async (source) => {
+const fetchHashTable = async source => {
   if (config.onLambda) {
     //  TODO: Fetch hash table from remote source
     return {};
   }
-  const sourceDir = `${tsmDir}/${source}`;
+  const sourceDir = `${tmsDir}/${source}`;
   const hsFile = `${sourceDir}/hash_table.json`;
   if (fs.existsSync(hsFile)) {
     const hashTable = fs.readFileSync(hsFile, 'utf-8');
@@ -119,7 +120,7 @@ const storeHashTable = async (source, hashTable) => {
   if (config.onLambda) {
     //  TODO: Fetch hash table from remote source
   } else {
-    const sourceDir = `${tsmDir}/${source}`;
+    const sourceDir = `${tmsDir}/${source}`;
     const hsFile = `${sourceDir}/hash_table.json`;
     const hashTableJSONPretty = JSON.stringify(hashTable, null, 4);
     if (!fs.existsSync(sourceDir)) fs.mkdirSync(sourceDir);
@@ -145,7 +146,7 @@ const splitJson = async (source, items) => {
     console.error('We need Lambda code here');
     return 0;
   }
-  const outputDir = `${tsmDir}/${source}`;
+  const outputDir = `${tmsDir}/${source}`;
   const jsonDir = `${outputDir}/json`;
   const ingestDir = `${outputDir}/ingest`;
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
@@ -165,7 +166,7 @@ const splitJson = async (source, items) => {
     new: 0,
     modified: 0,
   };
-  items.forEach((item) => {
+  items.forEach(item => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     const itemHash = crypto
       .createHash('md5')
@@ -231,7 +232,7 @@ const splitXml = (source, xml) => {
     console.error('We need Lambda code here');
     return 0;
   }
-  const outputDir = `${tsmDir}/${source}`;
+  const outputDir = `${tmsDir}/${source}`;
   const outxmlDir = `${outputDir}/xml`;
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
   if (!fs.existsSync(outxmlDir)) fs.mkdirSync(outxmlDir);
@@ -246,7 +247,7 @@ const splitXml = (source, xml) => {
 
   //  Now dump all the xml files
   let counter = 0;
-  xmls.forEach((fragment) => {
+  xmls.forEach(fragment => {
     //  Because this is easier than REGEX ;)
     const id = fragment.split('"')[1];
     if (id) {

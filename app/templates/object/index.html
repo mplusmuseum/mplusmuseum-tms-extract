@@ -1,0 +1,79 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+  <title>TMS extract/ingester</title>
+  <link href="/stylesheets/main.css" rel="stylesheet" />
+</head>
+<body>
+
+	{{> header}}
+
+	<div class="container">
+		<div>
+
+  		<h1>Object #{{id}}</h1>
+
+			{{#if showResults}}
+				<table class="dataDump">
+					<tr>
+						<td>
+							<h2>Pre-ingested JSON</h2>
+							<div class="json">
+								{{#if objectJSON}}
+									<pre>{{objectJSON}}</pre>
+								{{else}}
+									<p>
+										No JSON file found!
+									</p>
+								{{/if}}
+							</div>
+						</td>
+
+						<td>
+							<h2>Pre-ingested XML</h2>
+							<div class="xml">
+								{{#if objectXML}}
+									<pre>{{objectXML}}</pre>
+								{{else}}
+									<p>
+										No XML file found!
+									</p>
+								{{/if}}
+							</div>
+						</td>
+					</tr>
+				</table>
+
+				<table class="dataDump">
+					<tr>
+						<td>
+							<h2>GraphQL query</h2>
+							<div class="graphql">
+								<pre>{{GraphQLQuery}}</pre>
+							</div>
+							<br />
+							<a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a><br />
+							<a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a><br />
+						</td>
+
+						<td>
+							<h2>GraphQL Result</h2>
+							<div class="xml">
+								<pre>Not implimented yet</pre>
+							</div>
+						</td>
+					</tr>
+				</table>
+			{{else}}
+				<div class="norecords">
+					<p>
+						Sorry not object was found.
+					</p>
+				</div>
+			{{/if}}
+
+		</div>
+	</div>
+
+</body>
+</html>

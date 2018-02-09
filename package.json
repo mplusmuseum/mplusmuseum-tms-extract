@@ -7,6 +7,7 @@
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "body-parser": "^1.18.2",
     "colors": "^1.1.2",
     "commander": "^2.11.0",
     "compass": "^0.1.1",
@@ -48,6 +49,7 @@
     "test": "standard",
     "gulp": "gulp",
     "init": "babel gulpfile.es -o gulpfile.js && npm run build:prod",
+    "build": "npm run build:prod",
     "build:prod": "npm run gulp && npm run build:prod:css",
     "build:prod:css": "compass compile",
     "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",

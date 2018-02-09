@@ -10,7 +10,7 @@ app/helpers
 app/routes
 app/modules
 app/cli
-app/data/tsm
+app/data/tms
 server.js
 
 app/public/stylesheets/*.css
