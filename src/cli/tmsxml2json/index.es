@@ -7,6 +7,7 @@ const config = require('../../../config.json');
 const artisanalints = require('../../../lib/artisanalints');
 const parseObject = require('./parsers/object');
 const elasticsearch = require('elasticsearch');
+const progress = require('cli-progress');
 
 const esclient = new elasticsearch.Client(config.elasticsearch);
 
@@ -29,7 +30,8 @@ const parser = new xml2js.Parser({
 
 const rootDir = process.cwd();
 let startTime = new Date().getTime();
-const itemsUploaded = 0;
+let totalItemsToUpload = null;
+let itemsUploaded = 0;
 
 /*
 TODO: If we are using AWS Lambda then all of this has to go into the /tmp
@@ -352,11 +354,29 @@ const triggerIndexRebuilds = async (counts) => {
   console.log(counts);
 };
 
+const msToTime = (duration) => {
+  let seconds = parseInt((duration / 1000) % 60, 10);
+  let minutes = parseInt((duration / (1000 * 60)) % 60, 10);
+  let hours = parseInt((duration / (1000 * 60 * 60)) % 24, 10);
+
+  hours = hours < 10 ? `0${hours}` : hours;
+  minutes = minutes < 10 ? `0${minutes}` : minutes;
+  seconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  if (parseInt(hours, 10) > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  if (parseInt(minutes, 10) > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  return `${seconds}s`;
+};
+
 /**
  * This looks into the ingest folders to see if anything needs to be uploaded
  * @param {Object} counts An object that holds the counts to be displayed
  */
-const upsertItems = async (counts) => {
+const upsertItems = async (counts, countBar) => {
   //  Reset the messy globals so we can keep track of how long it may take
   //  to upsert all the items
   let itemsToUpload = 0;
@@ -371,8 +391,14 @@ const upsertItems = async (counts) => {
     }
   }
 
+  //  If we haven't set the total items on this run, then do it now
+  if (totalItemsToUpload === null) {
+    totalItemsToUpload = itemsToUpload;
+    itemsUploaded = 0;
+    countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
+  }
+
   if (itemsToUpload > 0) {
-    console.log('itemsToUpload: ', itemsToUpload);
     //  Go and grab the first item we can find
     /* eslint-disable no-await-in-loop */
     for (let i = 0; i < config.xml.length; i += 1) {
@@ -408,9 +434,18 @@ const upsertItems = async (counts) => {
             })
             .then(() => {
               fs.unlinkSync(`${ingestDir}/${files[0]}`);
+              itemsUploaded += 1;
+              const timeDiff = new Date().getTime() - startTime;
+              const aveTime = timeDiff / itemsUploaded;
+              const remainingTime =
+                aveTime * (totalItemsToUpload - itemsUploaded);
+              const myEta = msToTime(remainingTime);
+              countBar.update(itemsUploaded, {
+                myEta,
+              });
               setTimeout(() => {
-                upsertItems(counts);
-              }, 100);
+                upsertItems(counts, countBar);
+              }, 10);
             });
 
           break;
@@ -419,6 +454,7 @@ const upsertItems = async (counts) => {
     }
     /* eslint-enable no-await-in-loop */
   } else {
+    countBar.stop();
     triggerIndexRebuilds(counts);
   }
 };
@@ -428,6 +464,14 @@ const start = async () => {
   // reset the start time
   startTime = new Date().getTime();
   console.log('Starting to upsert items');
-  upsertItems(counts);
+  const countBar = new progress.Bar(
+    {
+      etaBuffer: 1,
+      format: 'progress [{bar}] {percentage}% | ETA: {myEta} | {value}/{total}',
+      hideCursor: true,
+    },
+    progress.Presets.shades_classic,
+  );
+  upsertItems(counts, countBar);
 };
 start();
