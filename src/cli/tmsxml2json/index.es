@@ -136,6 +136,37 @@ const storeHashTable = async (source, hashTable) => {
 };
 
 /**
+ * This takes the json and looks to see if we need to do a bulk upload which
+ * only happens on the 1st run. After that we skip the bulk and just upload
+ * seperate files.
+ * @param {Object} json     The convereted from XML json
+ * @return {Boolean}        If we did a bulk upload or not
+ */
+const bulkUpload = async (index, type, json) => {
+  const outputDir = `${tmsDir}/${index}`;
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
+  if (!fs.existsSync(`${outputDir}/bulk.json`)) {
+    console.log('Need to bulk upload');
+    const bulkJSONPretty = JSON.stringify(json, null, 4);
+    fs.writeFileSync(`${outputDir}/bulk.json`, bulkJSONPretty, 'utf-8');
+    const body = [].concat(...json.objects.map(object => [
+      { update: { _id: object.object.id } },
+      { doc: object.object, doc_as_upsert: true },
+    ]));
+
+    //  Delete any old index
+    const exists = await esclient.indices.exists({ index });
+    if (exists) {
+      await esclient.indices.delete({ index });
+    }
+    await esclient.indices.create({ index });
+    await esclient.bulk({ body, type, index });
+    return true;
+  }
+  return false;
+};
+
+/**
  * This is going to split the json into individual item to dump down to disk.
  * Actually it's going to do a bit more than that, so we should probably rename
  * it at some point. This takes the JSON and breaks it down into each item,
@@ -163,7 +194,7 @@ const splitJson = async (source, items) => {
   //  Now we need to fetch the hash table for this source
   const hashTable = await fetchHashTable(source);
 
-  //  Now loop through the items writing out the XML files
+  //  Now loop through the items writing out the JSON files
   //  TODO: Here I'm hardcoding the name of the node we want to pull out
   //  as we start dealing with other collections we'll define this based
   //  on the source
@@ -173,6 +204,7 @@ const splitJson = async (source, items) => {
     new: 0,
     modified: 0,
   };
+
   items.forEach((item) => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     const itemHash = crypto
@@ -284,7 +316,7 @@ const processXML = async () => {
   const counts = {};
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < config.xml.length; i += 1) {
-    const { file, index } = config.xml[i];
+    const { file, index, type } = config.xml[i];
     counts[index] = {
       file,
     };
@@ -296,6 +328,7 @@ const processXML = async () => {
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
       counts[index].jsonCount = await splitJson(index, json.objects);
+      await bulkUpload(index, type, json);
       counts[index].xmlCount = splitXml(index, xml);
     } else {
       counts[index].jsonCount = -1;
