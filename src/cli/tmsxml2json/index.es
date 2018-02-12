@@ -264,6 +264,7 @@ const splitXml = (source, xml) => {
   });
   return counter;
 };
+
 /**
  * This kicks off the process of looking for the XML and converting it
  * to json.
@@ -311,46 +312,6 @@ const processXML = async () => {
  * @param {Object} counts An object that holds the counts to be displayed
  */
 const triggerIndexRebuilds = async (counts) => {
-  /* eslint-disable no-await-in-loop */
-  /* eslint-disable no-loop-func */
-  // TODO: Turn this into awaits and promises
-  for (let i = 0; i < config.xml.length; i += 1) {
-    const { index } = config.xml[i];
-    esclient.indices.exists({ index }).then((exists) => {
-      if (exists) {
-        esclient.indices.delete({ index }).then(() => {
-          /*
-          TODO: check that the response means it worked
-          Response should be: `{ acknowledged: true }`
-          */
-          console.log(`Deleted index for ${index}`);
-          esclient.indices.create({ index }).then(() => {
-            /*
-            TODO: check that the response means it worked
-            Response should be:
-            { acknowledged: true,
-              shards_acknowledged: true,
-              index: '[index]' }
-            */
-            console.log(`Index recreated for ${index}`);
-          });
-        });
-      } else {
-        esclient.indices.create({ index }).then(() => {
-          /*
-          TODO: check that the response means it worked
-          Response should be:
-          { acknowledged: true,
-            shards_acknowledged: true,
-            index: '[index]' }
-          */
-          console.log(`Index created for ${index}`);
-        });
-      }
-    });
-  }
-  /* eslint-disable no-loop-func */
-  /* eslint-disable no-await-in-loop */
   console.log(counts);
 };
 
@@ -377,82 +338,83 @@ const msToTime = (duration) => {
  * @param {Object} counts An object that holds the counts to be displayed
  */
 const upsertItems = async (counts, countBar) => {
-  //  Reset the messy globals so we can keep track of how long it may take
-  //  to upsert all the items
+  //  Count the number of items we have left to upload, making a note of the
+  //  first one we find
   let itemsToUpload = 0;
-  for (let i = 0; i < config.xml.length; i += 1) {
-    const { index } = config.xml[i];
+  let itemIndex = null;
+  let itemType = null;
+  let itemFile = null;
+
+  config.xml.forEach((source) => {
+    const { index } = source;
     const ingestDir = `${tmsDir}/${index}/ingest`;
     if (fs.existsSync(ingestDir)) {
       const files = fs
         .readdirSync(ingestDir)
         .filter(file => file.split('.')[1] === 'json');
       itemsToUpload += files.length;
-    }
-  }
-
-  //  If we haven't set the total items on this run, then do it now
-  if (totalItemsToUpload === null) {
-    totalItemsToUpload = itemsToUpload;
-    itemsUploaded = 0;
-    countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
-  }
-
-  if (itemsToUpload > 0) {
-    //  Go and grab the first item we can find
-    /* eslint-disable no-await-in-loop */
-    for (let i = 0; i < config.xml.length; i += 1) {
-      const { index, type } = config.xml[i];
-      const ingestDir = `${tmsDir}/${index}/ingest`;
-      if (fs.existsSync(ingestDir)) {
-        const files = fs
-          .readdirSync(ingestDir)
-          .filter(file => file.split('.')[1] === 'json');
-        if (files.length > 0) {
-          const item = fs.readFileSync(`${ingestDir}/${files[0]}`);
-          const itemJSON = JSON.parse(item);
-          const { id } = itemJSON;
-
-          //  Now we need to check to look in the hashTable for an artisanal
-          //  integer. If there isn't one, we go fetch one and update the table
-          //  If there is one, then we can just use that.
-          const hashTable = await fetchHashTable(index);
-          if (hashTable[id].brlyInt === null) {
-            const brlyInt = await artisanalints.createArtisanalInt();
-            hashTable[id].brlyInt = brlyInt;
-            await storeHashTable(index, hashTable);
-          }
-          itemJSON.artInt = hashTable[id].brlyInt;
-
-          //  Now update ES
-          esclient
-            .update({
-              index,
-              type,
-              id,
-              body: { doc: itemJSON, doc_as_upsert: true },
-            })
-            .then(() => {
-              fs.unlinkSync(`${ingestDir}/${files[0]}`);
-              itemsUploaded += 1;
-              const timeDiff = new Date().getTime() - startTime;
-              const aveTime = timeDiff / itemsUploaded;
-              const remainingTime =
-                aveTime * (totalItemsToUpload - itemsUploaded);
-              const myEta = msToTime(remainingTime);
-              countBar.update(itemsUploaded, {
-                myEta,
-              });
-              setTimeout(() => {
-                upsertItems(counts, countBar);
-              }, 10);
-            });
-
-          break;
-        }
+      if (files.length > 0) {
+        itemIndex = index;
+        itemType = source.type;
+        [itemFile] = files;
       }
     }
-    /* eslint-enable no-await-in-loop */
+  });
+
+  //  If we have an itemIndex that isn't null it means
+  //  we found at least one thing to upsert
+  if (itemIndex !== null && itemType !== null && itemFile !== null) {
+    //  Read in the file
+    const item = fs.readFileSync(
+      `${tmsDir}/${itemIndex}/ingest/${itemFile}`,
+      'utf-8',
+    );
+    const itemJSON = JSON.parse(item);
+    const { id } = itemJSON;
+
+    //  Now we need to check to look in the hashTable for an artisanal
+    //  integer. If there isn't one, we go fetch one and update the table
+    //  If there is one, then we can just use that.
+    const hashTable = await fetchHashTable(itemIndex);
+    if (hashTable[id].brlyInt === null) {
+      const brlyInt = await artisanalints.createArtisanalInt();
+      hashTable[id].brlyInt = brlyInt;
+      await storeHashTable(itemIndex, hashTable);
+    }
+    itemJSON.artInt = hashTable[id].brlyInt;
+
+    //  If this is the first time we've called this function then we need to
+    //  kick off the progress bar
+    if (totalItemsToUpload === null) {
+      totalItemsToUpload = itemsToUpload;
+      itemsUploaded = 0;
+      countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
+    }
+
+    //  Now we do the ES upsert
+    const index = itemIndex;
+    const type = itemType;
+    esclient
+      .update({
+        index,
+        type,
+        id,
+        body: { doc: itemJSON, doc_as_upsert: true },
+      })
+      .then(() => {
+        fs.unlinkSync(`${tmsDir}/${itemIndex}/ingest/${itemFile}`);
+        itemsUploaded += 1;
+        const timeDiff = new Date().getTime() - startTime;
+        const aveTime = timeDiff / itemsUploaded;
+        const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
+        const myEta = msToTime(remainingTime);
+        countBar.update(itemsUploaded, {
+          myEta,
+        });
+        setTimeout(() => {
+          upsertItems(counts, countBar);
+        }, 10);
+      });
   } else {
     countBar.stop();
     triggerIndexRebuilds(counts);
@@ -461,6 +423,7 @@ const upsertItems = async (counts, countBar) => {
 
 const start = async () => {
   const counts = await processXML();
+  // const counts = {};
   // reset the start time
   startTime = new Date().getTime();
   console.log('Starting to upsert items');

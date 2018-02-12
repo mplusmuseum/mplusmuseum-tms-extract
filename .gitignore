@@ -22,3 +22,7 @@ ExportForMPlus_Objects_UCS.xml
 config.json
 
 htpasswd
+
+app/data/xml/ExportForMPlus_Objects_UCS_original.xml
+
+objects.json
