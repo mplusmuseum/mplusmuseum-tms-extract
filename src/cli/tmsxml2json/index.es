@@ -274,7 +274,7 @@ const splitJson = async (source, items) => {
     //  and write it into the `ingest` folder.
     const itemId = item[seekRoot].id;
     if (itemId === 123 || itemId === 4151) {
-      console.log(itemJSONPretty);
+      // console.log(itemJSONPretty);
     }
     if (!(itemId in hashTable)) {
       counter.new += 1;

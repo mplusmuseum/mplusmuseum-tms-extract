@@ -5,8 +5,24 @@ const parseText = text => ({ text: text._, lang: text.lang });
 
 const parseObjectOrArray = (obj, fn) => {
   if (obj === null || obj === undefined) return null;
-  if (Array.isArray(obj)) return obj.map(fn);
-  if (typeof obj === 'object') return Object.values(obj).map(fn);
+  let rtnObject = null;
+
+  if (Array.isArray(obj)) {
+    rtnObject = obj.map(fn);
+  }
+  if (typeof obj === 'object') {
+    rtnObject = Object.values(obj).map(fn);
+  }
+  if (rtnObject !== null) {
+    if (
+      Array.isArray(rtnObject) &&
+      rtnObject.length === 1 &&
+      Array.isArray(rtnObject[0])
+    ) {
+      [rtnObject] = rtnObject;
+    }
+    return rtnObject;
+  }
   return null;
 };
 
