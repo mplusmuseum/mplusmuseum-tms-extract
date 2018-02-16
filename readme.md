@@ -2,76 +2,115 @@
 
 alchemia is a tool to work with tms-xml files
 
-### tldr
+### Installing
+
+Pull the code down from git then...
+
+    $ yarn install
+    $ yarn run init
+
+### Before you start; setting up your config file
 
     $ cp config.json.example config.json
-    $ yarn
-    $ yarn run --silent start convert < ExportForDAM_Objects_UCS.xml > objects.json
-    $ yarn run start ingest < objects.json
 
-### design
+Your config file will now look something like...
 
-We expect one collection type per XML file, and will create a new index for each collection type.
-For example
+    {
+      "elasticsearch": {
+        "host": "localhost:9200"
+      },
+      "graphql": {
+        "host": "localhost:3000"
+      },
+      "xml": [
+        {
+          "file": "[filename].xml",
+          "index": "objects",
+          "type": "object"
+        },
+        {
+          "file": "[filename2].xml",
+          "index": "artists",
+          "type": "artist"
+        }
+      ],
+      "onLambda": false,
+    }
 
-```xml
-  <exportForDAM><objects><object id=123>blah</object><object id=876>bloo</object></objects></exportForDAM>`
-```
+Point elasticsearch and graphql to your own locations. Then make sure your XML
+files are placed in the correct directory. You should have XML files called things like `ExportFromTMS_Objects.xml` and `ExportFromTMS_Artists.xml`, these are the XML files that TMS exports to our XML specifications.
 
-Will create an elasticsearch index named `objects`, with type `object`.
+However you get your files they need to be placed into the following directory...
 
-### Convert tms-xml to json
+`app/data/xml`
 
-To convert a tms-xml to json, try
+# Note
 
-    $ yarn run --silent start convert < ../data/ExportForDAM_Objects_UCS.xml > objects.json
+The `index` and `type` are used by both ElasticSearch to build the indexes and by alchemia's own parsing code. In our current instance the type of `object` will look for XML to JSON parsing code kept in...
 
-_Note_: the `--silent` is important, because yarn outputs a bit too much info normally
+`src/cli/tmsxml2json/parsers/object`
 
-### Ingest json to elasticsearch
+...if we were to attempt to import `ExportFromTMS_Artists.xml` with a type of `artist` it would look for the code to parse the XML in...
 
-Lets say you are happy with the output, maybe ingest it to an elasticsearch instance.
-The index will be deleted and recreated, and is named the same as whatever collection is in `<exportForDAM>`.
+`src/cli/tmsxml2json/parsers/artist`
 
-    $ yarn run start ingest < objects.json
+...if that code doesn't exist then an error will be thrown.
 
-### full help
+### Running
 
-Using `yarn start` or `yarn start --help` will show the help
+Once you have the config set up you convert the XML to JSON and upsert to ElasticCloud in the same step...
 
-    $ yarn start
+    $ node app/cli/tmsxml2json/index.js
 
-    Usage: alchemia [options] [command]
+The first time you run the import it will convert the XML to JSON, create an index on ElasticSearch (ES), bulk upload the initial data to ES and then grab Artisanal Integers for each item in turn and updated ES. The initial bulk upload will take about 10-20 seconds, but the "backfill" of Integers will take about an hour.
 
-    Tools for working with tms-xml and elastic search
+After that, each time you get a new `ExportFromTMS_Objects.xml` file you need to place it into the `app/data/xml` folder and run the above command again.
 
+These are optional parameters that can be passed into the script...
 
-    Options:
+    $ node app/cli/tmsxml2json/index.js forcebulk
+      Force the system to do a full bulk upload (useful in combination with skipingest)
 
-      -V, --version        output the version number
-      -i, --input <path>   file to work with
-      -o, --output <path>  file to write to instead of stdout
-      -h, --help           output usage information
+    $ node app/cli/tmsxml2json/index.js skipbulk
+      Skips a bulk upload.
 
+    $ node app/cli/tmsxml2json/index.js resetindex
+      Essentially blows the index away, and therefor all your stored data. *Note* an ID to Artisanal Integer map will still exists, this will not break your Integers.
 
-    Commands:
+    $ node app/cli/tmsxml2json/index.js forceingest
+      Will make the system spit out .JSON files for each item into the `ingest` folder where
+      they will individually be updated into ES.
 
-      convert   Convert TMS-XML to json
-      ingest    Ingest json to elasticsearch
+    $ node app/cli/tmsxml2json/index.js skipingest
+      Will make the system _not_ upload any individual .JSON files, even if the data has changed.
+
+# Examples
+
+To basically reset the database, this will clean out the index and do everything all over again. It _won't_ reset the Artisanal Integer, each item will keep its Integer.
+
+    $ node app/cli/tmsxml2json/index.js resetindex forcebulk forceingest
+
+If you change the code that converts the XML to JSON (to add fields for example) then normally the system will spot that _all_ the items have been modified and will update the database one item at a time (about 5-8 minutes run time). This will tell the system to instead update everything in one go with a forced bulk update, and skip the individual file updates.
+
+    $ node app/cli/tmsxml2json/index.js forcebulk skipingest
 
 ### Admin web page
 
-There is the very start of a stub of a web admin page. It currently doesn't do anything, but you get it up and running you'll need to run the following commands. You'll also need to create a htpasswd file to add auth to the site.
+There is also an admin page that allows you to inspect items to check for data integrity. To to the initial install run...
 
 ```bash
-npm install
-npm run init
-npm install -g htpasswd
+yarn install -g htpasswd
 htpasswd -bc htpasswd [username] [password]
+cp .env.example .env
 ```
 
-That will run the initial build, after that on your development machine run...
+...to set the auth password. After that run to build and watch for code changes...
 
-`npm run go`
+    $ yarn run go
 
-When deploying to production use the `npm install` & `npm run init` commands the 1st time, and use PM2 to run the site. After that `git pull`, `npm run build:prod` and `pm2 restart [name]` to rebuild the code and restart it with pm2.
+...to kick things off, you can update the port number in the `.env` file.
+
+On production the command would be...
+
+    $ yarn run build
+    $ node server.js
