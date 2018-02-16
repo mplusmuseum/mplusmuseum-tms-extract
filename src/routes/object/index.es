@@ -22,7 +22,6 @@ exports.index = async (request, response) => {
 
   //  Go grab the JSON file
   let objectJSON = null;
-  console.log(jsonFile);
   if (fs.existsSync(jsonFile)) {
     objectJSON = fs.readFileSync(jsonFile, 'utf-8');
   }
