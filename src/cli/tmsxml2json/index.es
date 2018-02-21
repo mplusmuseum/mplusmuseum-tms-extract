@@ -3,13 +3,10 @@ const { pd } = require('pretty-data');
 const colours = require('colors');
 const fs = require('fs');
 const crypto = require('crypto');
-const config = require('../../../config.json');
 const artisanalints = require('../../../lib/artisanalints');
 const parseObject = require('./parsers/object');
 const elasticsearch = require('elasticsearch');
 const progress = require('cli-progress');
-
-const esclient = new elasticsearch.Client(config.elasticsearch);
 
 colours.setTheme({
   info: 'green',
@@ -19,6 +16,7 @@ colours.setTheme({
   debug: 'blue',
   error: 'red',
   alert: 'magenta',
+  wow: 'rainbow',
 });
 
 const parser = new xml2js.Parser({
@@ -32,11 +30,40 @@ const rootDir = process.cwd();
 let startTime = new Date().getTime();
 let totalItemsToUpload = null;
 let itemsUploaded = 0;
-
+let esLive = false;
 let forceBulk = false;
 let skipBulk = false;
 let forceResetIndex = false;
 let forceIngest = false;
+
+//  Make sure the config file exists
+if (!fs.existsSync(`${rootDir}/config.json`)) {
+  console.error('');
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('You are missing the config.json file.'.error);
+  console.error('Try copying config.json.example to config.json or'.error);
+  console.error('visting the web admin tool.'.error);
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('');
+  process.exit(1);
+}
+/* eslint-disable import/no-unresolved */
+const config = require('../../../config.json');
+/* eslint-enable import/no-unresolved */
+
+//  Make sure we have an elasticsearch thingy to connect to
+if (!('elasticsearch' in config)) {
+  console.error('');
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('No elasticsearch host set in config.json'.error);
+  console.error('Try adding it as shown in config.json.example or'.error);
+  console.error('visting the web admin tool to enter it there.'.error);
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('');
+  process.exit(1);
+}
+
+const esclient = new elasticsearch.Client(config.elasticsearch);
 
 /*
 TODO: If we are using AWS Lambda then all of this has to go into the /tmp
@@ -141,6 +168,24 @@ const storeHashTable = async (source, hashTable) => {
 };
 
 /**
+ * This pings elastic search to see if it's up
+ */
+const pingES = async () => {
+  const startPing = new Date().getTime();
+  let diff = null;
+  let worked = false;
+  try {
+    worked = await esclient.ping();
+  } catch (er) {
+    return diff;
+  }
+  const endPing = new Date().getTime();
+  if (worked === true) {
+    diff = endPing - startPing;
+  }
+  return diff;
+};
+/**
  * This takes the json and looks to see if we need to do a bulk upload which
  * only happens on the 1st run. After that we skip the bulk and just upload
  * seperate files.
@@ -179,6 +224,12 @@ const bulkUpload = async (index, type, json) => {
   }
 
   if (doBulkUpload === true) {
+    //  Only bulk upload if we know we can reach ES
+    if (esLive === false) {
+      console.log('Skipping bulk upload as ES is unreachable.'.warn);
+      return false;
+    }
+
     const bulkJSONPretty = JSON.stringify(json, null, 4);
     fs.writeFileSync(`${outputDir}/bulk.json`, bulkJSONPretty, 'utf-8');
     const body = [].concat(...json.objects.map(object => [
@@ -203,6 +254,12 @@ const bulkUpload = async (index, type, json) => {
   }
 
   if (doBulkUpload === false && resetIndex === true) {
+    //  Only reset the indexes if we know we can reach ES
+    if (esLive === false) {
+      console.log('Skipping index upload as ES is unreachable.'.warn);
+      return false;
+    }
+
     const exists = await esclient.indices.exists({ index });
     if (exists) {
       console.log(`Removing old index for ${index}`);
@@ -386,9 +443,11 @@ const splitXml = (source, xml) => {
 const processXML = async () => {
   //  Check that we have the xml defined in the config
   if (!('xml' in config)) {
-    console.error("No 'xml' element defined in config");
+    console.error("No 'xml' element defined in config".error);
     return false;
   }
+
+  console.log('About to start processing XML files.'.help);
 
   //  Loop through them doing the xml conversion for each one
   //  NOTE: we are looping this way because we are firing off an `await`
@@ -542,8 +601,26 @@ const upsertItems = async (counts, countBar) => {
 };
 
 const start = async () => {
-  console.log('About to start processing XML files.'.help);
+  console.error('');
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+
+  console.log('Pinging ElasticSearch...');
+  const ping = await pingES();
+  if (ping === null) {
+    console.log('Could not ping ES server'.error);
+  } else {
+    esLive = true;
+    console.log(`Pinged ES server in ${ping}ms`);
+  }
+
   const counts = await processXML();
+
+  if (counts === false) {
+    console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+    console.error('');
+    process.exit(1);
+  }
+
   // const counts = {};
   // reset the start time
   startTime = new Date().getTime();
@@ -558,20 +635,37 @@ const start = async () => {
     progress.Presets.shades_classic,
   );
   console.log('Now checking "ingest" folder for items to upsert'.help);
-  upsertItems(counts, countBar);
+  if (esLive === true) {
+    upsertItems(counts, countBar);
+  } else {
+    console.log("Can't connect to ES server, skipping upserting".warn);
+    console.log(counts);
+    console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+    console.error('');
+    process.exit(1);
+  }
 };
 
 process.argv.forEach((val) => {
-  if (val.toLowerCase() === 'forcebulk') {
+  if (
+    val.toLowerCase() === 'forcebulk' ||
+    val.toLowerCase() === '--forcebulk'
+  ) {
     forceBulk = true;
   }
-  if (val.toLowerCase() === 'skipbulk') {
+  if (val.toLowerCase() === 'skipbulk' || val.toLowerCase() === '--skipbulk') {
     skipBulk = true;
   }
-  if (val.toLowerCase() === 'forceingest') {
+  if (
+    val.toLowerCase() === 'forceingest' ||
+    val.toLowerCase() === '--forceingest'
+  ) {
     forceIngest = true;
   }
-  if (val.toLowerCase() === 'resetindex') {
+  if (
+    val.toLowerCase() === 'resetindex' ||
+    val.toLowerCase() === '--resetindex'
+  ) {
     forceResetIndex = true;
   }
   if (
