@@ -8,7 +8,7 @@
 
 	{{> header}}
 
-	<div class="container">
+	<div class="container admin-layout">
 		<div>
 
   		<h1>Status</h1>
@@ -26,6 +26,52 @@
 					<button type="submit" value="Search">Search</button>
 				</form>
 			</p>
+
+			<hr>
+
+			<h1>Elastic Search &amp; GraphQL</h1>
+			<p>
+				<form method="post">
+					<table>
+						<tr>
+							<td>Elastic Search</td>
+							<td><input type="text" name="elasticsearch" placeholder="Example: localhost:9200" {{#if config.elasticsearch.host}}value="{{config.elasticsearch.host}}"{{/if}}>
+						</tr>
+						<tr>
+							<td>GraphQL</td>
+							<td><input type="text" name="graphql" placeholder="Example: localhost:3000" {{#if config.graphql.host}}value="{{config.graphql.host}}"{{/if}}>
+						</tr>
+						<tr><td colspan="2"><button type="submit" value="updatehosts" name="action">Update</button></td></tr>
+					</table>
+
+				</form>
+			</p>
+
+			<hr>
+
+			<h1>Item XML data</h1>
+			<p>
+				<table>
+						<tr>
+							<th scope="col">File</th>
+							<th scope="col">Index</th>
+							<th scope="col">Type</th>
+							<th scope="col">Status</th>
+							<th scope="col" colspan="2" class="span">Action</th>
+						</tr>
+					{{#each config.xml}}
+						<tr>
+							<th scope="row">{{file}}</th>
+							<td>{{index}}</td>
+							<td>{{type}}</td>
+							{{#if missing}}<td class="error">Missing</td>{{else}}<td>Exists</td>{{/if}}
+							<td>{{#if missing}}&nbsp;{{else}}<button type="submit" value="update">Update</button></td>{{/if}}
+							<td><button type="submit" value="delete">Remove</button></td>
+						</tr>
+					{{/each}}
+				</table>
+			</p>
+
 		</div>
 	</div>
 

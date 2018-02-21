@@ -167,6 +167,45 @@ nav {
     font-family: monospace;
     font-size: 12px;
   }
+
+  &.admin-layout {
+    table {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 1em;
+      background: #f9f9f9;
+      th {
+        text-align: left;
+        &.span {
+          text-align: center;
+        }
+      }
+      td {
+        &.error {
+          color: red;
+        }
+      }
+      input[type='text'] {
+        width: 100%;
+        font-size: 1.2em;
+        padding: 8px;
+      }
+      button {
+        font-size: 1.2em;
+        padding: 8px;
+        background: #0d47a1;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+        cursor: pointer;
+        &:hover {
+          background-color: #039be5;
+        }
+      }
+    }
+  }
 }
 
 @media only screen and (min-width: 601px) {
