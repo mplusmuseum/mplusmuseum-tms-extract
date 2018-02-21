@@ -64,6 +64,12 @@ nav {
   margin: 0 auto;
   max-width: 1280px;
   width: 90%;
+
+  p {
+    font-size: 1.125rem;
+    line-height: 2rem;
+  }
+
   a {
     color: #039be5;
   }
@@ -169,6 +175,10 @@ nav {
   }
 
   &.admin-layout {
+    code {
+      font-weight: bold;
+      font-size: 1.2em;
+    }
     table {
       width: 100%;
       border: 1px solid #ddd;
