@@ -11,9 +11,11 @@
 	<div class="container admin-layout">
 		<div>
 
-  		<h1>Status</h1>
+			<h1>Status</h1>
 
-			<p>{{msg}}</p>
+			<hr>
+
+  		<h1>Search</h1>
 
 			<p>
 				<form method="post">
@@ -65,7 +67,7 @@
 								<th scope="row">{{file}}</th>
 								<td>{{index}}</td>
 								<td>{{type}}</td>
-								{{#if missing}}<td class="error">Missing</td>{{else}}<td>Exists</td>{{/if}}
+								{{#if missing}}<td class="error">Missing</td>{{else}}{{#if parser}}<td>Exists</td>{{else}}<td class="error">Missing parser code</td>{{/if}}{{/if}}
 								<td><button type="submit" value="delete:{{file}}" name="action">Remove</button></td>
 							</tr>
 						{{/each}}

@@ -58,13 +58,20 @@ exports.index = async (request, response) => {
   const configJSON = getConfig();
 
   //  Go through the config checking that the xml files we are looking for
-  //  actually exists.
+  //  actually exists, we'll check for the parse files here too.
   //  NOTE: The missing/exists may seem redundant, but we're just making it
   //  easier for the front end to toggle displays
+  //  NOTE: Checking to see if parsing code exists for the object like this
+  //  is kinda bad as we are asking the code to check on itself kinda. But it
+  //  is useful to give a less technical user who's just using the front end
+  //  feedback if they register a new XML data source for which we haven't
+  //  actually written parsers for.
   const rootDir = process.cwd();
   if ('xml' in configJSON) {
     configJSON.xml = configJSON.xml.map((itemData) => {
       const newItem = itemData;
+
+      //  Check the xml file
       const xmlFile = `${rootDir}/app/data/xml/${itemData.file}`;
       if (fs.existsSync(xmlFile)) {
         newItem.missing = false;
@@ -73,6 +80,18 @@ exports.index = async (request, response) => {
         newItem.missing = true;
         newItem.exists = false;
       }
+
+      //  Check the parsing code
+      //  NOTE: this is a _bit_ bad :)
+      const parseCode = `${rootDir}/app/cli/tmsxml2json/parsers/${
+        itemData.type
+      }/index.js`;
+      if (fs.existsSync(parseCode)) {
+        newItem.parser = true;
+      } else {
+        newItem.parser = false;
+      }
+
       return newItem;
     });
   }
@@ -158,10 +177,6 @@ exports.index = async (request, response) => {
         if (index === '' || type === '') {
           return response.redirect('/');
         }
-        console.log(request.body);
-        console.log('xmlFile: ', xmlFile);
-        console.log('index: ', index);
-        console.log('type: ', type);
         if (!('xml' in configJSON)) {
           configJSON.xml = [];
         }
