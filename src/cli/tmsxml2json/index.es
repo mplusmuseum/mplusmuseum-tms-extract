@@ -7,6 +7,7 @@ const artisanalints = require('../../../lib/artisanalints');
 const parseObject = require('./parsers/object');
 const elasticsearch = require('elasticsearch');
 const progress = require('cli-progress');
+const tools = require('../../modules/tools');
 
 colours.setTheme({
   info: 'green',
@@ -36,20 +37,7 @@ let skipBulk = false;
 let forceResetIndex = false;
 let forceIngest = false;
 
-//  Make sure the config file exists
-if (!fs.existsSync(`${rootDir}/config.json`)) {
-  console.error('');
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-  console.error('You are missing the config.json file.'.error);
-  console.error('Try copying config.json.example to config.json or'.error);
-  console.error('visting the web admin tool.'.error);
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-  console.error('');
-  process.exit(1);
-}
-/* eslint-disable import/no-unresolved */
-const config = require('../../../config.json');
-/* eslint-enable import/no-unresolved */
+const config = tools.getConfig();
 
 //  Make sure we have an elasticsearch thingy to connect to
 if (!('elasticsearch' in config)) {
@@ -167,24 +155,6 @@ const storeHashTable = async (source, hashTable) => {
   }
 };
 
-/**
- * This pings elastic search to see if it's up
- */
-const pingES = async () => {
-  const startPing = new Date().getTime();
-  let diff = null;
-  let worked = false;
-  try {
-    worked = await esclient.ping();
-  } catch (er) {
-    return diff;
-  }
-  const endPing = new Date().getTime();
-  if (worked === true) {
-    diff = endPing - startPing;
-  }
-  return diff;
-};
 /**
  * This takes the json and looks to see if we need to do a bulk upload which
  * only happens on the 1st run. After that we skip the bulk and just upload
@@ -605,7 +575,7 @@ const start = async () => {
   console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
 
   console.log('Pinging ElasticSearch...');
-  const ping = await pingES();
+  const ping = await tools.pingES();
   if (ping === null) {
     console.log('Could not ping ES server'.error);
   } else {

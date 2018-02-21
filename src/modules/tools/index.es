@@ -1,4 +1,5 @@
 const fs = require('fs');
+const elasticsearch = require('elasticsearch');
 
 /**
  * This reads the config from wherever it's kept and turns it into JSON
@@ -7,7 +8,7 @@ const fs = require('fs');
  * the local file system
  * @return {Boolean}        If we did a bulk upload or not
  */
-exports.getConfig = () => {
+const getConfig = () => {
   //  Read in the config file, if there is one
   const rootDir = process.cwd();
   const configFile = `${rootDir}/config.json`;
@@ -18,6 +19,7 @@ exports.getConfig = () => {
   }
   return configJSON;
 };
+exports.getConfig = getConfig;
 
 /**
  * This takes whatever config file is passed to it, cleans it up from the
@@ -45,3 +47,41 @@ exports.putConfig = (configJSON) => {
   const configJSONPretty = JSON.stringify(newJSON, null, 4);
   fs.writeFileSync(configFile, configJSONPretty, 'utf-8');
 };
+
+/**
+ * This pings elastic search to see if it's up
+ * @return {null/number} Null if no connection, milliseconds if we did
+ */
+const pingES = async () => {
+  const config = getConfig();
+  const esclient = new elasticsearch.Client(config.elasticsearch);
+  const startPing = new Date().getTime();
+  let diff = null;
+  let worked = false;
+  try {
+    worked = await esclient.ping();
+  } catch (er) {
+    return diff;
+  }
+  const endPing = new Date().getTime();
+  if (worked === true) {
+    diff = endPing - startPing;
+  }
+  return diff;
+};
+exports.pingES = pingES;
+
+/**
+ * This pings elastic search to see if it's up
+ */
+const startPinging = async () => {
+  const ms = await pingES();
+  if ('pingTmr' in global) {
+    clearTimeout(global.pingTmr);
+  }
+  global.pingTmr = setTimeout(() => {
+    console.log(`${ms}ms`);
+    startPinging();
+  }, 1000);
+};
+exports.startPinging = startPinging;
