@@ -13,7 +13,22 @@
 		<div>
 
 			<h1>Status</h1>
+			<p>
+				<table>
+					<tr>
+						<td>Last process started at:</td><td>{{timePretty counts.startProcessing}}</td>
+					</tr>
+					<tr>
+						<td>Last process action at:</td><td>{{timePretty counts.lastSave}} ({{timeAgo counts.lastSave}})</td>
+					</tr>
+					<tr>
+						<td>Processing Time:</td><td>{{timeDiff counts.processingTime}}</td>
+					</tr>
+				</table>
+			</p>
 
+{{{dumpJSON counts}}}
+{{dumpThis counts}}
 			<hr>
 
   		<h1>Search</h1>

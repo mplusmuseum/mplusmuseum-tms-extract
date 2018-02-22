@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
     return options.fn(this);
@@ -189,3 +191,9 @@ exports.dumpJSON = (object) => {
 };
 
 exports.prettyNumber = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+exports.timePretty = t => moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a');
+
+exports.timeDiff = diff => moment.duration(diff).humanize();
+
+exports.timeAgo = diff => moment(diff).fromNow();

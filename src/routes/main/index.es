@@ -199,6 +199,7 @@ exports.index = async (request, response) => {
   }
 
   templateValues.pingData = tools.getPingData();
+  templateValues.counts = tools.getCounts();
   templateValues.addableFiles = addableFiles;
   templateValues.dataDirExists = dataDirExists;
   templateValues.usingAbsolutePath = usingAbsolutePath;
