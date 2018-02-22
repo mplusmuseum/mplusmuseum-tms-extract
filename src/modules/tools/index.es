@@ -1,6 +1,31 @@
 const fs = require('fs');
 const elasticsearch = require('elasticsearch');
 const crypto = require('crypto');
+
+/**
+ * Converts a time difference in ms into an easier to read form
+ * @param {number} duration The time in milliseconds to convert
+ * @return {string}         The nice text string
+ */
+const msToTime = (duration) => {
+  let seconds = parseInt((duration / 1000) % 60, 10);
+  let minutes = parseInt((duration / (1000 * 60)) % 60, 10);
+  let hours = parseInt((duration / (1000 * 60 * 60)) % 24, 10);
+
+  hours = hours < 10 ? `0${hours}` : hours;
+  minutes = minutes < 10 ? `0${minutes}` : minutes;
+  seconds = seconds < 10 ? `0${seconds}` : seconds;
+
+  if (parseInt(hours, 10) > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  if (parseInt(minutes, 10) > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  return `${seconds}s`;
+};
+exports.msToTime = msToTime;
+
 /**
  * This reads the config from wherever it's kept and turns it into JSON
  * before passing it back.
