@@ -75,6 +75,17 @@ if (config.onLambda) {
 }
 
 /**
+ * This dumps the counts information down to disc
+ * @param {Object} counts the counts JSON object
+ */
+const saveCounts = (counts) => {
+  const newCounts = counts;
+  newCounts.lastSave = new Date().getTime();
+  const countsJSONPretty = JSON.stringify(newCounts, null, 4);
+  fs.writeFileSync(`${dataDir}/counts.json`, countsJSONPretty, 'utf-8');
+};
+
+/**
  * This converts an xml chunk into the JSON format we want
  * @param {string} xml the xml text we want to have parsed
  * @returns {Object} the JSON obeject representation of the xml
@@ -397,13 +408,19 @@ const processXML = async () => {
   //  NOTE: we are looping this way because we are firing off an `await`
   //  which modifies our counts object, so we're going to "sequentially"
   //  await the responses
-  const counts = {};
+  const counts = {
+    items: {},
+    startProcessing: new Date().getTime(),
+  };
+
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < config.xml.length; i += 1) {
     const { file, index, type } = config.xml[i];
-    counts[index] = {
+    counts.items[index] = {
+      startProcessing: new Date().getTime(),
       file,
     };
+    saveCounts(counts);
     console.log(`About to check for ${index} in file ${file}`.help);
 
     //  TODO: Error check that the file actually exists
@@ -415,14 +432,20 @@ const processXML = async () => {
       console.log('Finished conversion.'.alert);
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
-      counts[index].jsonCount = await splitJson(index, json.objects);
+      counts.items[index].jsonCount = await splitJson(index, json.objects);
       await checkIndexes(index);
-      await bulkUpload(index, type, json);
-      counts[index].xmlCount = splitXml(index, xml);
+      const bulkUploaded = await bulkUpload(index, type, json);
+      counts.items[index].bulkUpload = {
+        bulkUploaded,
+        lastChecked: new Date().getTime(),
+      };
+      counts.items[index].xmlCount = splitXml(index, xml);
+      saveCounts(counts);
     } else {
       console.log('File not found, skipping.'.error);
-      counts[index].jsonCount = -1;
-      counts[index].xmlCount = -1;
+      counts.items[index].jsonCount = -1;
+      counts.items[index].xmlCount = -1;
+      saveCounts(counts);
     }
     console.log('');
   }
@@ -432,29 +455,18 @@ const processXML = async () => {
 };
 
 /**
- * This triggers a rebuild of indexes
+ * This is the end of everything wrap-up
  * @param {Object} counts An object that holds the counts to be displayed
  */
-const triggerIndexRebuilds = async (counts) => {
+const finish = (counts) => {
+  const newCounts = counts;
+  newCounts.lastFinished = new Date().getTime();
+  saveCounts(newCounts);
   console.log(counts);
-};
-
-const msToTime = (duration) => {
-  let seconds = parseInt((duration / 1000) % 60, 10);
-  let minutes = parseInt((duration / (1000 * 60)) % 60, 10);
-  let hours = parseInt((duration / (1000 * 60 * 60)) % 24, 10);
-
-  hours = hours < 10 ? `0${hours}` : hours;
-  minutes = minutes < 10 ? `0${minutes}` : minutes;
-  seconds = seconds < 10 ? `0${seconds}` : seconds;
-
-  if (parseInt(hours, 10) > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
-  }
-  if (parseInt(minutes, 10) > 0) {
-    return `${minutes}m ${seconds}s`;
-  }
-  return `${seconds}s`;
+  console.log('Done!');
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('');
+  process.exit(1);
 };
 
 /**
@@ -515,6 +527,13 @@ const upsertItems = async (counts, countBar) => {
       countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
     }
 
+    const newCounts = counts;
+    newCounts.items[itemIndex].totalItemsToUpload = totalItemsToUpload;
+    newCounts.items[itemIndex].itemsUploaded = itemsUploaded;
+    newCounts.items[itemIndex].lastUpsert = new Date().getTime();
+
+    saveCounts(newCounts);
+
     //  Now we do the ES upsert
     const index = itemIndex;
     const type = itemType;
@@ -531,17 +550,17 @@ const upsertItems = async (counts, countBar) => {
         const timeDiff = new Date().getTime() - startTime;
         const aveTime = timeDiff / itemsUploaded;
         const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
-        const myEta = msToTime(remainingTime);
+        const myEta = tools.msToTime(remainingTime);
         countBar.update(itemsUploaded, {
           myEta,
         });
         setTimeout(() => {
-          upsertItems(counts, countBar);
+          upsertItems(newCounts, countBar);
         }, 10);
       });
   } else {
     countBar.stop();
-    triggerIndexRebuilds(counts);
+    finish(counts);
   }
 };
 
@@ -584,10 +603,9 @@ const start = async () => {
     upsertItems(counts, countBar);
   } else {
     console.log("Can't connect to ES server, skipping upserting".warn);
-    console.log(counts);
-    console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-    console.error('');
-    process.exit(1);
+    const newCounts = counts;
+    newCounts.error = "Can't connect to ES server, skipping upserting";
+    finish(counts);
   }
 };
 
