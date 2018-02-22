@@ -23,7 +23,7 @@ exports.index = async (request, response) => {
       const newItem = itemData;
 
       //  Check the xml file
-      const xmlFile = `${rootDir}/app/data/xml/${itemData.file}`;
+      const xmlFile = tools.getXmlDir();
       if (fs.existsSync(xmlFile)) {
         newItem.missing = false;
         newItem.exists = true;
@@ -149,6 +149,23 @@ exports.index = async (request, response) => {
         saveConfig = true;
       }
 
+      //  If we've been passed an absolute directory then we check it exists
+      //  and the update the config file
+      if (request.body.action === 'addDataDir') {
+        const { xmlPath } = request.body;
+        if (!fs.existsSync(xmlPath)) {
+          return response.redirect('/');
+        }
+        configJSON.xmlPath = xmlPath;
+        saveConfig = true;
+      }
+
+      //  If we've been told to remove the absolute directory we do that here
+      if (request.body.action === 'removeDataDir') {
+        delete configJSON.xmlPath;
+        saveConfig = true;
+      }
+
       if (saveConfig === true) {
         tools.putConfig(configJSON);
         return response.redirect('/');
@@ -164,10 +181,10 @@ exports.index = async (request, response) => {
     existingFiles = configJSON.xml.map(itemData => itemData.file);
   }
   let addableFiles = null;
-  let appdataxmlExists = false;
-  const dataDir = `${rootDir}/app/data/xml`;
+  let dataDirExists = false;
+  const dataDir = tools.getXmlDir();
   if (fs.existsSync(dataDir)) {
-    appdataxmlExists = true;
+    dataDirExists = true;
     const files = fs
       .readdirSync(dataDir)
       .filter(file => file.split('.')[1] === 'xml')
@@ -175,9 +192,17 @@ exports.index = async (request, response) => {
     addableFiles = files;
   }
 
+  //  Check to see if we're using an absolute path or not
+  let usingAbsolutePath = false;
+  if ('xmlPath' in configJSON) {
+    usingAbsolutePath = true;
+  }
+
   templateValues.pingData = tools.getPingData();
-  templateValues.appdataxmlExists = appdataxmlExists;
   templateValues.addableFiles = addableFiles;
+  templateValues.dataDirExists = dataDirExists;
+  templateValues.usingAbsolutePath = usingAbsolutePath;
+  templateValues.dataDir = dataDir;
   templateValues.config = configJSON;
   return response.render('main/index', templateValues);
 };

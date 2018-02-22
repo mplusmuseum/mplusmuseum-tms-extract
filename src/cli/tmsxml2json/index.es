@@ -65,7 +65,7 @@ if (config.onLambda) {
   process.exit(1);
 } else {
   dataDir = `${rootDir}/app/data`;
-  xmlDir = `${dataDir}/xml`;
+  xmlDir = tools.getXmlDir();
   tmsDir = `${dataDir}/tms`;
 
   // Make sure all the folders we need to use exist

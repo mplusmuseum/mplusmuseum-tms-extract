@@ -173,6 +173,11 @@ const getPings = () => {
 };
 exports.getPings = getPings;
 
+/**
+ * Grabs the latest ping data for the current ES instance and adds a bunch
+ * of extra information useful to both the backend and front end templates.
+ * @return {Object}   JSON object with a bunch of data in
+ */
 exports.getPingData = () => {
   const pings = getPings();
   let timetoLastPing = null;
@@ -238,4 +243,17 @@ exports.getPingData = () => {
     pings,
   };
   return pingData;
+};
+
+/**
+ * Grabs the xml directory from config and returns it or the default value
+ * @return {string}   The absolute directory of the xml
+ */
+exports.getXmlDir = () => {
+  const config = getConfig();
+  if ('xmlPath' in config) {
+    return config.xmlPath;
+  }
+  const rootDir = process.cwd();
+  return `${rootDir}/app/data/xml`;
 };
