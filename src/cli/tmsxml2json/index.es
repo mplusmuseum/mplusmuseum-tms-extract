@@ -77,6 +77,8 @@ if (config.onLambda) {
 /**
  * This dumps the counts information down to disc
  * @param {Object} counts the counts JSON object
+ * TODO: We should really check if we are running on Lambda and store the
+ * counts somewhere else if we need to.
  */
 const saveCounts = (counts) => {
   const newCounts = counts;
@@ -165,6 +167,13 @@ const storeHashTable = async (source, hashTable) => {
   }
 };
 
+/**
+ * This bit of code looks to see if the ES index for this index doesn't exist,
+ * and if it doesn't it'll re-create it. It'll also recreate it if we have been
+ * pass in the --resetindex flag on the command line.
+ *
+ * @param {string} index  The name of the index to check/build
+ */
 const checkIndexes = async (index) => {
   let resetIndex = false;
   if (forceResetIndex === true) {
@@ -550,7 +559,7 @@ const upsertItems = async (counts, countBar) => {
         const timeDiff = new Date().getTime() - startTime;
         const aveTime = timeDiff / itemsUploaded;
         const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
-        const myEta = tools.msToTime(remainingTime);
+        const myEta = tools.upsertItems(remainingTime);
         countBar.update(itemsUploaded, {
           myEta,
         });
@@ -564,6 +573,14 @@ const upsertItems = async (counts, countBar) => {
   }
 };
 
+/*
+ * This is our main script that runs everything else in order.
+ * NOTE: because of the way we run things our last call is to `upsertItems`
+ * which then kicks off a timer loop, so this function doesn't actually
+ * "finish" the script. That happens in the `upsertItems` function which
+ * keeps calling itself until all the files have been processed. We actually
+ * end in the `finished()` function.
+ */
 const start = async () => {
   console.error('');
   console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
@@ -641,4 +658,5 @@ process.argv.forEach((val) => {
     process.exit(1);
   }
 });
+
 start();
