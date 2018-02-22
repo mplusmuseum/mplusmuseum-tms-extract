@@ -536,13 +536,6 @@ const upsertItems = async (counts, countBar) => {
       countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
     }
 
-    const newCounts = counts;
-    newCounts.items[itemIndex].totalItemsToUpload = totalItemsToUpload;
-    newCounts.items[itemIndex].itemsUploaded = itemsUploaded;
-    newCounts.items[itemIndex].lastUpsert = new Date().getTime();
-
-    saveCounts(newCounts);
-
     //  Now we do the ES upsert
     const index = itemIndex;
     const type = itemType;
@@ -559,10 +552,18 @@ const upsertItems = async (counts, countBar) => {
         const timeDiff = new Date().getTime() - startTime;
         const aveTime = timeDiff / itemsUploaded;
         const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
-        const myEta = tools.upsertItems(remainingTime);
+        const myEta = tools.msToTime(remainingTime);
         countBar.update(itemsUploaded, {
           myEta,
         });
+
+        const newCounts = counts;
+        newCounts.items[itemIndex].totalItemsToUpload = totalItemsToUpload;
+        newCounts.items[itemIndex].itemsUploaded = itemsUploaded;
+        newCounts.items[itemIndex].lastUpsert = new Date().getTime();
+
+        saveCounts(newCounts);
+
         setTimeout(() => {
           upsertItems(newCounts, countBar);
         }, 10);
