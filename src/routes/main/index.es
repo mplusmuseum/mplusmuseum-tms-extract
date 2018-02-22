@@ -80,6 +80,14 @@ exports.index = async (request, response) => {
             saveConfig = true;
             delete configJSON.elasticsearch;
           }
+          //  If we've updated the ElasticSearch then stop any currently
+          //  set up pinging timer and fire off a new ping.
+          if (saveConfig) {
+            if ('pingTmr' in global) {
+              clearTimeout(global.pingTmr);
+            }
+            tools.startPinging();
+          }
         }
         //  Do the graphQL part
         if ('graphql' in request.body) {
