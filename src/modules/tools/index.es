@@ -54,7 +54,6 @@ exports.putConfig = (configJSON) => {
  */
 const pingES = async () => {
   const config = getConfig();
-  const esclient = new elasticsearch.Client(config.elasticsearch);
   //  We want to add error suppression to the client so it doesn't throw
   //  errors (which sometimes will) on the ping test. We want to know the
   //  response is 'null', we don't need all the error messages in our logs
@@ -90,7 +89,6 @@ exports.pingES = pingES;
 const startPinging = async () => {
   //  Ping the ES
   const ms = await pingES();
-  console.log(`${ms}ms`);
 
   //  Grab the current ES server, and record the data into the ping file
   const config = getConfig();
@@ -144,5 +142,6 @@ const startPinging = async () => {
   //  Call this again in a while
   global.pingTmr = setTimeout(() => {
     startPinging();
+  }, 60 * 1000);
 };
 exports.startPinging = startPinging;
