@@ -27,11 +27,38 @@ const msToTime = (duration) => {
 exports.msToTime = msToTime;
 
 /**
+ * This reads the counts file from wherever it's kept and turns it into JSON
+ * before passing it back.
+ * We may also be fetching this from some other place over the network than
+ * the local file system
+ * @return {Object}        The counts json
+ */
+const getCounts = () => {
+  //  Read in the config file, if there is one
+  const rootDir = process.cwd();
+  const countsFile = `${rootDir}/app/data/counts.json`;
+  let countsJSON = {};
+  if (fs.existsSync(countsFile)) {
+    const counts = fs.readFileSync(countsFile, 'utf-8');
+    countsJSON = JSON.parse(counts);
+    if ('startProcessing' in countsJSON && 'lastSave' in countsJSON) {
+      countsJSON.processingTime =
+        countsJSON.lastSave - countsJSON.startProcessing;
+    }
+    if ('lastSave' in countsJSON) {
+      countsJSON.timeSinceLastSave = new Date().getTime() - countsJSON.lastSave;
+    }
+  }
+  return countsJSON;
+};
+exports.getCounts = getCounts;
+
+/**
  * This reads the config from wherever it's kept and turns it into JSON
  * before passing it back.
  * We may also be fetching this from some other place over the network than
  * the local file system
- * @return {Boolean}        If we did a bulk upload or not
+ * @return {Object}        The config json
  */
 const getConfig = () => {
   //  Read in the config file, if there is one
