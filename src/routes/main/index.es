@@ -175,6 +175,7 @@ exports.index = async (request, response) => {
     addableFiles = files;
   }
 
+  templateValues.pingData = tools.getPingData();
   templateValues.appdataxmlExists = appdataxmlExists;
   templateValues.addableFiles = addableFiles;
   templateValues.config = configJSON;

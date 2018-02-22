@@ -151,7 +151,7 @@ exports.startPinging = startPinging;
  * elastic search host.
  * @return {Array} array of connection speeds and time
  */
-exports.getPings = () => {
+const getPings = () => {
   const config = getConfig();
   if ('elasticsearch' in config) {
     const ES = config.elasticsearch.host;
@@ -170,4 +170,72 @@ exports.getPings = () => {
     }
   }
   return [];
+};
+exports.getPings = getPings;
+
+exports.getPingData = () => {
+  const pings = getPings();
+  let timetoLastPing = null;
+  let averagePing = null;
+  let nullCount = 0;
+  let mostRecentIsDead = true;
+  let lastFiveAreDead = true;
+  let haveData = false;
+
+  if (pings.length > 0) {
+    let totalMS = 0;
+    let pingCount = 0;
+    pings.forEach((ping) => {
+      haveData = true;
+
+      if (timetoLastPing === null) {
+        timetoLastPing = new Date().getTime() - ping.timestamp;
+        timetoLastPing = parseInt(timetoLastPing / 1000, 10);
+      }
+
+      if (ping.ms === null) {
+        nullCount += 1;
+      } else {
+        pingCount += 1;
+        totalMS += ping.ms;
+      }
+      //  Check to see if the most recent ping was dead
+      if (pingCount + nullCount === 1) {
+        if (ping.ms !== null) {
+          mostRecentIsDead = false;
+        }
+      }
+      //  Check to see if all the most recent 5 pings were dead
+      if (pingCount + nullCount <= 5) {
+        if (ping.ms !== null) {
+          lastFiveAreDead = false;
+        }
+      }
+    });
+    averagePing = parseInt(totalMS / pingCount, 10);
+    if (pingCount + nullCount < 5) {
+      lastFiveAreDead = false;
+    }
+    const d = new Date().getTime();
+    pings.map((ping) => {
+      const newPing = ping;
+      const diff = parseInt((d - ping.timestamp) / 1000, 10);
+      if (diff < 60) {
+        newPing.timeAgo = '1s';
+      } else {
+        newPing.timeAgo = `${parseInt(diff / 60, 10)}m`;
+      }
+      return newPing;
+    });
+  }
+  const pingData = {
+    haveData,
+    nullCount,
+    averagePing,
+    timetoLastPing,
+    mostRecentIsDead,
+    lastFiveAreDead,
+    pings,
+  };
+  return pingData;
 };

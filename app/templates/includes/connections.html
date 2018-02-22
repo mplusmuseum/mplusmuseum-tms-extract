@@ -1,0 +1,35 @@
+<div class="connections">
+  <div class="graphQL">
+    GraphQL: {{#if config.graphql.host}}Configured{{else}}Not configured{{/if}}
+  </div>
+  <div class="elasticsearch"
+{{#if pingData.haveData}}
+title="
+{{#each pingData.pings}}
+{{#ifEqual ms null}}
+failed, {{../timeAgo}} ago.
+{{else}}
+{{../ms}}ms, {{../timeAgo}} ago.
+{{/ifEqual}}
+{{/each}}
+"
+{{else}}
+title="
+No data"
+{{/if}}>
+    Elastic Search:
+    {{#if pingData.haveData}}
+      {{#if pingData.averagePing}}<span class="average">Averge ping: {{pingData.averagePing}}ms.</span>{{/if}}
+      {{#if pingData.timetoLastPing}}<span class="last">Last ping: {{pingData.timetoLastPing}}s.</span>{{/if}}
+      {{#if pingData.mostRecentIsDead}}
+        {{#if pingData.lastFiveAreDead}}
+          <span class="alert">Last 5 pings failed!</span>
+        {{else}}
+          <span class="warn">Last ping failed.</span>
+        {{/if}}
+      {{/if}}
+    {{else}}
+      <span class="error">No data found</span>
+    {{/if}}
+  </div>
+</div>
