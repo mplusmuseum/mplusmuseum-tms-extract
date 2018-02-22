@@ -8,6 +8,7 @@ const http = require('http');
 const bodyParser = require('body-parser');
 
 const auth = require('http-auth');
+const tools = require('./app/modules/tools');
 
 const basic = auth.basic({
   realm: 'Private area',
@@ -57,6 +58,9 @@ if (process.env.NODE_ENV !== 'DEV') {
     res.status(500).send('Something broke!');
   });
 }
+
+//  This is where we are going to do some extra checking
+tools.startPinging();
 
 console.log(`>> Connect to: http://localhost:${process.env.PORT}`.alert);
 http.createServer(app).listen(process.env.PORT);

@@ -60,6 +60,34 @@ nav {
   }
 }
 
+.connections {
+  background: #fcfcfc;
+  min-height: 32px;
+  line-height: 32px;
+  height: auto;
+  position: relative;
+  width: 100%;
+  border-bottom: 1px solid #039be5;
+  font-size: 0.8em;
+  .graphQL {
+    float: right;
+    margin-right: 2em;
+  }
+  .elasticSearch {
+    float: right;
+    margin-right: 2em;
+    cursor: pointer;
+    .alert {
+      color: red;
+      font-weight: bold;
+    }
+    .warn {
+      color: orange;
+      font-weight: bold;
+    }
+  }
+}
+
 .container {
   margin: 0 auto;
   max-width: 1280px;

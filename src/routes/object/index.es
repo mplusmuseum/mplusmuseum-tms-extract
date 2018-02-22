@@ -97,5 +97,6 @@ exports.index = async (request, response) => {
   templateValues.GraphQLQuery = GraphQLQuery;
   templateValues.encodedQL = encodedQL;
   templateValues.encodedAPI = encodedAPI;
+  templateValues.pingData = tools.getPingData();
   return response.render('object/index', templateValues);
 };
