@@ -145,3 +145,29 @@ const startPinging = async () => {
   }, 60 * 1000);
 };
 exports.startPinging = startPinging;
+
+/**
+ * Tries and grabs the ping file for the currently defined in config
+ * elastic search host.
+ * @return {Array} array of connection speeds and time
+ */
+exports.getPings = () => {
+  const config = getConfig();
+  if ('elasticsearch' in config) {
+    const ES = config.elasticsearch.host;
+    const EShash = crypto
+      .createHash('md5')
+      .update(ES)
+      .digest('hex');
+    const rootDir = process.cwd();
+    const pingESFile = `${rootDir}/app/data/esPing.json`;
+    if (fs.existsSync(pingESFile)) {
+      const pingEStxt = fs.readFileSync(pingESFile, 'utf-8');
+      const pingESJSON = JSON.parse(pingEStxt);
+      if (EShash in pingESJSON.hosts) {
+        return pingESJSON.hosts[EShash];
+      }
+    }
+  }
+  return [];
+};
