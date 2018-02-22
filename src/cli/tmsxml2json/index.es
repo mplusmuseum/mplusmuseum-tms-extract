@@ -88,6 +88,21 @@ const saveCounts = (counts) => {
 };
 
 /**
+ * This is the end of everything wrap-up
+ * @param {Object} counts An object that holds the counts to be displayed
+ */
+const finish = (counts) => {
+  const newCounts = counts;
+  newCounts.lastFinished = new Date().getTime();
+  saveCounts(newCounts);
+  console.log(counts);
+  console.log('Done!');
+  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.error('');
+  process.exit(1);
+};
+
+/**
  * This converts an xml chunk into the JSON format we want
  * @param {string} xml the xml text we want to have parsed
  * @returns {Object} the JSON obeject representation of the xml
@@ -461,21 +476,6 @@ const processXML = async () => {
   /* eslint-enable no-await-in-loop */
 
   return counts;
-};
-
-/**
- * This is the end of everything wrap-up
- * @param {Object} counts An object that holds the counts to be displayed
- */
-const finish = (counts) => {
-  const newCounts = counts;
-  newCounts.lastFinished = new Date().getTime();
-  saveCounts(newCounts);
-  console.log(counts);
-  console.log('Done!');
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-  console.error('');
-  process.exit(1);
 };
 
 /**
