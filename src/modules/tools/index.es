@@ -244,3 +244,16 @@ exports.getPingData = () => {
   };
   return pingData;
 };
+
+/**
+ * Grabs the xml directory from config and returns it or the default value
+ * @return {string}   The absolute directory of the xml
+ */
+exports.getXmlDir = () => {
+  const config = getConfig();
+  if ('xmlPath' in config) {
+    return config.xmlPath;
+  }
+  const rootDir = process.cwd();
+  return `${rootDir}/app/data/xml`;
+};

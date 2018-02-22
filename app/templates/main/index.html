@@ -90,7 +90,14 @@
 			<h1>Add XML item files</h1>
 				{{#if addableFiles}}
 				<p>
-				The following files have been found in the <code>/app/data/xml</code> folder, please enter the <code>Index</code> and <code>Type</code> and click the "Add" button for each file you wish to add.
+				The following files have been found in the
+				{{#if usingAbsolutePath}}
+					<code>{{dataDir}}</code>
+				{{else}}
+					<code>/app/data/xml</code>
+				{{/if}}
+
+				folder, please enter the <code>Index</code> and <code>Type</code> and click the "Add" button for each file you wish to add.
 				</p>
 				<p>
 					<form method="post">
@@ -121,9 +128,46 @@
 				<p>
 				{{else}}
 					<p>
-						No exported .xml files found in <code>/app/data/xml</code>. You should place (or automate the placing of) the .xml files exported from TMS into the <code>/app/data/xml</code> directory and then refresh this page.
+						No exported .xml files found in
+						{{#if usingAbsolutePath}}
+							<code>{{dataDir}}</code>
+						{{else}}
+							<code>/app/data/xml</code>
+						{{/if}}.
+						You should place (or automate the placing of) the .xml files exported from TMS into the
+						{{#if usingAbsolutePath}}
+							<code>{{dataDir}}</code> absolute
+						{{else}}
+							<code>/app/data/xml</code> directory
+						{{/if}}
+						 and then refresh this page.
 					</p>
 				{{/if}}
+
+				<hr>
+
+				<h1>Change XML directory location</h1>
+				<p>
+					{{#if usingAbsolutePath}}
+						We have been told to use the <em>absolute</em> path: <code>{{dataDir}}</code>. If you wish to change this or go back to the default directory click the remove button below.
+						<form method="post">
+							<table>
+								<tr><td><button type="submit" value="removeDataDir" name="action">Remove</button></td></tr>
+							</table>
+						</form>
+					{{else}}
+						We are looking for the XML files in the default location of <code>/app/data/xml</code>, you can change this to an <em>absolute</em> path if you know it here.
+						<form method="post">
+							<table>
+								<tr>
+									<td>Absolute path</td>
+									<td><input type="text" name="xmlPath" placeholder="example: /usr/local/tmp" >
+									<td><button type="submit" value="addDataDir" name="action">Add</button></td>
+								</tr>
+							</table>
+						</form>
+					{{/if}}
+				</p>
 
 		</div>
 	</div>
