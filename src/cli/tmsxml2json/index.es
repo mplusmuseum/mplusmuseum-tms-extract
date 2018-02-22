@@ -33,7 +33,6 @@ let totalItemsToUpload = null;
 let itemsUploaded = 0;
 let esLive = false;
 let forceBulk = false;
-let skipBulk = false;
 let forceResetIndex = false;
 let forceIngest = false;
 
@@ -155,6 +154,30 @@ const storeHashTable = async (source, hashTable) => {
   }
 };
 
+const checkIndexes = async (index) => {
+  let resetIndex = false;
+  if (forceResetIndex === true) {
+    console.log('We have been told to reset the index.'.warn);
+    resetIndex = true;
+  }
+
+  //  Check the indexes here, if one doesn't already exist then we *must*
+  //  create one, otherwise only re-create on if we've been forced to by
+  //  the command line
+  const exists = await esclient.indices.exists({ index });
+  if (exists === false) {
+    console.log(`Creating new index for ${index}`);
+    await esclient.indices.create({ index });
+  }
+
+  if (resetIndex === true && exists === true) {
+    console.log(`Removing old index for ${index}`);
+    await esclient.indices.delete({ index });
+    console.log(`Creating new index for ${index}`);
+    await esclient.indices.create({ index });
+  }
+};
+
 /**
  * This takes the json and looks to see if we need to do a bulk upload which
  * only happens on the 1st run. After that we skip the bulk and just upload
@@ -166,31 +189,11 @@ const bulkUpload = async (index, type, json) => {
   const outputDir = `${tmsDir}/${index}`;
   if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir);
   let doBulkUpload = false;
-  let resetIndex = false;
-
-  //  If a previous bulk upload files doesn't exist, then we are going to
-  //  need to do the bulk upload (this normally happens on 1st run);
-  if (!fs.existsSync(`${outputDir}/bulk.json`)) {
-    console.log('No previous bulk upload found.'.help);
-    doBulkUpload = true;
-    resetIndex = true;
-  }
 
   //  If we are forcing a bulk upload then we do that here
   if (forceBulk === true) {
     console.log('We have been told to force a new bulk upload.'.warn);
     doBulkUpload = true;
-  }
-
-  //  If we are skipping the bulk upload then that takes priority
-  if (skipBulk === true) {
-    console.log('We have been told to skip a new bulk upload.'.warn);
-    doBulkUpload = false;
-  }
-
-  if (forceResetIndex === true) {
-    console.log('We have been told to reset the index.'.warn);
-    resetIndex = true;
   }
 
   if (doBulkUpload === true) {
@@ -207,37 +210,9 @@ const bulkUpload = async (index, type, json) => {
       { doc: object.object, doc_as_upsert: true },
     ]));
 
-    //  Delete any old index
-    if (resetIndex === true) {
-      const exists = await esclient.indices.exists({ index });
-      if (exists) {
-        console.log(`Removing old index for ${index}`);
-        await esclient.indices.delete({ index });
-      }
-      console.log(`Creating new index for ${index}`);
-      await esclient.indices.create({ index });
-    }
-
     console.log('Doing bulk upload');
     await esclient.bulk({ body, type, index });
     return true;
-  }
-
-  if (doBulkUpload === false && resetIndex === true) {
-    //  Only reset the indexes if we know we can reach ES
-    if (esLive === false) {
-      console.log('Skipping index upload as ES is unreachable.'.warn);
-      return false;
-    }
-
-    const exists = await esclient.indices.exists({ index });
-    if (exists) {
-      console.log(`Removing old index for ${index}`);
-      await esclient.indices.delete({ index });
-    }
-    console.log(`Creating new index for ${index}`);
-    await esclient.indices.create({ index });
-    return false;
   }
 
   return false;
@@ -287,7 +262,6 @@ const splitJson = async (source, items) => {
   } else {
     console.log(`Splitting JSON into ${items.length} separate files.`.help);
   }
-  console.log(`Saving them into: ${jsonDir}`.help);
 
   items.forEach((item) => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
@@ -442,6 +416,7 @@ const processXML = async () => {
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
       counts[index].jsonCount = await splitJson(index, json.objects);
+      await checkIndexes(index);
       await bulkUpload(index, type, json);
       counts[index].xmlCount = splitXml(index, xml);
     } else {
@@ -623,9 +598,7 @@ process.argv.forEach((val) => {
   ) {
     forceBulk = true;
   }
-  if (val.toLowerCase() === 'skipbulk' || val.toLowerCase() === '--skipbulk') {
-    skipBulk = true;
-  }
+
   if (
     val.toLowerCase() === 'forceingest' ||
     val.toLowerCase() === '--forceingest'
