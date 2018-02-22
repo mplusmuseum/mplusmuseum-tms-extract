@@ -3,6 +3,7 @@
 .sass-cache
 
 app/cli
+app/data/esPing.json
 app/data/tms
 app/data/xml
 app/helpers
