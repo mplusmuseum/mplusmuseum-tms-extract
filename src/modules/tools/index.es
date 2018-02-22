@@ -173,6 +173,11 @@ const getPings = () => {
 };
 exports.getPings = getPings;
 
+/**
+ * Grabs the latest ping data for the current ES instance and adds a bunch
+ * of extra information useful to both the backend and front end templates.
+ * @return {Object}   JSON object with a bunch of data in
+ */
 exports.getPingData = () => {
   const pings = getPings();
   let timetoLastPing = null;
