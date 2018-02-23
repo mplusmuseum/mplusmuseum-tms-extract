@@ -1,11 +1,11 @@
 const fs = require('fs');
 const tools = require('../../modules/tools');
 
-const config = tools.getConfig();
-
-exports.index = async (request, response) => {
+exports.index = (request, response) => {
   const templateValues = {};
   templateValues.msg = 'Hello world!';
+
+  const config = tools.getConfig();
 
   //  Check to see if we have an id, if not then redirect back to root
   //  TODO: in the future we'll redirect to /objects
@@ -86,10 +86,15 @@ exports.index = async (request, response) => {
   }
 }`;
   const encodedQuery = encodeURIComponent(GraphQLQuery);
-  const encodedQL = `${config.graphql.host}/graphql?query=${encodedQuery}`;
-  const encodedAPI = `${
-    config.graphql.host
-  }/api-explorer?query=${encodedQuery}`;
+  let encodedQL = null;
+  let encodedAPI = null;
+
+  let showQL = false;
+  if ('graphql' in config && 'host' in config.graphql) {
+    showQL = true;
+    encodedQL = `${config.graphql.host}/graphql?query=${encodedQuery}`;
+    encodedAPI = `${config.graphql.host}/api-explorer?query=${encodedQuery}`;
+  }
   templateValues.id = id;
   templateValues.showResults = showResults;
   templateValues.objectJSON = objectJSON;
@@ -97,6 +102,8 @@ exports.index = async (request, response) => {
   templateValues.GraphQLQuery = GraphQLQuery;
   templateValues.encodedQL = encodedQL;
   templateValues.encodedAPI = encodedAPI;
+  templateValues.showQL = showQL;
   templateValues.pingData = tools.getPingData();
+  templateValues.config = config;
   return response.render('object/index', templateValues);
 };
