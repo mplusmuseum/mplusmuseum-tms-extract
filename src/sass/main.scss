@@ -242,6 +242,25 @@ nav {
           background-color: #039be5;
         }
       }
+      .progress-back,
+      .progress-front {
+        height: 100%;
+        width: 100%;
+        background: white;
+        border: 1px solid #eee;
+        border-radius: 4px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        line-height: 20px;
+        font-size: 0.9em;
+      }
+      .progress-front {
+        background: #039be5;
+        overflow: hidden;
+        width: 0%;
+        color: white;
+      }
     }
   }
 }

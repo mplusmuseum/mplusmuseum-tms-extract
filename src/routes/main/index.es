@@ -24,7 +24,7 @@ exports.index = async (request, response) => {
 
       //  Check the xml file
       const xmlFile = tools.getXmlDir();
-      if (fs.existsSync(xmlFile)) {
+      if (fs.existsSync(`${xmlFile}/${newItem.file}`)) {
         newItem.missing = false;
         newItem.exists = true;
       } else {
@@ -198,8 +198,77 @@ exports.index = async (request, response) => {
     usingAbsolutePath = true;
   }
 
+  //  Now we want to do all the status stuff, we need to loop over the files
+  //  specified in the config and blend that in with the details from the counts
+  const counts = tools.getCounts();
+  const status = {
+    xmls: [],
+  };
+  const xmlDir = tools.getXmlDir();
+  if ('xml' in configJSON) {
+    //  Do some checks in each item, i.e. if it even exists and the last
+    //  modified time
+    configJSON.xml.forEach((item) => {
+      const xmlStatus = {
+        file: item.file,
+        index: item.index,
+      };
+      if (fs.existsSync(`${xmlDir}/${item.file}`)) {
+        xmlStatus.exists = true;
+        xmlStatus.stat = fs.statSync(`${xmlDir}/${item.file}`);
+      } else {
+        xmlStatus.exists = false;
+      }
+
+      if ('items' in counts) {
+        if (item.index in counts.items) {
+          xmlStatus.counts = counts.items[item.index];
+        }
+
+        //  If we have count data, then we can work out some other information
+        if (item.index in counts.items && xmlStatus.exists) {
+          const c = counts.items[item.index];
+          const genTime = new Date(xmlStatus.stat.mtime).getTime();
+          //  If we started processing the file _before_ the current file
+          //  was modified, then we haven't processed the latest file
+          if (c.startProcessing < genTime) {
+            xmlStatus.processed = false;
+          } else {
+            xmlStatus.processed = true;
+          }
+
+          //  Now we can check to see if the processing has finished, it's
+          //  finished if the itemsUploaded === totalItemsToUpload
+          xmlStatus.notStarted = false;
+          if (
+            c.itemsUploaded === c.totalItemsToUpload &&
+            c.itemsUploaded !== null &&
+            c.itemsUploaded !== undefined
+          ) {
+            xmlStatus.finished = true;
+          } else {
+            xmlStatus.finished = false;
+            if (c.itemsUploaded !== null && c.itemsUploaded !== undefined) {
+              xmlStatus.percent = c.itemsUploaded / c.totalItemsToUpload;
+              xmlStatus.percent *= 100;
+            } else {
+              xmlStatus.notStarted = true;
+              xmlStatus.percent = 0;
+            }
+          }
+          if (c.startProcessing && c.lastUpsert) {
+            xmlStatus.processingTime = c.lastUpsert - c.startProcessing;
+          }
+        }
+      }
+
+      status.xmls.push(xmlStatus);
+    });
+  }
+
   templateValues.pingData = tools.getPingData();
-  templateValues.counts = tools.getCounts();
+  templateValues.status = status;
+  templateValues.counts = counts;
   templateValues.addableFiles = addableFiles;
   templateValues.dataDirExists = dataDirExists;
   templateValues.usingAbsolutePath = usingAbsolutePath;
