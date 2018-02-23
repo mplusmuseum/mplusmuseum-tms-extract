@@ -19,7 +19,7 @@
 					<tr>
 						<td>
 							<h2>Pre-ingested JSON</h2>
-							<div class="json">
+							<div class="json boxme">
 								{{#if objectJSON}}
 									<pre>{{objectJSON}}</pre>
 								{{else}}
@@ -32,7 +32,7 @@
 
 						<td>
 							<h2>Pre-ingested XML</h2>
-							<div class="xml">
+							<div class="xml boxme">
 								{{#if objectXML}}
 									<pre>{{objectXML}}</pre>
 								{{else}}
@@ -49,17 +49,24 @@
 					<tr>
 						<td>
 							<h2>GraphQL query</h2>
-							<div class="graphql">
+							<div class="graphql boxme">
 								<pre>{{GraphQLQuery}}</pre>
 							</div>
-							<br />
-							<a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a><br />
-							<a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a><br />
+
+							{{#if showQL}}
+								<div class="links">
+									<ul>
+										<li><a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a></li>
+										<li><a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a></li>
+									</ul>
+								</div>
+							{{/if}}
+
 						</td>
 
 						<td>
 							<h2>GraphQL Result</h2>
-							<div class="xml">
+							<div class="xml boxme">
 								<pre>Not implimented yet</pre>
 							</div>
 						</td>
@@ -68,7 +75,7 @@
 			{{else}}
 				<div class="norecords">
 					<p>
-						Sorry not object was found.
+						Sorry item not found.
 					</p>
 				</div>
 			{{/if}}
