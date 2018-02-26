@@ -6,6 +6,7 @@ alchemia is a tool to work with tms-xml files
 
 Pull the code down from git then...
 
+    $ gem install compass
     $ yarn install
     $ yarn build
 
