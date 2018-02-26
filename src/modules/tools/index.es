@@ -194,6 +194,7 @@ exports.putConfig = (configJSON) => {
       const newData = itemData;
       delete newData.missing;
       delete newData.exists;
+      delete newData.parser;
       return newData;
     });
   }
