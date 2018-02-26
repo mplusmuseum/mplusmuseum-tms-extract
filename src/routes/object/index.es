@@ -70,6 +70,7 @@ exports.index = (request, response) => {
       rank
       primarydisplay
       filename
+      remote
     }
     medium {
       id
