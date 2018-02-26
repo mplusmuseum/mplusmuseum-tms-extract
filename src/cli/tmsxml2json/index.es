@@ -278,6 +278,10 @@ const splitJson = async (source, items) => {
   if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir);
   if (!fs.existsSync(ingestDir)) fs.mkdirSync(ingestDir);
 
+  //  TODO: Get this from the config directory
+  const mediaDirPrefix = '//wkcdatmsapp-p04/TMSMedia/Collection_Images/';
+  const mediaDir = '/Users/danielcatt/Documents/mplusImgs/media';
+
   //  Now we need to fetch the hash table for this source
   const hashTable = await fetchHashTable(source);
 
@@ -305,13 +309,17 @@ const splitJson = async (source, items) => {
       .update(itemJSONPretty)
       .digest('hex');
 
-    //  Check in the hashtable to see if this item already exist.
-    //  If it doesn't already exist then we need to add it to the hashTable
-    //  and write it into the `ingest` folder.
+    //  This is handy debug code.
     const itemId = item[seekRoot].id;
     if (itemId === 123 || itemId === 4151) {
       // console.log(itemJSONPretty);
     }
+
+    //  Check in the hashtable to see if this item already exist.
+    //  If it doesn't already exist then we need to add it to the hashTable
+    //  and write it into the `ingest` folder.
+    let writeJSONFile = false;
+
     if (!(itemId in hashTable)) {
       counter.new += 1;
       hashTable[itemId] = {
@@ -320,11 +328,7 @@ const splitJson = async (source, items) => {
         discovered: new Date().getTime(),
         updated: new Date().getTime(),
       };
-      fs.writeFileSync(
-        `${ingestDir}/id_${itemId}.json`,
-        itemJSONPretty,
-        'utf-8',
-      );
+      writeJSONFile = true;
     }
 
     //  Now we check to see if the hash is different, if so then it's been
@@ -335,16 +339,95 @@ const splitJson = async (source, items) => {
       hashTable[itemId].hash = itemHash;
       hashTable[itemId].updated = new Date().getTime();
       //  Put the file into the `ingest` folder.
-      fs.writeFileSync(
-        `${ingestDir}/id_${itemId}.json`,
-        itemJSONPretty,
-        'utf-8',
-      );
+      writeJSONFile = true;
+    }
+
+    //  And now we're going to look at the media tag and see if there's supposed
+    //  to be some images uploaded, if so we'll need to do a bunch of checks.
+    //  At some point this should be broken up into it's own function
+    if ('medias' in item[seekRoot] && item[seekRoot].medias !== null) {
+      const { medias } = item[seekRoot];
+
+      //  Check to see if a medias entry exists in the hashTable
+      if (!('medias' in hashTable[itemId])) {
+        hashTable[itemId].medias = {};
+        writeJSONFile = true;
+      }
+
+      //  Grab the filename if there is one and strip off the file prefix
+      medias.forEach((media) => {
+        //  If the clean version of the filename doesn't exist in the hashTable
+        //  then we'll need to add it
+        if (
+          'filename' in media &&
+          media.filename !== null &&
+          media.filename !== undefined
+        ) {
+          const mediaFile = media.filename.replace(mediaDirPrefix, '');
+          //  If we don't have an entry, add it and flag the file for upserting
+          if (!(mediaFile in hashTable[itemId].medias)) {
+            hashTable[itemId].medias[mediaFile] = {
+              discovered: new Date().getTime(),
+              updated: null,
+              remote: null,
+              size: null,
+              mtime: null,
+              exists: false,
+              checked: false,
+            };
+            writeJSONFile = true;
+          }
+
+          //  Now we want to see if the file data or size if different, if it
+          //  is then once again we'll need to upsert the file.
+          if (fs.existsSync(`${mediaDir}/${mediaFile}`)) {
+            //  If the file didn't previously exist, but does now, then we
+            //  once again mark the file for upserting
+            if (hashTable[itemId].medias[mediaFile].exists === false) {
+              hashTable[itemId].medias[mediaFile].exists = true;
+              writeJSONFile = true;
+            }
+
+            //  Grab the stats for the file and see if they are different
+            //  from what we already have, if so then we need to upsert the file
+            const stats = fs.statSync(`${mediaDir}/${mediaFile}`);
+            const mtime = parseInt(stats.mtimeMs, 10);
+            const { size } = stats;
+            //  Check to see if the modified time is different
+            //  TODO: Note, it *may* be that the images are written out by
+            //  TMS each and every time, so this will always be the case and
+            //  will always trigger a file update. We should probably rely
+            //  just on size, which *may* sometimes be the same but it more
+            //  likely a better check than mtime.
+            if (hashTable[itemId].medias[mediaFile].mtime !== mtime) {
+              hashTable[itemId].medias[mediaFile].mtime = mtime;
+              // writeJSONFile = true; NOTE: don't rely on mtime!
+            }
+
+            //  Check the size of the file, if it's changed then it's likely
+            //  that the image has changed. This is based on the assumption
+            //  that somehow the headers on the file when it's spat out by
+            //  TMS don't always change the file.
+            //  Otherwise we're going to have to be super amazing at telling
+            //  when a media file has changed, lets hope we don't ever have to
+            //  do that!
+            if (hashTable[itemId].medias[mediaFile].size !== size) {
+              hashTable[itemId].medias[mediaFile].size = size;
+              writeJSONFile = true;
+            }
+          }
+          hashTable[itemId].medias[mediaFile].checked = true;
+        }
+      });
     }
 
     if (forceIngest === true) {
       hashTable[itemId].updated = new Date().getTime();
       //  Put the file into the `ingest` folder.
+      writeJSONFile = true;
+    }
+
+    if (writeJSONFile === true) {
       fs.writeFileSync(
         `${ingestDir}/id_${itemId}.json`,
         itemJSONPretty,
