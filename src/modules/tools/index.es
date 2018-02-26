@@ -27,6 +27,40 @@ const msToTime = (duration) => {
 exports.msToTime = msToTime;
 
 /**
+ * This reads the config from wherever it's kept and turns it into JSON
+ * before passing it back.
+ * We may also be fetching this from some other place over the network than
+ * the local file system
+ * @return {Object}        The config json
+ */
+const getConfig = () => {
+  //  Read in the config file, if there is one
+  const rootDir = process.cwd();
+  const configFile = `${rootDir}/config.json`;
+  let configJSON = {};
+  if (fs.existsSync(configFile)) {
+    const configTxt = fs.readFileSync(configFile, 'utf-8');
+    configJSON = JSON.parse(configTxt);
+  }
+  return configJSON;
+};
+
+exports.getConfig = getConfig;
+/**
+ * Grabs the xml directory from config and returns it or the default value
+ * @return {string}   The absolute directory of the xml
+ */
+const getXmlDir = () => {
+  const config = getConfig();
+  if ('xmlPath' in config) {
+    return config.xmlPath;
+  }
+  const rootDir = process.cwd();
+  return `${rootDir}/app/data/xml`;
+};
+exports.getXmlDir = getXmlDir;
+
+/**
  * This reads the counts file from wherever it's kept and turns it into JSON
  * before passing it back.
  * We may also be fetching this from some other place over the network than
@@ -54,24 +88,92 @@ const getCounts = () => {
 exports.getCounts = getCounts;
 
 /**
- * This reads the config from wherever it's kept and turns it into JSON
- * before passing it back.
- * We may also be fetching this from some other place over the network than
- * the local file system
- * @return {Object}        The config json
+ * This breaks down the counts json object and builds up a bunch more useful
+ * details that can be further used by code or the frontend
+ * @param {Object} counts  The counts object
+ * @return {Object}        The counts json
  */
-const getConfig = () => {
-  //  Read in the config file, if there is one
-  const rootDir = process.cwd();
-  const configFile = `${rootDir}/config.json`;
-  let configJSON = {};
-  if (fs.existsSync(configFile)) {
-    const configTxt = fs.readFileSync(configFile, 'utf-8');
-    configJSON = JSON.parse(configTxt);
+exports.getStatus = (counts) => {
+  const status = {
+    xmls: [],
+  };
+  const configJSON = getConfig();
+  const xmlDir = getXmlDir();
+
+  if ('xml' in configJSON) {
+    //  Do some checks in each item, i.e. if it even exists and the last
+    //  modified time
+    configJSON.xml.forEach((item) => {
+      const xmlStatus = {
+        file: item.file,
+        index: item.index,
+      };
+      if (fs.existsSync(`${xmlDir}/${item.file}`)) {
+        xmlStatus.exists = true;
+        xmlStatus.stat = fs.statSync(`${xmlDir}/${item.file}`);
+      } else {
+        xmlStatus.exists = false;
+      }
+
+      if ('items' in counts) {
+        if (item.index in counts.items) {
+          xmlStatus.counts = counts.items[item.index];
+        }
+
+        //  If we have count data, then we can work out some other information
+        if (item.index in counts.items && xmlStatus.exists) {
+          const c = counts.items[item.index];
+          const genTime = new Date(xmlStatus.stat.mtime).getTime();
+          //  If we started processing the file _before_ the current file
+          //  was modified, then we haven't processed the latest file
+          if (c.startProcessing < genTime) {
+            xmlStatus.processed = false;
+          } else {
+            xmlStatus.processed = true;
+          }
+
+          //  Now we can check to see if the processing has finished, it's
+          //  finished if the itemsUploaded === totalItemsToUpload
+          xmlStatus.notStarted = false;
+          if (
+            c.itemsUploaded === c.totalItemsToUpload &&
+            c.itemsUploaded !== null &&
+            c.itemsUploaded !== undefined
+          ) {
+            xmlStatus.finished = true;
+          } else {
+            xmlStatus.finished = false;
+            if (c.itemsUploaded !== null && c.itemsUploaded !== undefined) {
+              xmlStatus.percent = c.itemsUploaded / c.totalItemsToUpload;
+              xmlStatus.percent *= 100;
+            } else {
+              xmlStatus.notStarted = true;
+              xmlStatus.percent = 0;
+            }
+          }
+          if (c.startProcessing && c.lastUpsert) {
+            xmlStatus.processingTime = c.lastUpsert - c.startProcessing;
+          }
+
+          if (
+            'jsonCount' in c &&
+            c.jsonCount.new === 0 &&
+            c.jsonCount.modified === 0 &&
+            xmlStatus.processed === true
+          ) {
+            xmlStatus.notStarted = false;
+            xmlStatus.finished = true;
+            xmlStatus.processingTime =
+              c.bulkUpload.lastChecked - c.startProcessing;
+          }
+        }
+      }
+
+      status.xmls.push(xmlStatus);
+    });
   }
-  return configJSON;
+  return status;
 };
-exports.getConfig = getConfig;
 
 /**
  * This takes whatever config file is passed to it, cleans it up from the
@@ -295,17 +397,4 @@ exports.getPingData = () => {
     pings,
   };
   return pingData;
-};
-
-/**
- * Grabs the xml directory from config and returns it or the default value
- * @return {string}   The absolute directory of the xml
- */
-exports.getXmlDir = () => {
-  const config = getConfig();
-  if ('xmlPath' in config) {
-    return config.xmlPath;
-  }
-  const rootDir = process.cwd();
-  return `${rootDir}/app/data/xml`;
 };
