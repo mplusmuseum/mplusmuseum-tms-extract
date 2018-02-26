@@ -61,6 +61,20 @@ const getXmlDir = () => {
 exports.getXmlDir = getXmlDir;
 
 /**
+ * Grabs the mediaDir directory from config and returns it or the default value
+ * @return {string}   The absolute directory of the mediaDir
+ */
+const getMediaDir = () => {
+  const config = getConfig();
+  if ('imgPath' in config) {
+    return config.imgPath;
+  }
+  const rootDir = process.cwd();
+  return `${rootDir}/app/data/media`;
+};
+exports.getMediaDir = getMediaDir;
+
+/**
  * This reads the counts file from wherever it's kept and turns it into JSON
  * before passing it back.
  * We may also be fetching this from some other place over the network than
