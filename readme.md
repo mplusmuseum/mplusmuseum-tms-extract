@@ -7,7 +7,7 @@ alchemia is a tool to work with tms-xml files
 Pull the code down from git then...
 
     $ yarn install
-    $ yarn run init
+    $ yarn build
 
 ### Before you start; setting up your config file
 
