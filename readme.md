@@ -59,7 +59,7 @@ The `index` and `type` are used by both ElasticSearch to build the indexes and b
 
 ### Running
 
-Once you have the config set up you convert the XML to JSON and upsert to ElasticCloud in the same step...
+Once you have the config set up you convert the XML to JSON and upsert to elasticsearch in the same step...
 
     $ node app/cli/tmsxml2json/index.js
 
