@@ -59,8 +59,8 @@
         {{/if}}
 
         {{#if counts.jsonCount}}
-          <tr><td>New items</td><td>{{prettyNumber counts.jsonCount.new}}</td></tr>
-          <tr><td>Modified items</td><td>{{prettyNumber counts.jsonCount.modified}}</td></tr>
+          {{#if counts.jsonCount.new}}<tr><td>New items</td><td>{{prettyNumber counts.jsonCount.new}}</td></tr>{{/if}}
+          {{#if counts.jsonCount.modified}}<tr><td>Modified items</td><td>{{prettyNumber counts.jsonCount.modified}}</td></tr>{{/if}}
         {{/if}}
 
       </table>
