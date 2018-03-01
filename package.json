@@ -55,10 +55,11 @@
     "build:gulp": "babel gulpfile.es -o gulpfile.js",
     "build:prod": "npm-run-all gulp build:prod:css",
     "build:prod:css": "compass compile",
-    "build:dev": "npm-run-all build:dev:css build:dev:watch",
+    "build:dev": "npm-run-all -p build:dev:css build:dev:watch",
     "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
-    "start:dev": "nodemon server.js -i app/public/scripts -i app/data -i config.json",
+    "start:dev":
+      "nodemon server.js -i app/public/scripts -i app/data -i config.json",
     "go": "npm-run-all -p build:dev start:dev"
   }
 }

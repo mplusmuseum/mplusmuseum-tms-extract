@@ -19,7 +19,7 @@ exports.index = async (request, response) => {
   //  actually written parsers for.
   const rootDir = process.cwd();
   if ('xml' in configJSON) {
-    configJSON.xml = configJSON.xml.map(itemData => {
+    configJSON.xml = configJSON.xml.map((itemData) => {
       const newItem = itemData;
 
       //  Check the xml file
@@ -111,7 +111,7 @@ exports.index = async (request, response) => {
       //  do that here
       if (request.body.action.split(':')[0] === 'delete') {
         const xmlFile = request.body.action.split(':')[1];
-        configJSON.xml = configJSON.xml.filter(itemData => {
+        configJSON.xml = configJSON.xml.filter((itemData) => {
           if (itemData.file === xmlFile) {
             return false;
           }
