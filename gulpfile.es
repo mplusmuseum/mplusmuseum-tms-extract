@@ -6,45 +6,42 @@ import babel from 'gulp-babel';
 const forServer = () =>
   babel({
     presets: [['env', { targets: { node: 'current' } }]],
-    babelrc: false
+    babelrc: false,
   });
 
 const forNode = () =>
   babel({
     presets: [['env', { targets: { node: 'current' } }]],
     ignore: ['src/js/*.es', 'src/public'],
-    babelrc: false
+    babelrc: false,
   });
 
 const forBrowsers = () =>
   babel({
     presets: [
-      ['env', { targets: { browsers: ['last 2 versions', 'safari >= 8'] } }]
+      ['env', { targets: { browsers: ['last 2 versions', 'safari >= 8'] } }],
     ],
     only: ['src/public/**/*.es'],
-    babelrc: false
+    babelrc: false,
   });
 
 gulp.task('babelServer', () =>
   gulp
     .src('server.es')
     .pipe(forServer())
-    .pipe(gulp.dest('./'))
-);
+    .pipe(gulp.dest('./')));
 
 gulp.task('babelNodeFiles', () =>
   gulp
     .src('src/**/*.es')
     .pipe(forNode())
-    .pipe(gulp.dest('app'))
-);
+    .pipe(gulp.dest('app')));
 
 gulp.task('babelJSFiles', () =>
   gulp
     .src('src/public/**/*.es')
     .pipe(forBrowsers())
-    .pipe(gulp.dest('app/public'))
-);
+    .pipe(gulp.dest('app/public')));
 
 gulp.task('clean', () => {
   del('app/**/*.es', { force: true });
@@ -52,5 +49,5 @@ gulp.task('clean', () => {
 
 gulp.task(
   'default',
-  runSequence(['babelServer', 'babelNodeFiles', 'babelJSFiles'], 'clean')
+  runSequence(['babelServer', 'babelNodeFiles', 'babelJSFiles'], 'clean'),
 );

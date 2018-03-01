@@ -11,6 +11,7 @@
     "cli-progress": "^1.7.0",
     "colors": "^1.1.2",
     "commander": "^2.11.0",
+    "compass": "^0.1.1",
     "del": "^3.0.0",
     "dotenv": "^5.0.0",
     "elasticsearch": "^13.3.1",
@@ -22,10 +23,10 @@
     "gulp-cli": "^1.4.0",
     "http-auth": "^3.2.3",
     "moment": "^2.20.1",
-    "node-sass": "^4.7.2",
     "pretty-data": "^0.40.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
+    "run-sequence": "^2.2.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -37,8 +38,6 @@
     "eslint-plugin-node": "^5.2.1",
     "nodemon": "^1.14.10",
     "npm-run-all": "^4.1.2",
-    "parallelshell": "^3.0.2",
-    "run-sequence": "^2.2.0",
     "standard": "^10.0.3",
     "watch-run": "^1.2.5"
   },
@@ -54,11 +53,11 @@
     "build": "npm-run-all build:gulp build:prod",
     "build:gulp": "babel gulpfile.es -o gulpfile.js",
     "build:prod": "npm-run-all gulp build:prod:css",
-    "build:prod:css": "node-sass -o app/public/stylesheets/ --output-style expanded src/sass/main.scss",
-    "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
-    "build:dev:css": "node-sass --watch -o app/public/stylesheets/ --output-style expanded src/sass/main.scss",
+    "build:prod:css": "compass compile",
+    "build:dev": "npm-run-all build:dev:css build:dev:watch",
+    "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
     "start:dev": "nodemon server.js -i app/public/scripts -i app/data -i config.json",
-    "go": "parallelshell 'npm run build:dev' 'npm run start:dev'"
+    "go": "npm-run-all -p build:dev start:dev"
   }
 }
