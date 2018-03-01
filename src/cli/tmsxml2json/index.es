@@ -8,6 +8,7 @@ const parseObject = require('./parsers/object');
 const elasticsearch = require('elasticsearch');
 const progress = require('cli-progress');
 const tools = require('../../modules/tools');
+const cloudinary = require('cloudinary');
 
 colours.setTheme({
   info: 'green',
@@ -73,6 +74,26 @@ if (config.onLambda) {
   if (!fs.existsSync(xmlDir)) fs.mkdirSync(xmlDir);
   if (!fs.existsSync(tmsDir)) fs.mkdirSync(tmsDir);
 }
+
+const uploadImage = async (filename) => {
+  const mediaDir = tools.getMediaDir();
+  const mediaFile = `${mediaDir}/${filename}`;
+
+  //  Check to see if the image exists
+  if (!fs.existsSync(mediaFile)) {
+    return null;
+  }
+  if (!('cloudinary' in config)) {
+    return null;
+  }
+
+  cloudinary.config(config.cloudinary);
+  return new Promise((resolve) => {
+    cloudinary.uploader.upload(mediaFile, (result) => {
+      resolve(result);
+    });
+  });
+};
 
 /**
  * This dumps the counts information down to disc
@@ -278,6 +299,9 @@ const splitJson = async (source, items) => {
   if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir);
   if (!fs.existsSync(ingestDir)) fs.mkdirSync(ingestDir);
 
+  //  Grab where the images are supposed to be kept
+  const mediaDir = tools.getMediaDir();
+
   //  Now we need to fetch the hash table for this source
   const hashTable = await fetchHashTable(source);
 
@@ -305,13 +329,17 @@ const splitJson = async (source, items) => {
       .update(itemJSONPretty)
       .digest('hex');
 
-    //  Check in the hashtable to see if this item already exist.
-    //  If it doesn't already exist then we need to add it to the hashTable
-    //  and write it into the `ingest` folder.
+    //  This is handy debug code.
     const itemId = item[seekRoot].id;
     if (itemId === 123 || itemId === 4151) {
       // console.log(itemJSONPretty);
     }
+
+    //  Check in the hashtable to see if this item already exist.
+    //  If it doesn't already exist then we need to add it to the hashTable
+    //  and write it into the `ingest` folder.
+    let writeJSONFile = false;
+
     if (!(itemId in hashTable)) {
       counter.new += 1;
       hashTable[itemId] = {
@@ -320,11 +348,7 @@ const splitJson = async (source, items) => {
         discovered: new Date().getTime(),
         updated: new Date().getTime(),
       };
-      fs.writeFileSync(
-        `${ingestDir}/id_${itemId}.json`,
-        itemJSONPretty,
-        'utf-8',
-      );
+      writeJSONFile = true;
     }
 
     //  Now we check to see if the hash is different, if so then it's been
@@ -335,16 +359,105 @@ const splitJson = async (source, items) => {
       hashTable[itemId].hash = itemHash;
       hashTable[itemId].updated = new Date().getTime();
       //  Put the file into the `ingest` folder.
-      fs.writeFileSync(
-        `${ingestDir}/id_${itemId}.json`,
-        itemJSONPretty,
-        'utf-8',
-      );
+      writeJSONFile = true;
+    }
+
+    //  And now we're going to look at the media tag and see if there's supposed
+    //  to be some images uploaded, if so we'll need to do a bunch of checks.
+    //  At some point this should be broken up into it's own function
+    if ('medias' in item[seekRoot] && item[seekRoot].medias !== null) {
+      const { medias } = item[seekRoot];
+
+      //  Check to see if a medias entry exists in the hashTable
+      if (!('medias' in hashTable[itemId])) {
+        hashTable[itemId].medias = {};
+        writeJSONFile = true;
+      }
+
+      //  Grab the filename if there is one and strip off the file prefix
+      medias.forEach((media) => {
+        //  If the clean version of the filename doesn't exist in the hashTable
+        //  then we'll need to add it
+        if (
+          'filename' in media &&
+          media.filename !== null &&
+          media.filename !== undefined
+        ) {
+          //  If we have a dir prefix then we want to strip it out here
+          let mediaFile = media.filename;
+          const mediaDirPrefix = tools.getMediaDirPrefix();
+          mediaFile = media.filename.replace(mediaDirPrefix, '');
+
+          //  If we don't have an entry, add it and flag the file for upserting
+          if (!(mediaFile in hashTable[itemId].medias)) {
+            hashTable[itemId].medias[mediaFile] = {
+              discovered: new Date().getTime(),
+              updated: null,
+              remote: null,
+              size: null,
+              mtime: null,
+              exists: false,
+              checked: false,
+              doUpload: false,
+            };
+            writeJSONFile = true;
+          }
+
+          //  Set the need to upload to false.
+          hashTable[itemId].medias[mediaFile].doUpload = false;
+
+          //  Now we want to see if the file data or size if different, if it
+          //  is then once again we'll need to upsert the file.
+          if (fs.existsSync(`${mediaDir}/${mediaFile}`)) {
+            //  If the file didn't previously exist, but does now, then we
+            //  once again mark the file for upserting
+            if (hashTable[itemId].medias[mediaFile].exists === false) {
+              hashTable[itemId].medias[mediaFile].exists = true;
+              hashTable[itemId].medias[mediaFile].doUpload = true;
+              writeJSONFile = true;
+            }
+
+            //  Grab the stats for the file and see if they are different
+            //  from what we already have, if so then we need to upsert the file
+            const stats = fs.statSync(`${mediaDir}/${mediaFile}`);
+            const mtime = parseInt(stats.mtimeMs, 10);
+            const { size } = stats;
+            //  Check to see if the modified time is different
+            //  TODO: Note, it *may* be that the images are written out by
+            //  TMS each and every time, so this will always be the case and
+            //  will always trigger a file update. We should probably rely
+            //  just on size, which *may* sometimes be the same but it more
+            //  likely a better check than mtime.
+            if (hashTable[itemId].medias[mediaFile].mtime !== mtime) {
+              hashTable[itemId].medias[mediaFile].mtime = mtime;
+              // writeJSONFile = true; NOTE: don't rely on mtime!
+            }
+
+            //  Check the size of the file, if it's changed then it's likely
+            //  that the image has changed. This is based on the assumption
+            //  that somehow the headers on the file when it's spat out by
+            //  TMS don't always change the file.
+            //  Otherwise we're going to have to be super amazing at telling
+            //  when a media file has changed, lets hope we don't ever have to
+            //  do that!
+            if (hashTable[itemId].medias[mediaFile].size !== size) {
+              hashTable[itemId].medias[mediaFile].size = size;
+              hashTable[itemId].medias[mediaFile].doUpload = true;
+              writeJSONFile = true;
+            }
+          }
+          hashTable[itemId].medias[mediaFile].checked = true;
+        }
+      });
     }
 
     if (forceIngest === true) {
       hashTable[itemId].updated = new Date().getTime();
       //  Put the file into the `ingest` folder.
+      writeJSONFile = true;
+    }
+
+    if (writeJSONFile === true) {
       fs.writeFileSync(
         `${ingestDir}/id_${itemId}.json`,
         itemJSONPretty,
@@ -517,16 +630,99 @@ const upsertItems = async (counts, countBar) => {
     const itemJSON = JSON.parse(item);
     const { id } = itemJSON;
 
+    const hashTable = await fetchHashTable(itemIndex);
+
     //  Now we need to check to look in the hashTable for an artisanal
     //  integer. If there isn't one, we go fetch one and update the table
     //  If there is one, then we can just use that.
-    const hashTable = await fetchHashTable(itemIndex);
     if (hashTable[id].brlyInt === null) {
       const brlyInt = await artisanalints.createArtisanalInt();
       hashTable[id].brlyInt = brlyInt;
       await storeHashTable(itemIndex, hashTable);
     }
     itemJSON.artInt = hashTable[id].brlyInt;
+
+    //  Now we need to check to see if there are any images that need uploading
+    const imagesToUpload = [];
+
+    if ('medias' in hashTable[id]) {
+      Object.entries(hashTable[id].medias).forEach((media) => {
+        const [mediaFile, data] = media;
+        if (data.doUpload === true) {
+          imagesToUpload.push(mediaFile);
+        }
+      });
+    }
+
+    if (imagesToUpload.length > 0) {
+      /* eslint-disable no-await-in-loop */
+      for (let i = 0; i < imagesToUpload.length; i += 1) {
+        const mediaFile = imagesToUpload[i];
+        const cloudData = await uploadImage(mediaFile);
+        if (cloudData !== null) {
+          hashTable[id].medias[mediaFile].remote = `v${cloudData.version}/${
+            cloudData.public_id
+          }.${cloudData.format}`;
+          hashTable[id].medias[mediaFile].width = cloudData.width;
+          hashTable[id].medias[mediaFile].height = cloudData.height;
+          hashTable[id].medias[mediaFile].updated = new Date().getTime();
+          await storeHashTable(itemIndex, hashTable);
+        }
+      }
+      /* eslint-enable no-await-in-loop */
+    }
+
+    //  Now check to see if we have entires for this record in the hashTable
+    //  if we do then we need to add the data to the JSON that's getting
+    //  uploaded to the DB
+    if ('medias' in itemJSON && 'medias' in hashTable[id]) {
+      itemJSON.medias = itemJSON.medias.map((media) => {
+        const newMedia = media;
+        if (newMedia.filename !== null && newMedia.filename !== undefined) {
+          let mediaFile = newMedia.filename;
+          const mediaDirPrefix = tools.getMediaDirPrefix();
+          mediaFile = newMedia.filename.replace(mediaDirPrefix, '');
+          if (mediaFile in hashTable[id].medias) {
+            const hshTblMdFl = hashTable[id].medias[mediaFile];
+            const { remote } = hshTblMdFl;
+            newMedia.filename = mediaFile;
+            newMedia.remote = remote;
+            newMedia.exists = hshTblMdFl.exists;
+            if (
+              remote !== null &&
+              'cloudinary' in config &&
+              'cloud_name' in config.cloudinary
+            ) {
+              if ('width' in hshTblMdFl) {
+                newMedia.width = hshTblMdFl.width;
+              }
+              if ('height' in hshTblMdFl) {
+                newMedia.height = hshTblMdFl.height;
+              }
+              newMedia.baseUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/${remote}`;
+              newMedia.baseUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/${remote}`;
+              newMedia.squareUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/c_fill,g_auto,h_150,w_150/${remote}`;
+              newMedia.smallUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/w_480,c_scale/${remote}`;
+              newMedia.mediumUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/w_1000,c_scale/${remote}`;
+              newMedia.largeUrl = `http://res.cloudinary.com/${
+                config.cloudinary.cloud_name
+              }/image/upload/w_2048,c_scale/${remote}`;
+            }
+          }
+        }
+        return newMedia;
+      });
+    }
 
     //  If this is the first time we've called this function then we need to
     //  kick off the progress bar
