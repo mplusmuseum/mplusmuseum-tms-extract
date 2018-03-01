@@ -66,13 +66,27 @@ exports.getXmlDir = getXmlDir;
  */
 const getMediaDir = () => {
   const config = getConfig();
-  if ('imgPath' in config) {
-    return config.imgPath;
+  if ('mediaPath' in config) {
+    return config.mediaPath;
   }
   const rootDir = process.cwd();
   return `${rootDir}/app/data/media`;
 };
 exports.getMediaDir = getMediaDir;
+
+/**
+ * Grabs the prefix we want to remove off filenames to be able to find them
+ * correctly
+ * @return {string}   The absolute directory of the mediaDir
+ */
+const getMediaDirPrefix = () => {
+  const config = getConfig();
+  if ('mediaDirPrefix' in config) {
+    return config.mediaDirPrefix;
+  }
+  return '';
+};
+exports.getMediaDirPrefix = getMediaDirPrefix;
 
 /**
  * This reads the counts file from wherever it's kept and turns it into JSON

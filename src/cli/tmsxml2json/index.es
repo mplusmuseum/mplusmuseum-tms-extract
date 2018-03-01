@@ -385,9 +385,8 @@ const splitJson = async (source, items) => {
         ) {
           //  If we have a dir prefix then we want to strip it out here
           let mediaFile = media.filename;
-          if ('mediaDirPrefix' in config) {
-            mediaFile = media.filename.replace(config.mediaDirPrefix, '');
-          }
+          const mediaDirPrefix = tools.getMediaDirPrefix();
+          mediaFile = media.filename.replace(mediaDirPrefix, '');
 
           //  If we don't have an entry, add it and flag the file for upserting
           if (!(mediaFile in hashTable[itemId].medias)) {
@@ -681,24 +680,24 @@ const upsertItems = async (counts, countBar) => {
         const newMedia = media;
         if (newMedia.filename !== null && newMedia.filename !== undefined) {
           let mediaFile = newMedia.filename;
-          if ('mediaDirPrefix' in config) {
-            mediaFile = newMedia.filename.replace(config.mediaDirPrefix, '');
-          }
+          const mediaDirPrefix = tools.getMediaDirPrefix();
+          mediaFile = newMedia.filename.replace(mediaDirPrefix, '');
           if (mediaFile in hashTable[id].medias) {
-            const { remote } = hashTable[id].medias[mediaFile];
+            const hshTblMdFl = hashTable[id].medias[mediaFile];
+            const { remote } = hshTblMdFl;
             newMedia.filename = mediaFile;
             newMedia.remote = remote;
-            newMedia.exists = hashTable[id].medias[mediaFile].exists;
+            newMedia.exists = hshTblMdFl.exists;
             if (
               remote !== null &&
               'cloudinary' in config &&
               'cloud_name' in config.cloudinary
             ) {
-              if ('width' in hashTable[id].medias[mediaFile]) {
-                newMedia.width = hashTable[id].medias[mediaFile].width;
+              if ('width' in hshTblMdFl) {
+                newMedia.width = hshTblMdFl.width;
               }
-              if ('height' in hashTable[id].medias[mediaFile]) {
-                newMedia.height = hashTable[id].medias[mediaFile].height;
+              if ('height' in hshTblMdFl) {
+                newMedia.height = hshTblMdFl.height;
               }
               newMedia.baseUrl = `http://res.cloudinary.com/${
                 config.cloudinary.cloud_name

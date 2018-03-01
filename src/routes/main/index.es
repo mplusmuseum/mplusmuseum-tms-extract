@@ -166,6 +166,49 @@ exports.index = async (request, response) => {
         saveConfig = true;
       }
 
+      //  This is all media stuff here
+
+      //  First add/remove the media directory
+      if (request.body.action === 'addMediaDir') {
+        const { mediaPath } = request.body;
+        if (!fs.existsSync(mediaPath)) {
+          return response.redirect('/');
+        }
+        configJSON.mediaPath = mediaPath;
+        saveConfig = true;
+      }
+
+      //  If we've been told to remove the absolute directory we do that here
+      if (request.body.action === 'removeMediaDir') {
+        delete configJSON.mediaPath;
+        saveConfig = true;
+      }
+
+      //  If we are updating the Media Dir Prefix then do that here
+      if (request.body.action === 'updateMediaDirPrefix') {
+        if (configJSON.mediaDirPrefix !== request.body.mediaDirPrefix) {
+          configJSON.mediaDirPrefix = request.body.mediaDirPrefix;
+          saveConfig = true;
+        }
+      }
+
+      //  If we are updating the cloudinary info then we do that here
+      if (request.body.action === 'updatecloudinary') {
+        configJSON.cloudinary = {
+          cloud_name: request.body.cloud_name,
+          api_key: request.body.api_key,
+          api_secret: request.body.api_secret,
+        };
+        if (
+          configJSON.cloudinary.cloud_name === '' &&
+          configJSON.cloudinary.api_key === '' &&
+          configJSON.cloudinary.api_secret === ''
+        ) {
+          delete configJSON.cloudinary;
+        }
+        saveConfig = true;
+      }
+
       if (saveConfig === true) {
         tools.putConfig(configJSON);
         return response.redirect('/');
@@ -198,6 +241,13 @@ exports.index = async (request, response) => {
     usingAbsolutePath = true;
   }
 
+  //  Check to see if we're using an absolute path or not
+  let usingMediaAbsolutePath = false;
+  if ('mediaPath' in configJSON) {
+    usingMediaAbsolutePath = true;
+  }
+  const mediaDir = tools.getMediaDir();
+
   //  Now we want to do all the status stuff, we need to loop over the files
   //  specified in the config and blend that in with the details from the counts
   const counts = tools.getCounts();
@@ -209,7 +259,9 @@ exports.index = async (request, response) => {
   templateValues.addableFiles = addableFiles;
   templateValues.dataDirExists = dataDirExists;
   templateValues.usingAbsolutePath = usingAbsolutePath;
+  templateValues.usingMediaAbsolutePath = usingMediaAbsolutePath;
   templateValues.dataDir = dataDir;
+  templateValues.mediaDir = mediaDir;
   templateValues.config = configJSON;
   return response.render('main/index', templateValues);
 };
