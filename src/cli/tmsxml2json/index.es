@@ -75,7 +75,7 @@ if (config.onLambda) {
   if (!fs.existsSync(tmsDir)) fs.mkdirSync(tmsDir);
 }
 
-const uploadImage = async (filename) => {
+const uploadImage = async filename => {
   const mediaDir = tools.getMediaDir();
   const mediaFile = `${mediaDir}/${filename}`;
 
@@ -88,8 +88,8 @@ const uploadImage = async (filename) => {
   }
 
   cloudinary.config(config.cloudinary);
-  return new Promise((resolve) => {
-    cloudinary.uploader.upload(mediaFile, (result) => {
+  return new Promise(resolve => {
+    cloudinary.uploader.upload(mediaFile, result => {
       resolve(result);
     });
   });
@@ -101,7 +101,7 @@ const uploadImage = async (filename) => {
  * TODO: We should really check if we are running on Lambda and store the
  * counts somewhere else if we need to.
  */
-const saveCounts = (counts) => {
+const saveCounts = counts => {
   const newCounts = counts;
   newCounts.lastSave = new Date().getTime();
   const countsJSONPretty = JSON.stringify(newCounts, null, 4);
@@ -112,7 +112,7 @@ const saveCounts = (counts) => {
  * This is the end of everything wrap-up
  * @param {Object} counts An object that holds the counts to be displayed
  */
-const finish = (counts) => {
+const finish = counts => {
   const newCounts = counts;
   newCounts.lastFinished = new Date().getTime();
   saveCounts(newCounts);
@@ -136,7 +136,8 @@ const parseString = async (source, xml) => {
           reject(err);
         }
         resolve(result);
-      }));
+      }),
+    );
 
     //  Select the parser to use based on the source
     let parserLib = null;
@@ -170,7 +171,7 @@ const parseString = async (source, xml) => {
  * @param {string} source   the string defining the source type (from config)
  * @returns {Object}        The Hash fetchHashTable
  */
-const fetchHashTable = async (source) => {
+const fetchHashTable = async source => {
   if (config.onLambda) {
     //  TODO: Fetch hash table from remote source
     return {};
@@ -210,7 +211,7 @@ const storeHashTable = async (source, hashTable) => {
  *
  * @param {string} index  The name of the index to check/build
  */
-const checkIndexes = async (index) => {
+const checkIndexes = async index => {
   let resetIndex = false;
   if (forceResetIndex === true) {
     console.log('We have been told to reset the index.'.warn);
@@ -261,10 +262,12 @@ const bulkUpload = async (index, type, json) => {
 
     const bulkJSONPretty = JSON.stringify(json, null, 4);
     fs.writeFileSync(`${outputDir}/bulk.json`, bulkJSONPretty, 'utf-8');
-    const body = [].concat(...json.objects.map(object => [
-      { update: { _id: object.object.id } },
-      { doc: object.object, doc_as_upsert: true },
-    ]));
+    const body = [].concat(
+      ...json.objects.map(object => [
+        { update: { _id: object.object.id } },
+        { doc: object.object, doc_as_upsert: true },
+      ]),
+    );
 
     console.log('Doing bulk upload');
     await esclient.bulk({ body, type, index });
@@ -322,7 +325,7 @@ const splitJson = async (source, items) => {
     console.log(`Splitting JSON into ${items.length} separate files.`.help);
   }
 
-  items.forEach((item) => {
+  items.forEach(item => {
     const itemJSONPretty = JSON.stringify(item[seekRoot], null, 4);
     const itemHash = crypto
       .createHash('md5')
@@ -375,7 +378,7 @@ const splitJson = async (source, items) => {
       }
 
       //  Grab the filename if there is one and strip off the file prefix
-      medias.forEach((media) => {
+      medias.forEach(media => {
         //  If the clean version of the filename doesn't exist in the hashTable
         //  then we'll need to add it
         if (
@@ -403,6 +406,9 @@ const splitJson = async (source, items) => {
             };
             writeJSONFile = true;
           }
+
+          //  Set the need to upload to false.
+          hashTable[itemId].medias[mediaFile].doUpload = false;
 
           //  Now we want to see if the file data or size if different, if it
           //  is then once again we'll need to upsert the file.
@@ -514,7 +520,7 @@ const splitXml = (source, xml) => {
 
   //  Now dump all the xml files
   let counter = 0;
-  xmls.forEach((fragment) => {
+  xmls.forEach(fragment => {
     //  Because this is easier than REGEX ;)
     const id = fragment.split('"')[1];
     if (id) {
@@ -601,7 +607,7 @@ const upsertItems = async (counts, countBar) => {
   let itemType = null;
   let itemFile = null;
 
-  config.xml.forEach((source) => {
+  config.xml.forEach(source => {
     const { index } = source;
     const ingestDir = `${tmsDir}/${index}/ingest`;
     if (fs.existsSync(ingestDir)) {
@@ -644,7 +650,7 @@ const upsertItems = async (counts, countBar) => {
     const imagesToUpload = [];
 
     if ('medias' in hashTable[id]) {
-      Object.entries(hashTable[id].medias).forEach((media) => {
+      Object.entries(hashTable[id].medias).forEach(media => {
         const [mediaFile, data] = media;
         if (data.doUpload === true) {
           imagesToUpload.push(mediaFile);
@@ -661,6 +667,8 @@ const upsertItems = async (counts, countBar) => {
           hashTable[id].medias[mediaFile].remote = `v${cloudData.version}/${
             cloudData.public_id
           }.${cloudData.format}`;
+          hashTable[id].medias[mediaFile].width = cloudData.width;
+          hashTable[id].medias[mediaFile].height = cloudData.height;
           hashTable[id].medias[mediaFile].updated = new Date().getTime();
           await storeHashTable(itemIndex, hashTable);
         }
@@ -672,7 +680,7 @@ const upsertItems = async (counts, countBar) => {
     //  if we do then we need to add the data to the JSON that's getting
     //  uploaded to the DB
     if ('medias' in itemJSON && 'medias' in hashTable[id]) {
-      itemJSON.medias = itemJSON.medias.map((media) => {
+      itemJSON.medias = itemJSON.medias.map(media => {
         const newMedia = media;
         if (newMedia.filename !== null && newMedia.filename !== undefined) {
           let mediaFile = newMedia.filename;
@@ -786,7 +794,7 @@ const start = async () => {
   }
 };
 
-process.argv.forEach((val) => {
+process.argv.forEach(val => {
   if (
     val.toLowerCase() === 'forcebulk' ||
     val.toLowerCase() === '--forcebulk'
