@@ -71,6 +71,13 @@ exports.index = (request, response) => {
       primarydisplay
       filename
       remote
+      width
+      height
+      baseUrl
+      squareUrl
+      smallUrl
+      mediumUrl
+      largeUrl
     }
     medium {
       id
