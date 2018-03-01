@@ -27,6 +27,7 @@
     "pretty-data": "^0.40.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
+    "run-sequence": "^2.2.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -37,8 +38,7 @@
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-node": "^5.2.1",
     "nodemon": "^1.14.10",
-    "parallelshell": "^3.0.2",
-    "run-sequence": "^2.2.0",
+    "npm-run-all": "^4.1.2",
     "standard": "^10.0.3",
     "watch-run": "^1.2.5"
   },
@@ -51,14 +51,14 @@
     "json2elasticsearch": "node --harmony cli/json2elasticsearch.js",
     "test": "standard",
     "gulp": "gulp",
-    "init": "babel gulpfile.es -o gulpfile.js && npm run build:prod",
-    "build": "npm run build:prod",
-    "build:prod": "npm run gulp && npm run build:prod:css",
+    "build": "npm-run-all build:gulp build:prod",
+    "build:gulp": "babel gulpfile.es -o gulpfile.js",
+    "build:prod": "npm-run-all gulp build:prod:css",
     "build:prod:css": "compass compile",
-    "build:dev": "parallelshell 'npm run build:dev:css' 'npm run build:dev:watch'",
+    "build:dev": "npm-run-all build:dev:css build:dev:watch",
     "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
     "start:dev": "nodemon server.js -i app/public/scripts -i app/data -i config.json",
-    "go": "parallelshell 'npm run build:dev' 'npm run start:dev'"
+    "go": "npm-run-all -p build:dev start:dev"
   }
 }

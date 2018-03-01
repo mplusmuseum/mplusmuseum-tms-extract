@@ -7,7 +7,7 @@ alchemia is a tool to work with tms-xml files
 Pull the code down from git then...
 
     $ yarn install
-    $ yarn run init
+    $ yarn build
 
 ### Before you start; setting up your config file
 
@@ -22,6 +22,7 @@ Your config file will now look something like...
       "graphql": {
         "host": "localhost:3000"
       },
+      "xmlPath": "app/data/xml",
       "xml": [
         {
           "file": "[filename].xml",
@@ -38,11 +39,7 @@ Your config file will now look something like...
     }
 
 Point elasticsearch and graphql to your own locations. Then make sure your XML
-files are placed in the correct directory. You should have XML files called things like `ExportFromTMS_Objects.xml` and `ExportFromTMS_Artists.xml`, these are the XML files that TMS exports to our XML specifications.
-
-However you get your files they need to be placed into the following directory...
-
-`app/data/xml`
+files are placed in the directory specified by xmlPath (default **app/data/xml**). You should have XML files called things like `ExportFromTMS_Objects.xml` and `ExportFromTMS_Artists.xml`, these are the XML files that TMS exports to our XML specifications.
 
 # Note
 
@@ -58,7 +55,7 @@ The `index` and `type` are used by both ElasticSearch to build the indexes and b
 
 ### Running
 
-Once you have the config set up you convert the XML to JSON and upsert to ElasticCloud in the same step...
+Once you have the config set up you convert the XML to JSON and upsert to elasticsearch in the same step...
 
     $ node app/cli/tmsxml2json/index.js
 
