@@ -603,170 +603,207 @@ const upsertItems = async (counts, countBar) => {
   let itemType = null;
   let itemFile = null;
 
-  config.xml.forEach((source) => {
-    const { index } = source;
-    const ingestDir = `${tmsDir}/${index}/ingest`;
-    if (fs.existsSync(ingestDir)) {
-      const files = fs
-        .readdirSync(ingestDir)
-        .filter(file => file.split('.')[1] === 'json');
-      itemsToUpload += files.length;
-      if (files.length > 0) {
-        itemIndex = index;
-        itemType = source.type;
-        [itemFile] = files;
-      }
-    }
-  });
-
-  //  If we have an itemIndex that isn't null it means
-  //  we found at least one thing to upsert
-  if (itemIndex !== null && itemType !== null && itemFile !== null) {
-    //  Read in the file
-    const item = fs.readFileSync(
-      `${tmsDir}/${itemIndex}/ingest/${itemFile}`,
-      'utf-8',
-    );
-    const itemJSON = JSON.parse(item);
-    const { id } = itemJSON;
-
-    const hashTable = await fetchHashTable(itemIndex);
-
-    //  Now we need to check to look in the hashTable for an artisanal
-    //  integer. If there isn't one, we go fetch one and update the table
-    //  If there is one, then we can just use that.
-    if (hashTable[id].brlyInt === null) {
-      const brlyInt = await artisanalints.createArtisanalInt();
-      hashTable[id].brlyInt = brlyInt;
-      await storeHashTable(itemIndex, hashTable);
-    }
-    itemJSON.artInt = hashTable[id].brlyInt;
-
-    //  Now we need to check to see if there are any images that need uploading
-    const imagesToUpload = [];
-
-    if ('medias' in hashTable[id]) {
-      Object.entries(hashTable[id].medias).forEach((media) => {
-        const [mediaFile, data] = media;
-        if (data.doUpload === true) {
-          imagesToUpload.push(mediaFile);
-        }
-      });
-    }
-
-    if (imagesToUpload.length > 0) {
-      /* eslint-disable no-await-in-loop */
-      for (let i = 0; i < imagesToUpload.length; i += 1) {
-        const mediaFile = imagesToUpload[i];
-        const cloudData = await uploadImage(mediaFile);
-        if (cloudData !== null) {
-          hashTable[id].medias[mediaFile].remote = `v${cloudData.version}/${
-            cloudData.public_id
-          }.${cloudData.format}`;
-          hashTable[id].medias[mediaFile].width = cloudData.width;
-          hashTable[id].medias[mediaFile].height = cloudData.height;
-          hashTable[id].medias[mediaFile].updated = new Date().getTime();
-          await storeHashTable(itemIndex, hashTable);
+  try {
+    config.xml.forEach((source) => {
+      const { index } = source;
+      const ingestDir = `${tmsDir}/${index}/ingest`;
+      if (fs.existsSync(ingestDir)) {
+        const files = fs
+          .readdirSync(ingestDir)
+          .filter(file => file.split('.')[1] === 'json');
+        itemsToUpload += files.length;
+        if (files.length > 0) {
+          itemIndex = index;
+          itemType = source.type;
+          [itemFile] = files;
         }
       }
-      /* eslint-enable no-await-in-loop */
-    }
+    });
 
-    //  Now check to see if we have entires for this record in the hashTable
-    //  if we do then we need to add the data to the JSON that's getting
-    //  uploaded to the DB
-    if ('medias' in itemJSON && 'medias' in hashTable[id]) {
-      itemJSON.medias = itemJSON.medias.map((media) => {
-        const newMedia = media;
-        if (newMedia.filename !== null && newMedia.filename !== undefined) {
-          let mediaFile = newMedia.filename;
-          const mediaDirPrefix = tools.getMediaDirPrefix();
-          mediaFile = newMedia.filename.replace(mediaDirPrefix, '');
-          if (mediaFile in hashTable[id].medias) {
-            const hshTblMdFl = hashTable[id].medias[mediaFile];
-            const { remote } = hshTblMdFl;
-            newMedia.filename = mediaFile;
-            newMedia.remote = remote;
-            newMedia.exists = hshTblMdFl.exists;
-            if (
-              remote !== null &&
-              'cloudinary' in config &&
-              'cloud_name' in config.cloudinary
-            ) {
-              if ('width' in hshTblMdFl) {
-                newMedia.width = hshTblMdFl.width;
-              }
-              if ('height' in hshTblMdFl) {
-                newMedia.height = hshTblMdFl.height;
-              }
-              newMedia.baseUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/${remote}`;
-              newMedia.baseUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/${remote}`;
-              newMedia.squareUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/c_fill,g_auto,h_150,w_150/${remote}`;
-              newMedia.smallUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/w_480,c_scale/${remote}`;
-              newMedia.mediumUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/w_1000,c_scale/${remote}`;
-              newMedia.largeUrl = `http://res.cloudinary.com/${
-                config.cloudinary.cloud_name
-              }/image/upload/w_2048,c_scale/${remote}`;
-            }
+    //  If we have an itemIndex that isn't null it means
+    //  we found at least one thing to upsert
+    if (itemIndex !== null && itemType !== null && itemFile !== null) {
+      //  Read in the file
+      const item = fs.readFileSync(
+        `${tmsDir}/${itemIndex}/ingest/${itemFile}`,
+        'utf-8',
+      );
+      const itemJSON = JSON.parse(item);
+      const { id } = itemJSON;
+
+      const hashTable = await fetchHashTable(itemIndex);
+
+      //  Now we need to check to look in the hashTable for an artisanal
+      //  integer. If there isn't one, we go fetch one and update the table
+      //  If there is one, then we can just use that.
+      if (hashTable[id].brlyInt === null) {
+        const brlyInt = await artisanalints.createArtisanalInt();
+        hashTable[id].brlyInt = brlyInt;
+        await storeHashTable(itemIndex, hashTable);
+      }
+      itemJSON.artInt = hashTable[id].brlyInt;
+
+      //  Now we need to check to see if there are any images that
+      //  need uploading
+      const imagesToUpload = [];
+
+      if ('medias' in hashTable[id]) {
+        Object.entries(hashTable[id].medias).forEach((media) => {
+          const [mediaFile, data] = media;
+          if (data.doUpload === true) {
+            imagesToUpload.push(mediaFile);
+          }
+        });
+      }
+
+      if (imagesToUpload.length > 0) {
+        /* eslint-disable no-await-in-loop */
+        for (let i = 0; i < imagesToUpload.length; i += 1) {
+          const mediaFile = imagesToUpload[i];
+          const cloudData = await uploadImage(mediaFile);
+          if (cloudData !== null) {
+            hashTable[id].medias[mediaFile].remote = `v${cloudData.version}/${
+              cloudData.public_id
+            }.${cloudData.format}`;
+            hashTable[id].medias[mediaFile].width = cloudData.width;
+            hashTable[id].medias[mediaFile].height = cloudData.height;
+            hashTable[id].medias[mediaFile].updated = new Date().getTime();
+            await storeHashTable(itemIndex, hashTable);
           }
         }
-        return newMedia;
-      });
-    }
+        /* eslint-enable no-await-in-loop */
+      }
 
-    //  If this is the first time we've called this function then we need to
-    //  kick off the progress bar
-    if (totalItemsToUpload === null) {
-      totalItemsToUpload = itemsToUpload;
-      itemsUploaded = 0;
-      countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
-    }
-
-    //  Now we do the ES upsert
-    const index = itemIndex;
-    const type = itemType;
-    esclient
-      .update({
-        index,
-        type,
-        id,
-        body: { doc: itemJSON, doc_as_upsert: true },
-      })
-      .then(() => {
-        fs.unlinkSync(`${tmsDir}/${itemIndex}/ingest/${itemFile}`);
-        itemsUploaded += 1;
-        const timeDiff = new Date().getTime() - startTime;
-        const aveTime = timeDiff / itemsUploaded;
-        const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
-        const myEta = tools.msToTime(remainingTime);
-        countBar.update(itemsUploaded, {
-          myEta,
+      //  Now check to see if we have entires for this record in the hashTable
+      //  if we do then we need to add the data to the JSON that's getting
+      //  uploaded to the DB
+      if (
+        'medias' in itemJSON &&
+        'medias' in hashTable[id] &&
+        itemJSON.medias !== null
+      ) {
+        itemJSON.medias = itemJSON.medias.map((media) => {
+          const newMedia = media;
+          if (newMedia.filename !== null && newMedia.filename !== undefined) {
+            let mediaFile = newMedia.filename;
+            const mediaDirPrefix = tools.getMediaDirPrefix();
+            mediaFile = newMedia.filename.replace(mediaDirPrefix, '');
+            if (mediaFile in hashTable[id].medias) {
+              const hshTblMdFl = hashTable[id].medias[mediaFile];
+              const { remote } = hshTblMdFl;
+              newMedia.filename = mediaFile;
+              newMedia.remote = remote;
+              newMedia.exists = hshTblMdFl.exists;
+              if (
+                remote !== null &&
+                'cloudinary' in config &&
+                'cloud_name' in config.cloudinary
+              ) {
+                if ('width' in hshTblMdFl) {
+                  newMedia.width = hshTblMdFl.width;
+                }
+                if ('height' in hshTblMdFl) {
+                  newMedia.height = hshTblMdFl.height;
+                }
+                newMedia.baseUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/${remote}`;
+                newMedia.baseUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/${remote}`;
+                newMedia.squareUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/c_fill,g_auto,h_150,w_150/${remote}`;
+                newMedia.smallUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/w_480,c_scale/${remote}`;
+                newMedia.mediumUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/w_1000,c_scale/${remote}`;
+                newMedia.largeUrl = `http://res.cloudinary.com/${
+                  config.cloudinary.cloud_name
+                }/image/upload/w_2048,c_scale/${remote}`;
+              }
+            }
+          }
+          return newMedia;
         });
+      }
 
-        const newCounts = counts;
-        newCounts.items[itemIndex].totalItemsToUpload = totalItemsToUpload;
-        newCounts.items[itemIndex].itemsUploaded = itemsUploaded;
-        newCounts.items[itemIndex].lastUpsert = new Date().getTime();
+      //  If this is the first time we've called this function then we need to
+      //  kick off the progress bar
+      if (totalItemsToUpload === null) {
+        totalItemsToUpload = itemsToUpload;
+        itemsUploaded = 0;
+        countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
+      }
 
-        saveCounts(newCounts);
+      //  Now we do the ES upsert
+      const index = itemIndex;
+      const type = itemType;
+      esclient
+        .update({
+          index,
+          type,
+          id,
+          body: { doc: itemJSON, doc_as_upsert: true },
+        })
+        .then(() => {
+          fs.unlinkSync(`${tmsDir}/${itemIndex}/ingest/${itemFile}`);
+          itemsUploaded += 1;
+          const timeDiff = new Date().getTime() - startTime;
+          const aveTime = timeDiff / itemsUploaded;
+          const remainingTime = aveTime * (totalItemsToUpload - itemsUploaded);
+          const myEta = tools.msToTime(remainingTime);
+          countBar.update(itemsUploaded, {
+            myEta,
+          });
 
+          const newCounts = counts;
+          newCounts.items[itemIndex].totalItemsToUpload = totalItemsToUpload;
+          newCounts.items[itemIndex].itemsUploaded = itemsUploaded;
+          newCounts.items[itemIndex].lastUpsert = new Date().getTime();
+
+          saveCounts(newCounts);
+
+          setTimeout(() => {
+            upsertItems(newCounts, countBar);
+          }, 10);
+        });
+    } else {
+      countBar.stop();
+      finish(counts);
+    }
+  } catch (er) {
+    try {
+      console.log('Filed on file: ', itemFile);
+      console.log(er);
+      if (itemFile !== null) {
+        //  A daft way to move a file, but I may want to do something with the
+        //  content before/after the move
+        const sourceFile = `${tmsDir}/${itemIndex}/ingest/${itemFile}`;
+        const fileContent = fs.readFileSync(sourceFile, 'utf-8');
+        const failedDir = `${tmsDir}/${itemIndex}/failed`;
+
+        //  Create a failed directory if there isn't one
+        if (!fs.existsSync(failedDir)) fs.mkdirSync(failedDir);
+
+        fs.writeFileSync(`${failedDir}/${itemFile}`, fileContent, 'utf-8');
+        fs.unlinkSync(`${tmsDir}/${itemIndex}/ingest/${itemFile}`);
         setTimeout(() => {
-          upsertItems(newCounts, countBar);
+          upsertItems(counts, countBar);
         }, 10);
-      });
-  } else {
-    countBar.stop();
-    finish(counts);
+      } else {
+        console.error('Something odd happened, we threw an error');
+        console.error('and itemFile is null.');
+        process.exit(1);
+      }
+    } catch (er2) {
+      console.error('Failed wait ingesting files.');
+      console.error('Please look in the logs for details');
+      console.error(er2);
+      process.exit(1);
+    }
   }
 };
 
