@@ -677,7 +677,11 @@ const upsertItems = async (counts, countBar) => {
       //  Now check to see if we have entires for this record in the hashTable
       //  if we do then we need to add the data to the JSON that's getting
       //  uploaded to the DB
-      if ('medias' in itemJSON && 'medias' in hashTable[id]) {
+      if (
+        'medias' in itemJSON &&
+        'medias' in hashTable[id] &&
+        itemJSON.medias !== null
+      ) {
         itemJSON.medias = itemJSON.medias.map((media) => {
           const newMedia = media;
           if (newMedia.filename !== null && newMedia.filename !== undefined) {
@@ -773,6 +777,7 @@ const upsertItems = async (counts, countBar) => {
   } catch (er) {
     try {
       console.log('Filed on file: ', itemFile);
+      console.log(er);
       if (itemFile !== null) {
         //  A daft way to move a file, but I may want to do something with the
         //  content before/after the move
