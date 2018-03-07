@@ -9,6 +9,7 @@ const elasticsearch = require('elasticsearch');
 const progress = require('cli-progress');
 const tools = require('../../modules/tools');
 const cloudinary = require('cloudinary');
+const moment = require('moment');
 
 colours.setTheme({
   info: 'green',
@@ -36,6 +37,7 @@ let esLive = false;
 let forceBulk = false;
 let forceResetIndex = false;
 let forceIngest = false;
+let isInvokedFromServer = true;
 
 const config = tools.getConfig();
 
@@ -48,7 +50,9 @@ if (!('elasticsearch' in config)) {
   console.error('visting the web admin tool to enter it there.'.error);
   console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
   console.error('');
-  process.exit(1);
+  if (isInvokedFromServer === false) {
+    process.exit(1);
+  }
 }
 
 const esclient = new elasticsearch.Client(config.elasticsearch);
@@ -63,7 +67,9 @@ let tmsDir = null;
 
 if (config.onLambda) {
   console.error('We need Lambda code here');
-  process.exit(1);
+  if (isInvokedFromServer === false) {
+    process.exit(1);
+  }
 } else {
   dataDir = `${rootDir}/app/data`;
   xmlDir = tools.getXmlDir();
@@ -117,10 +123,19 @@ const finish = (counts) => {
   newCounts.lastFinished = new Date().getTime();
   saveCounts(newCounts);
   console.log(counts);
+
+  const countsDir = `${dataDir}/counts`;
+  if (!fs.existsSync(countsDir)) fs.mkdirSync(countsDir);
+  const datetime = moment().format('YYYY-MM-DD-HH-mm-ss');
+  const countsJSONPretty = JSON.stringify(counts, null, 4);
+  fs.writeFileSync(`${countsDir}/${datetime}.json`, countsJSONPretty, 'utf-8');
+
   console.log('Done!');
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-  console.error('');
-  process.exit(1);
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.log('');
+  if (isInvokedFromServer === false) {
+    process.exit(1);
+  }
 };
 
 /**
@@ -796,13 +811,17 @@ const upsertItems = async (counts, countBar) => {
       } else {
         console.error('Something odd happened, we threw an error');
         console.error('and itemFile is null.');
-        process.exit(1);
+        if (isInvokedFromServer === false) {
+          process.exit(1);
+        }
       }
     } catch (er2) {
       console.error('Failed wait ingesting files.');
       console.error('Please look in the logs for details');
       console.error(er2);
-      process.exit(1);
+      if (isInvokedFromServer === false) {
+        process.exit(1);
+      }
     }
   }
 };
@@ -816,8 +835,8 @@ const upsertItems = async (counts, countBar) => {
  * end in the `finished()` function.
  */
 const start = async () => {
-  console.error('');
-  console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+  console.log('');
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
 
   console.log('Pinging ElasticSearch...');
   const ping = await tools.pingES();
@@ -831,9 +850,11 @@ const start = async () => {
   const counts = await processXML();
 
   if (counts === false) {
-    console.error('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
-    console.error('');
-    process.exit(1);
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.wow);
+    console.log('');
+    if (isInvokedFromServer === false) {
+      process.exit(1);
+    }
   }
 
   // const counts = {};
@@ -892,5 +913,15 @@ process.argv.forEach((val) => {
     process.exit(1);
   }
 });
+exports.start = start;
 
-start();
+//  Stupid hack to see if we are being run on the command line or from
+//  server.js. If we are being called on the command line then we need
+//  to fire off the `start()` otherwise we leave that to server.js to call
+if ('mainModule' in process && 'filename' in process.mainModule) {
+  const whereAreWeFrom = process.mainModule.filename.split('/').pop();
+  if (whereAreWeFrom === 'index.js') {
+    isInvokedFromServer = false;
+    start();
+  }
+}

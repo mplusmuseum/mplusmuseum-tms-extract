@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 
 const auth = require('http-auth');
 const tools = require('./app/modules/tools');
+const tmsxml2json = require('./app/cli/tmsxml2json');
 
 const basic = auth.basic({
   realm: 'Private area',
@@ -61,6 +62,10 @@ if (process.env.NODE_ENV !== 'DEV') {
 
 //  This is where we are going to do some extra checking
 tools.startPinging();
+
+setInterval(() => {
+  tmsxml2json.start();
+}, 1000 * 60 * 60 * 4); // Check every fours hours, starts after four hours.
 
 console.log(`>> Connect to: http://localhost:${process.env.PORT}`.alert);
 http.createServer(app).listen(process.env.PORT);
