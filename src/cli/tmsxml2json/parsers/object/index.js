@@ -1,5 +1,5 @@
 /*
-These are all the cool parse functions to get the data into the right format
+These are all the cool parse functions to get the data into the right format@@@
 */
 const parseText = text => ({ text: text._, lang: text.lang });
 

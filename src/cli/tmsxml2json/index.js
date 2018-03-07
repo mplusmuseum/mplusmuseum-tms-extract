@@ -1,5 +1,7 @@
 const xml2js = require('xml2js');
-const { pd } = require('pretty-data');
+const {
+  pd,
+} = require('pretty-data');
 const colours = require('colors');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -175,7 +177,7 @@ const parseString = async (source, xml) => {
     return null;
   }
   /*
-  */
+   */
 };
 
 /**
@@ -235,17 +237,25 @@ const checkIndexes = async (index) => {
   //  Check the indexes here, if one doesn't already exist then we *must*
   //  create one, otherwise only re-create on if we've been forced to by
   //  the command line
-  const exists = await esclient.indices.exists({ index });
+  const exists = await esclient.indices.exists({
+    index,
+  });
   if (exists === false) {
     console.log(`Creating new index for ${index}`);
-    await esclient.indices.create({ index });
+    await esclient.indices.create({
+      index,
+    });
   }
 
   if (resetIndex === true && exists === true) {
     console.log(`Removing old index for ${index}`);
-    await esclient.indices.delete({ index });
+    await esclient.indices.delete({
+      index,
+    });
     console.log(`Creating new index for ${index}`);
-    await esclient.indices.create({ index });
+    await esclient.indices.create({
+      index,
+    });
   }
 };
 
@@ -276,13 +286,23 @@ const bulkUpload = async (index, type, json) => {
 
     const bulkJSONPretty = JSON.stringify(json, null, 4);
     fs.writeFileSync(`${outputDir}/bulk.json`, bulkJSONPretty, 'utf-8');
-    const body = [].concat(...json.objects.map(object => [
-      { update: { _id: object.object.id } },
-      { doc: object.object, doc_as_upsert: true },
+    const body = [].concat(...json.objects.map(object => [{
+      update: {
+        _id: object.object.id,
+      },
+    },
+    {
+      doc: object.object,
+      doc_as_upsert: true,
+    },
     ]));
 
     console.log('Doing bulk upload');
-    await esclient.bulk({ body, type, index });
+    await esclient.bulk({
+      body,
+      type,
+      index,
+    });
     return true;
   }
 
@@ -381,7 +401,9 @@ const splitJson = async (source, items) => {
     //  to be some images uploaded, if so we'll need to do a bunch of checks.
     //  At some point this should be broken up into it's own function
     if ('medias' in item[seekRoot] && item[seekRoot].medias !== null) {
-      const { medias } = item[seekRoot];
+      const {
+        medias,
+      } = item[seekRoot];
 
       //  Check to see if a medias entry exists in the hashTable
       if (!('medias' in hashTable[itemId])) {
@@ -436,7 +458,9 @@ const splitJson = async (source, items) => {
             //  from what we already have, if so then we need to upsert the file
             const stats = fs.statSync(`${mediaDir}/${mediaFile}`);
             const mtime = parseInt(stats.mtimeMs, 10);
-            const { size } = stats;
+            const {
+              size,
+            } = stats;
             //  Check to see if the modified time is different
             //  TODO: Note, it *may* be that the images are written out by
             //  TMS each and every time, so this will always be the case and
@@ -567,7 +591,11 @@ const processXML = async () => {
 
   /* eslint-disable no-await-in-loop */
   for (let i = 0; i < config.xml.length; i += 1) {
-    const { file, index, type } = config.xml[i];
+    const {
+      file,
+      index,
+      type,
+    } = config.xml[i];
     counts.items[index] = {
       startProcessing: new Date().getTime(),
       file,
@@ -620,7 +648,9 @@ const upsertItems = async (counts, countBar) => {
 
   try {
     config.xml.forEach((source) => {
-      const { index } = source;
+      const {
+        index,
+      } = source;
       const ingestDir = `${tmsDir}/${index}/ingest`;
       if (fs.existsSync(ingestDir)) {
         const files = fs
@@ -644,7 +674,9 @@ const upsertItems = async (counts, countBar) => {
         'utf-8',
       );
       const itemJSON = JSON.parse(item);
-      const { id } = itemJSON;
+      const {
+        id,
+      } = itemJSON;
 
       const hashTable = await fetchHashTable(itemIndex);
 
@@ -705,7 +737,9 @@ const upsertItems = async (counts, countBar) => {
             mediaFile = newMedia.filename.replace(mediaDirPrefix, '');
             if (mediaFile in hashTable[id].medias) {
               const hshTblMdFl = hashTable[id].medias[mediaFile];
-              const { remote } = hshTblMdFl;
+              const {
+                remote,
+              } = hshTblMdFl;
               newMedia.filename = mediaFile;
               newMedia.remote = remote;
               newMedia.exists = hshTblMdFl.exists;
@@ -750,7 +784,9 @@ const upsertItems = async (counts, countBar) => {
       if (totalItemsToUpload === null) {
         totalItemsToUpload = itemsToUpload;
         itemsUploaded = 0;
-        countBar.start(totalItemsToUpload, itemsUploaded, { myEta: '????ms' });
+        countBar.start(totalItemsToUpload, itemsUploaded, {
+          myEta: '????ms',
+        });
       }
 
       //  Now we do the ES upsert
@@ -761,7 +797,10 @@ const upsertItems = async (counts, countBar) => {
           index,
           type,
           id,
-          body: { doc: itemJSON, doc_as_upsert: true },
+          body: {
+            doc: itemJSON,
+            doc_as_upsert: true,
+          },
         })
         .then(() => {
           fs.unlinkSync(`${tmsDir}/${itemIndex}/ingest/${itemFile}`);

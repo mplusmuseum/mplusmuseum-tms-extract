@@ -19,9 +19,6 @@
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "get-stdin": "^5.0.1",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^7.0.0",
-    "gulp-cli": "^1.4.0",
     "http-auth": "^3.2.3",
     "moment": "^2.20.1",
     "pretty-data": "^0.40.0",
@@ -50,16 +47,14 @@
     "tmsxml2json": "node --harmony cli/tmsxml2json.js",
     "json2elasticsearch": "node --harmony cli/json2elasticsearch.js",
     "test": "standard",
-    "gulp": "gulp",
-    "build": "npm-run-all build:gulp build:prod",
-    "build:gulp": "babel gulpfile.es -o gulpfile.js",
-    "build:prod": "npm-run-all gulp build:prod:css",
+    "build": "npm-run-all build:prod build:prod:css",
+    "build:prod": "babel src -d app",
     "build:prod:css": "compass compile",
     "build:dev": "npm-run-all -p build:dev:css build:dev:watch",
     "build:dev:css": "compass watch",
-    "build:dev:watch": "watch-run -p 'src/**/*.es,server.es' 'npm run gulp'",
+    "build:dev:watch": "watch-run -p 'src/**/*.js,server.js' 'npm run build'",
     "start:dev":
-      "nodemon server.js -i app/public/scripts -i app/data -i config.json",
+      "nodemon server.js -i src -i app/public/scripts -i app/data -i config.json",
     "go": "npm-run-all -p build:dev start:dev"
   }
 }
