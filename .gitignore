@@ -21,3 +21,5 @@ objects.json
 server.js
 
 *log
+
+package-lock.json
