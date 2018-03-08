@@ -48,7 +48,7 @@ app.use(bodyParser.urlencoded({
 
 app.get('/', routes.main.index)
 app.post('/', routes.main.index)
-app.get('/object/:id', routes.object.index)
+app.get('/view/:item/:id', routes.item.index)
 
 app.use((request, response) => {
   console.error('ERROR!!')

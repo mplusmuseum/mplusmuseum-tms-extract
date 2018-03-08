@@ -15,82 +15,45 @@ exports.index = (request, response) => {
 
   //  Grab the id
   const { id } = request.params
+  const itemName = request.params.item
+  let itemTitle = 'Unknown'
+  switch (itemName) {
+    case 'objects':
+      itemTitle = 'Object'
+      break
+    case 'authors':
+      itemTitle = 'Author'
+      break
+    default:
+      itemTitle = 'Unknown'
+  }
 
   //  Setup all the directory stuff
   const rootDir = process.cwd()
-  const dataDir = `${rootDir}/app/data/tms/objects`
+  const dataDir = `${rootDir}/app/data/tms/${itemName}`
   const jsonFile = `${dataDir}/json/id_${id}.json`
   const xmlFile = `${dataDir}/xml/id_${id}.xml`
 
   //  Go grab the JSON file
-  let objectJSON = null
+  let itemJSON = null
   if (fs.existsSync(jsonFile)) {
-    objectJSON = fs.readFileSync(jsonFile, 'utf-8')
+    itemJSON = fs.readFileSync(jsonFile, 'utf-8')
   }
 
   //  Go grab the XML file
-  let objectXML = null
+  let itemXML = null
   if (fs.existsSync(xmlFile)) {
-    objectXML = fs.readFileSync(xmlFile, 'utf-8')
+    itemXML = fs.readFileSync(xmlFile, 'utf-8')
   }
 
   let showResults = true
-  if (objectJSON === null && objectXML === null) {
+  if (itemJSON === null && itemXML === null) {
     showResults = false
   }
 
   const GraphQLQuery = `{
-  artwork(id: ${id}) {
+  author(id: ${id}) {
     id
-    area {
-      id
-    }
-    areacategories {
-      rank
-      type
-    }
-    category {
-      id
-    }
-    creditLines {
-      lang
-      text
-    }
-    dated
-    dateBegin
-    dateEnd
-    dimensions {
-      lang
-      text
-    }
-    makers {
-      id
-    }
-    medias {
-      rank
-      primarydisplay
-      filename
-      remote
-      width
-      height
-      baseUrl
-      squareUrl
-      smallUrl
-      mediumUrl
-      largeUrl
-    }
-    medium {
-      id
-    }
-    objectNumber
-    objectStatus {
-      lang
-      text
-    }
-    titles {
-      lang
-      text
-    }
   }
 }`
   const encodedQuery = encodeURIComponent(GraphQLQuery)
@@ -105,13 +68,14 @@ exports.index = (request, response) => {
   }
   templateValues.id = id
   templateValues.showResults = showResults
-  templateValues.objectJSON = objectJSON
-  templateValues.objectXML = objectXML
+  templateValues.itemTitle = itemTitle
+  templateValues.itemJSON = itemJSON
+  templateValues.itemXML = itemXML
   templateValues.GraphQLQuery = GraphQLQuery
   templateValues.encodedQL = encodedQL
   templateValues.encodedAPI = encodedAPI
   templateValues.showQL = showQL
   templateValues.pingData = tools.getPingData()
   templateValues.config = config
-  return response.render('object/index', templateValues)
+  return response.render('item/index', templateValues)
 }

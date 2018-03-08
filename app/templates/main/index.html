@@ -1,15 +1,15 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-  <title>TMS extract/ingester</title>
-  <link href="/stylesheets/main.css" rel="stylesheet" />
+	<title>TMS extract/ingester</title>
+	<link href="/stylesheets/main.css" rel="stylesheet" />
 	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
 	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
 </head>
+
 <body>
 
-	{{> header}}
-	{{> connections}}
+	{{> header}} {{> connections}}
 
 	<div class="container admin-layout">
 		<div>
@@ -18,19 +18,21 @@
 
 			<hr>
 
-  		<h1>Search</h1>
+			<h1>Search</h1>
 
-			<p>
-				<form method="post">
-					<label>
-	          <span class="label">Search for object</span>
-	          <span class="field">
-	            <input type="text" name="id" required placeholder="Object ID">
-	          </span>
-	        </label>
-					<button type="submit" value="Search">Search</button>
-				</form>
-			</p>
+			{{#if config.xml}}
+				{{#each config.xml}}
+				<p>
+					<form method="post">
+						<table>
+							<td>Search for {{index}}</td>
+							<td><input type="text" name="id" required placeholder="{{index}} ID"></td>
+							<td><button type="submit" name="search" value="{{index}}">Search</button></td>
+						</table>
+					</form>
+				</p>
+				{{/each}}
+			{{/if}}
 
 			<hr>
 
@@ -40,13 +42,21 @@
 					<table>
 						<tr>
 							<td>Elastic Search</td>
-							<td><input type="text" name="elasticsearch" placeholder="Example: localhost:9200" {{#if config.elasticsearch.host}}value="{{config.elasticsearch.host}}"{{/if}}>
+							<td>
+								<input type="text" name="elasticsearch" placeholder="Example: localhost:9200" {{#if config.elasticsearch.host}}value="{{config.elasticsearch.host}}"
+								    {{/if}}>
 						</tr>
 						<tr>
 							<td>GraphQL</td>
-							<td><input type="text" name="graphql" placeholder="Example: localhost:3000" {{#if config.graphql.host}}value="{{config.graphql.host}}"{{/if}}>
+							<td>
+								<input type="text" name="graphql" placeholder="Example: localhost:3000" {{#if config.graphql.host}}value="{{config.graphql.host}}"
+								    {{/if}}>
 						</tr>
-						<tr><td colspan="2"><button type="submit" value="updatehosts" name="action">Update</button></td></tr>
+						<tr>
+							<td colspan="2">
+								<button type="submit" value="updatehosts" name="action">Update</button>
+							</td>
+						</tr>
 					</table>
 
 				</form>
@@ -57,34 +67,34 @@
 			<h1>Item XML data</h1>
 			<p>
 				{{#if config.xml}}
-					<form method="post">
-						<table>
-								<tr>
-									<th scope="col">File</th>
-									<th scope="col">Index</th>
-									<th scope="col">Type</th>
-									<th scope="col">Status</th>
-									<th scope="col">Action</th>
-								</tr>
-							{{#each config.xml}}
-								<tr>
-									<th scope="row">{{file}}</th>
-									<td>{{index}}</td>
-									<td>{{type}}</td>
-									{{#if missing}}<td class="error">Missing</td>{{else}}{{#if parser}}<td>Exists</td>{{else}}<td class="error">Missing parser code</td>{{/if}}{{/if}}
-									<td><button type="submit" value="delete:{{file}}" name="action">Remove</button></td>
-								</tr>
-							{{/each}}
-						</table>
-					</form>
-				{{else}}
-					No TMS XML data files have been registered with the system yet.
-					{{#if addableFiles}}
-						You should use the form in the next section to select one or more files to register.
-					{{else}}
-						Follow the instructions in the next section to get started.
-					{{/if}}
-				{{/if}}
+				<form method="post">
+					<table>
+						<tr>
+							<th scope="col">File</th>
+							<th scope="col">Index</th>
+							<th scope="col">Type</th>
+							<th scope="col">Status</th>
+							<th scope="col">Action</th>
+						</tr>
+						{{#each config.xml}}
+						<tr>
+							<th scope="row">{{file}}</th>
+							<td>{{index}}</td>
+							<td>{{type}}</td>
+							{{#if missing}}
+							<td class="error">Missing</td>{{else}}{{#if parser}}
+							<td>Exists</td>{{else}}
+							<td class="error">Missing parser code</td>{{/if}}{{/if}}
+							<td>
+								<button type="submit" value="delete:{{file}}" name="action">Remove</button>
+							</td>
+						</tr>
+						{{/each}}
+					</table>
+				</form>
+				{{else}} No TMS XML data files have been registered with the system yet. {{#if addableFiles}} You should use the form in
+				the next section to select one or more files to register. {{else}} Follow the instructions in the next section to get
+				started. {{/if}} {{/if}}
 			</p>
 
 			<hr>
@@ -92,31 +102,36 @@
 			<h1>Add XML item files</h1>
 			{{#if addableFiles}}
 			<p>
-			The following files have been found in the
-			{{#if usingAbsolutePath}}
+				The following files have been found in the {{#if usingAbsolutePath}}
 				<code>{{dataDir}}</code>
-			{{else}}
+				{{else}}
 				<code>/app/data/xml</code>
-			{{/if}}
-
-			folder, please enter the <code>Index</code> and <code>Type</code> and click the "Add" button for each file you wish to add.
+				{{/if}} folder, please enter the
+				<code>Index</code> and
+				<code>Type</code> and click the "Add" button for each file you wish to add.
 			</p>
 			<p>
 				<form method="post">
 					<table>
-							<tr>
-								<th scope="col">File</th>
-								<th scope="col">Index</th>
-								<th scope="col">Type</th>
-								<th scope="col">Action</th>
-							</tr>
+						<tr>
+							<th scope="col">File</th>
+							<th scope="col">Index</th>
+							<th scope="col">Type</th>
+							<th scope="col">Action</th>
+						</tr>
 						{{#each addableFiles}}
-							<tr>
-								<th scope="row">{{@this}}</th>
-								<th scope="col"><input type="text" name="index:{{@this}}" placeholder="Example: objects"></th>
-								<th scope="col"><input type="text" name="type:{{@this}}" placeholder="Example: object"></th>
-								<td><button type="submit" value="add:{{@this}}" name="action">Add</button></td>
-							</tr>
+						<tr>
+							<th scope="row">{{@this}}</th>
+							<th scope="col">
+								<input type="text" name="index:{{@this}}" placeholder="Example: objects">
+							</th>
+							<th scope="col">
+								<input type="text" name="type:{{@this}}" placeholder="Example: object">
+							</th>
+							<td>
+								<button type="submit" value="add:{{@this}}" name="action">Add</button>
+							</td>
+						</tr>
 						{{/each}}
 					</table>
 				</form>
@@ -126,48 +141,54 @@
 				<strong>Index:</strong> this is the index name that will be used in ElasticSearch.
 			</p>
 			<p>
-				<strong>Type:</strong> this is the type that gets passed to ElasticSearch during upserts. It should also match the directory the parsing code used to parse this XML file, that's found in <code>/app/cli/tmsxml2json/parsers</code>, i.e. <code>/app/cli/tmsxml2json/parsers/[type]/index.js</code>
+				<strong>Type:</strong> this is the type that gets passed to ElasticSearch during upserts. It should also match the directory
+				the parsing code used to parse this XML file, that's found in
+				<code>/app/cli/tmsxml2json/parsers</code>, i.e.
+				<code>/app/cli/tmsxml2json/parsers/[type]/index.js</code>
 			</p>
 			{{else}}
-				<p>
-					No exported .xml files found in
-					{{#if usingAbsolutePath}}
-						<code>{{dataDir}}</code>
-					{{else}}
-						<code>/app/data/xml</code>
-					{{/if}}.
-					You should place (or automate the placing of) the .xml files exported from TMS into the
-					{{#if usingAbsolutePath}}
-						<code>{{dataDir}}</code> absolute
-					{{else}}
-						<code>/app/data/xml</code> directory
-					{{/if}}
-					 and then refresh this page.
-				</p>
+			<p>
+				No exported .xml files found in {{#if usingAbsolutePath}}
+				<code>{{dataDir}}</code>
+				{{else}}
+				<code>/app/data/xml</code>
+				{{/if}}. You should place (or automate the placing of) the .xml files exported from TMS into the {{#if usingAbsolutePath}}
+				<code>{{dataDir}}</code> absolute {{else}}
+				<code>/app/data/xml</code> directory {{/if}} and then refresh this page.
+			</p>
 			{{/if}}
 
 			<hr>
 
 			<h1>Change XML directory location</h1>
 			<p>
-				{{#if usingAbsolutePath}}
-					We have been told to use the <em>absolute</em> path: <code>{{dataDir}}</code>. If you wish to change this or go back to the default directory click the remove button below.
-					<form method="post">
-						<table>
-							<tr><td><button type="submit" value="removeDataDir" name="action">Remove</button></td></tr>
-						</table>
-					</form>
-				{{else}}
-					We are looking for the XML files in the default location of <code>/app/data/xml</code>, you can change this to an <em>absolute</em> path if you know it here.
-					<form method="post">
-						<table>
-							<tr>
-								<td>Absolute path</td>
-								<td><input type="text" name="xmlPath" placeholder="example: /usr/local/tmp" >
-								<td><button type="submit" value="addDataDir" name="action">Add</button></td>
-							</tr>
-						</table>
-					</form>
+				{{#if usingAbsolutePath}} We have been told to use the
+				<em>absolute</em> path:
+				<code>{{dataDir}}</code>. If you wish to change this or go back to the default directory click the remove button below.
+				<form method="post">
+					<table>
+						<tr>
+							<td>
+								<button type="submit" value="removeDataDir" name="action">Remove</button>
+							</td>
+						</tr>
+					</table>
+				</form>
+				{{else}} We are looking for the XML files in the default location of
+				<code>/app/data/xml</code>, you can change this to an
+				<em>absolute</em> path if you know it here.
+				<form method="post">
+					<table>
+						<tr>
+							<td>Absolute path</td>
+							<td>
+								<input type="text" name="xmlPath" placeholder="example: /usr/local/tmp">
+								<td>
+									<button type="submit" value="addDataDir" name="action">Add</button>
+								</td>
+						</tr>
+					</table>
+				</form>
 				{{/if}}
 			</p>
 
@@ -175,34 +196,47 @@
 
 			<h1>Change Media directory location</h1>
 			<p>
-				{{#if usingMediaAbsolutePath}}
-					We have been told to use the <em>absolute</em> path: <code>{{mediaDir}}</code>. If you wish to change this or go back to the default directory click the remove button below.
-					<form method="post">
-						<table>
-							<tr><td><button type="submit" value="removeMediaDir" name="action">Remove</button></td></tr>
-						</table>
-					</form>
-				{{else}}
-					We are looking for media files in the default location of <code>/app/data/media</code>, you can change this to an <em>absolute</em> path if you know it here.
-					<form method="post">
-						<table>
-							<tr>
-								<td>Absolute path</td>
-								<td><input type="text" name="mediaPath" placeholder="example: /usr/local/media" >
-								<td><button type="submit" value="addMediaDir" name="action">Add</button></td>
-							</tr>
-						</table>
-					</form>
+				{{#if usingMediaAbsolutePath}} We have been told to use the
+				<em>absolute</em> path:
+				<code>{{mediaDir}}</code>. If you wish to change this or go back to the default directory click the remove button below.
+				<form method="post">
+					<table>
+						<tr>
+							<td>
+								<button type="submit" value="removeMediaDir" name="action">Remove</button>
+							</td>
+						</tr>
+					</table>
+				</form>
+				{{else}} We are looking for media files in the default location of
+				<code>/app/data/media</code>, you can change this to an
+				<em>absolute</em> path if you know it here.
+				<form method="post">
+					<table>
+						<tr>
+							<td>Absolute path</td>
+							<td>
+								<input type="text" name="mediaPath" placeholder="example: /usr/local/media">
+								<td>
+									<button type="submit" value="addMediaDir" name="action">Add</button>
+								</td>
+						</tr>
+					</table>
+				</form>
 				{{/if}}
 			</p>
 
 			<p>
-				When importing media the system will look at the filename provided in the XML and then search for the media file in the above media directory. If the filename in the XML hash
-				extra path information at the start that needs to be removed to find the file in the directory you can set that here. For example...
+				When importing media the system will look at the filename provided in the XML and then search for the media file in the above
+				media directory. If the filename in the XML hash extra path information at the start that needs to be removed to find
+				the file in the directory you can set that here. For example...
 			</p>
 			<p>
-				If the filename is "<code>//TMSMedia/Collection_Images/collection_0001/image_0002.jpg</code>" and the file is placed in "<code>{{#if usingMediaAbsolutePath}}{{mediaDir}}{{else}}/app/data/media{{/if}}/collection_0001/image_0002.jpg</code>" you would specify
-				"<code>//TMSMedia/Collection_Images/</code>" as the prefix to remove.
+				If the filename is "
+				<code>//TMSMedia/Collection_Images/collection_0001/image_0002.jpg</code>" and the file is placed in "
+				<code>{{#if usingMediaAbsolutePath}}{{mediaDir}}{{else}}/app/data/media{{/if}}/collection_0001/image_0002.jpg</code>" you would
+				specify "
+				<code>//TMSMedia/Collection_Images/</code>" as the prefix to remove.
 			</p>
 			<p>
 				Note, at the moment we can only handle one prefix to remove.
@@ -211,31 +245,48 @@
 					<table>
 						<tr>
 							<td>Media Directory Prefix</td>
-							<td><input type="text" name="mediaDirPrefix" placeholder="Example: //TMSMedia/Collection_Images" {{#if config.mediaDirPrefix}}value="{{config.mediaDirPrefix}}"{{/if}}>
+							<td>
+								<input type="text" name="mediaDirPrefix" placeholder="Example: //TMSMedia/Collection_Images" {{#if config.mediaDirPrefix}}value="{{config.mediaDirPrefix}}"
+								    {{/if}}>
 						</tr>
-						<tr><td colspan="2"><button type="submit" value="updateMediaDirPrefix" name="action">Update</button></td></tr>
+						<tr>
+							<td colspan="2">
+								<button type="submit" value="updateMediaDirPrefix" name="action">Update</button>
+							</td>
+						</tr>
 					</table>
 				</form>
 			</p>
 
 			<h2>Cloudinary</h2>
 			<p>
-				We are currently using <a href="https://cloudinary.com">Cloudinary</a> to host images (they are ultimately stored on S3), you will need to add your cloudinary credentials here.
+				We are currently using
+				<a href="https://cloudinary.com">Cloudinary</a> to host images (they are ultimately stored on S3), you will need to add your cloudinary credentials here.
 				<form method="post">
 					<table>
 						<tr>
 							<td>Cloud name</td>
-							<td><input type="text" name="cloud_name" placeholder="Example: mytmsimagehost" {{#if config.cloudinary.cloud_name}}value="{{config.cloudinary.cloud_name}}"{{/if}}>
+							<td>
+								<input type="text" name="cloud_name" placeholder="Example: mytmsimagehost" {{#if config.cloudinary.cloud_name}}value="{{config.cloudinary.cloud_name}}"
+								    {{/if}}>
 						</tr>
 						<tr>
 							<td>API key</td>
-							<td><input type="text" name="api_key" placeholder="Example: 5551234567890" {{#if config.cloudinary.api_key}}value="{{config.cloudinary.api_key}}"{{/if}}>
+							<td>
+								<input type="text" name="api_key" placeholder="Example: 5551234567890" {{#if config.cloudinary.api_key}}value="{{config.cloudinary.api_key}}"
+								    {{/if}}>
 						</tr>
 						<tr>
 							<td>API secret</td>
-							<td><input type="text" name="api_secret" placeholder="Example: abCD12-3Fg4Hixyz" {{#if config.cloudinary.api_secret}}value="{{config.cloudinary.api_secret}}"{{/if}}>
+							<td>
+								<input type="text" name="api_secret" placeholder="Example: abCD12-3Fg4Hixyz" {{#if config.cloudinary.api_secret}}value="{{config.cloudinary.api_secret}}"
+								    {{/if}}>
 						</tr>
-						<tr><td colspan="2"><button type="submit" value="updatecloudinary" name="action">Update</button></td></tr>
+						<tr>
+							<td colspan="2">
+								<button type="submit" value="updatecloudinary" name="action">Update</button>
+							</td>
+						</tr>
 					</table>
 				</form>
 			</p>
@@ -244,4 +295,5 @@
 	</div>
 
 </body>
+
 </html>

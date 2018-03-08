@@ -53,8 +53,8 @@ exports.index = async (request, response) => {
   if ('body' in request) {
     //  If we've been passed an ID then we are probably looking up an item
     //  TODO: we also need to know the 'type'/'index' of the item
-    if ('id' in request.body) {
-      return response.redirect(`/object/${request.body.id}`)
+    if ('search' in request.body) {
+      return response.redirect(`/view/${request.body.search}/${request.body.id}`)
     }
 
     //  We have been passed an action, which could be all sorts of things, in
