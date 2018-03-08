@@ -1,17 +1,17 @@
 /*
 These are all the cool parse functions to get the data into the right format
 */
-const parseText = text => ({ text: text._, lang: text.lang });
+const parseText = text => ({ text: text._, lang: text.lang })
 
 const parseObjectOrArray = (obj, fn) => {
-  if (obj === null || obj === undefined) return null;
-  let rtnObject = null;
+  if (obj === null || obj === undefined) return null
+  let rtnObject = null
 
   if (Array.isArray(obj)) {
-    rtnObject = obj.map(fn);
+    rtnObject = obj.map(fn)
   }
   if (typeof obj === 'object') {
-    rtnObject = Object.values(obj).map(fn);
+    rtnObject = Object.values(obj).map(fn)
   }
   if (rtnObject !== null) {
     if (
@@ -19,31 +19,31 @@ const parseObjectOrArray = (obj, fn) => {
       rtnObject.length === 1 &&
       Array.isArray(rtnObject[0])
     ) {
-      [rtnObject] = rtnObject;
+      [rtnObject] = rtnObject
     }
-    return rtnObject;
+    return rtnObject
   }
-  return null;
-};
+  return null
+}
 
 const parseAreaCategory = areacategory => ({
   rank: parseInt(areacategory.rank, 10),
   type: areacategory.type,
-  areacat: areacategory.areacat ? areacategory.areacat.map(parseText) : null,
-});
+  areacat: areacategory.areacat ? areacategory.areacat.map(parseText) : null
+})
 
 const parseMedia = media => ({
   rank: parseInt(media.rank, 10),
   primarydisplay: parseInt(media.primarydisplay, 10) === 1,
-  filename: media.filename,
-});
+  filename: media.filename
+})
 
 const parseTitles = (titles) => {
   if (Array.isArray(titles)) {
-    return parseObjectOrArray(titles, parseText);
+    return parseObjectOrArray(titles, parseText)
   }
-  return parseText(titles);
-};
+  return parseText(titles)
+}
 
 const parseAuthor = author => ({
   rank: parseInt(author.rank, 10),
@@ -53,27 +53,27 @@ const parseAuthor = author => ({
   name: author.name,
   birthyear_yearformed: parseInt(author.birthyear_yearformed, 10),
   deathyear: parseInt(author.deathyear, 10),
-  roles: parseObjectOrArray(author.roles, parseText),
-});
+  roles: parseObjectOrArray(author.roles, parseText)
+})
 
-const parseAuthors = authors => parseObjectOrArray(authors, parseAuthor);
+const parseAuthors = authors => parseObjectOrArray(authors, parseAuthor)
 
-const parseDate = date => new Date(date);
+const parseDate = date => new Date(date)
 
 const parseVenue = venue => ({
   begindate: parseDate(venue.begindate),
   enddate: parseDate(venue.enddate),
-  name: parseObjectOrArray(venue.name, parseText),
-});
+  name: parseObjectOrArray(venue.name, parseText)
+})
 
-const parseVenues = venues => parseObjectOrArray(venues, parseVenue);
+const parseVenues = venues => parseObjectOrArray(venues, parseVenue)
 
 const parseExhibition = exhibition => ({
   begindate: parseDate(exhibition.begindate),
   enddate: parseDate(exhibition.enddate),
   title: exhibition.title ? parseText(exhibition.title.title) : null,
-  venues: parseObjectOrArray(exhibition.venues, parseVenues),
-});
+  venues: parseObjectOrArray(exhibition.venues, parseVenues)
+})
 
 const parseObject = o => ({
   id: parseInt(o.id, 10),
@@ -86,7 +86,7 @@ const parseObject = o => ({
   dimensions: parseObjectOrArray(o.dimensions, parseText),
   areacategories: parseObjectOrArray(
     o.areacategories.areacategory,
-    parseAreaCategory,
+    parseAreaCategory
   ),
   authors: parseObjectOrArray(o.authors, parseAuthors),
   medias: parseObjectOrArray(o.medias, parseMedia),
@@ -94,7 +94,7 @@ const parseObject = o => ({
   dated: o.dated,
   exhibitions: parseObjectOrArray(o.exhibitions, parseExhibition),
   copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
-  summaries: parseObjectOrArray(o.summaries, parseText),
-});
+  summaries: parseObjectOrArray(o.summaries, parseText)
+})
 
-exports.parseJson = json => parseObject(json);
+exports.parseJson = json => parseObject(json)
