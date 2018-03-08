@@ -18,7 +18,6 @@ gulpfile.js
 htpasswd
 node_modules
 objects.json
-server.js
 
 *log
 
