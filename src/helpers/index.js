@@ -192,20 +192,20 @@ exports.dumpJSON = (object) => {
 
 exports.prettyNumber = (x) => {
   if (x === null || x === undefined) return ''
-  x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 exports.timePretty = (t) => {
   if (t === null || t === undefined) return ''
-  moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
+  return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
 }
 
 exports.timeDiff = (diff) => {
   if (diff === null || diff === undefined) return ''
-  moment.duration(diff).humanize()
+  return moment.duration(diff).humanize()
 }
 
 exports.timeAgo = (diff) => {
   if (diff === null || diff === undefined) return ''
-  moment(diff).fromNow()
+  return moment(diff).fromNow()
 }
