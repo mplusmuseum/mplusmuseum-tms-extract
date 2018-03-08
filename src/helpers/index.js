@@ -190,10 +190,22 @@ exports.dumpJSON = (object) => {
   return pre
 }
 
-exports.prettyNumber = x => x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+exports.prettyNumber = (x) => {
+  if (x === null || x === undefined) return ''
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}
 
-exports.timePretty = t => moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
+exports.timePretty = (t) => {
+  if (t === null || t === undefined) return ''
+  return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
+}
 
-exports.timeDiff = diff => moment.duration(diff).humanize()
+exports.timeDiff = (diff) => {
+  if (diff === null || diff === undefined) return ''
+  return moment.duration(diff).humanize()
+}
 
-exports.timeAgo = diff => moment(diff).fromNow()
+exports.timeAgo = (diff) => {
+  if (diff === null || diff === undefined) return ''
+  return moment(diff).fromNow()
+}

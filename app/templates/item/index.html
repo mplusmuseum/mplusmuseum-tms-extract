@@ -14,7 +14,7 @@
 	<div class="container">
 		<div>
 
-  		<h1>Object #{{id}}</h1>
+  		<h1>{{itemTitle}} #{{id}}</h1>
 
 			{{#if showResults}}
 				<table class="dataDump">
@@ -22,8 +22,8 @@
 						<td>
 							<h2>Pre-ingested JSON</h2>
 							<div class="json boxme">
-								{{#if objectJSON}}
-									<pre>{{objectJSON}}</pre>
+								{{#if itemJSON}}
+									<pre>{{itemJSON}}</pre>
 								{{else}}
 									<p>
 										No JSON file found!
@@ -35,8 +35,8 @@
 						<td>
 							<h2>Pre-ingested XML</h2>
 							<div class="xml boxme">
-								{{#if objectXML}}
-									<pre>{{objectXML}}</pre>
+								{{#if itemXML}}
+									<pre>{{itemXML}}</pre>
 								{{else}}
 									<p>
 										No XML file found!
