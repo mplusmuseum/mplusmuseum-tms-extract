@@ -7,6 +7,7 @@ const fs = require('fs')
 const crypto = require('crypto')
 const artisanalints = require('../../../lib/artisanalints')
 const parseObject = require('./parsers/object')
+const parseAuthor = require('./parsers/author')
 const elasticsearch = require('elasticsearch')
 const progress = require('cli-progress')
 const tools = require('../../modules/tools')
@@ -158,8 +159,11 @@ const parseString = async (source, xml) => {
     //  Select the parser to use based on the source
     let parserLib = null
     switch (source) {
-      case 'object':
+      case 'objects':
         parserLib = parseObject
+        break
+      case 'authors':
+        parserLib = parseAuthor
         break
       default:
         parserLib = parseObject
@@ -344,7 +348,11 @@ const splitJson = async (source, items) => {
   //  TODO: Here I'm hardcoding the name of the node we want to pull out
   //  as we start dealing with other collections we'll define this based
   //  on the source
-  const seekRoot = 'object'
+  let seekRoot = 'object'
+  if (source === 'authors') {
+    seekRoot = 'author'
+  }
+
   const counter = {
     total: 0,
     new: 0,
@@ -530,10 +538,11 @@ const splitJson = async (source, items) => {
  * _very_ ropey splits rather than anything clever. It should be good enough
  * for the moment
  * @param {string} source   the string defining the source type (from config)
+ * @param {string} type     the type of 'object' (i.e. author, etc)
  * @param {string} xml      the xml to split up
  * @returns {number}        how many xml items we found
  */
-const splitXml = (source, xml) => {
+const splitXml = (source, type, xml) => {
   //  We need to make sure the folder we are going to spit these out into
   //  exists
   if (config.onLambda) {
@@ -548,10 +557,10 @@ const splitXml = (source, xml) => {
   //  THIS IS BAD HARDCODED CODE BASED ON EXTERNAL SPECIFICATIONS
   const trimmedXml = xml
     .trim()
-    .replace('<ExportForMPlus><objects>', '')
-    .replace('</objects></ExportForMPlus>', '')
+    .replace(`<ExportForMPlus><${source}>`, '')
+    .replace(`</${source}></ExportForMPlus>`, '')
     .replace('<?xml version="1.0" encoding="utf-8"?>', '')
-  const xmls = trimmedXml.split('</object>').map(chunk => `${chunk}</object>`)
+  const xmls = trimmedXml.split(`</${type}>`).map(chunk => `${chunk}</${type}>`)
 
   //  Now dump all the xml files
   let counter = 0
@@ -612,14 +621,14 @@ const processXML = async () => {
       console.log('Finished conversion.'.alert)
       //  TODO: This may not be "json.objects" when we start using different
       //  xml imports
-      counts.items[index].jsonCount = await splitJson(index, json.objects)
+      counts.items[index].jsonCount = await splitJson(index, json[index])
       await checkIndexes(index)
       const bulkUploaded = await bulkUpload(index, type, json)
       counts.items[index].bulkUpload = {
         bulkUploaded,
         lastChecked: new Date().getTime()
       }
-      counts.items[index].xmlCount = splitXml(index, xml)
+      counts.items[index].xmlCount = splitXml(index, type, xml)
       saveCounts(counts)
     } else {
       console.log('File not found, skipping.'.error)
