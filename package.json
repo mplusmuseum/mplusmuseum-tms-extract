@@ -13,19 +13,25 @@
     "colors": "^1.1.2",
     "commander": "^2.11.0",
     "compass": "^0.1.1",
+    "connect-ensure-login": "^0.1.1",
+    "cookie-parser": "^1.4.3",
     "del": "^3.0.0",
     "dotenv": "^5.0.0",
     "elasticsearch": "^13.3.1",
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
+    "express-session": "^1.15.6",
     "get-stdin": "^5.0.1",
     "http-auth": "^3.2.3",
     "moment": "^2.20.1",
+    "passport": "^0.4.0",
+    "passport-auth0": "^0.6.1",
     "pretty-data": "^0.40.0",
-    "standard": "^10.0.3",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
     "run-sequence": "^2.2.0",
+    "session-file-store": "^1.2.0",
+    "standard": "^10.0.3",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -44,7 +50,7 @@
     "build:dev": "npm-run-all -p build:dev:css build:dev:watch",
     "build:dev:css": "compass watch",
     "build:dev:watch": "watch-run -p 'src/**/*.js' 'npm run build'",
-    "start:dev": "nodemon server.js -i src -i app/public/scripts -i app/data -i config.json",
+    "start:dev": "nodemon server.js -i src -i app/public/scripts -i app/data -i config.json -i sessions",
     "go": "npm-run-all -p build:dev start:dev"
   }
 }

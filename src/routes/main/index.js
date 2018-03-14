@@ -1,8 +1,31 @@
 const fs = require('fs')
 const tools = require('../../modules/tools')
+const User = require('../../modules/user')
 
-exports.index = async (request, response) => {
+exports.status = (request, response) => {
   const templateValues = {}
+  const user = new User(request.user)
+
+  const covers = [
+    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919558/ohdcbboj5hpmunrwm3rv.jpg',
+    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919371/sdeh5ygups5zc7us8tqy.jpg',
+    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919240/jan7bs5tz0ie5feeo8us.jpg',
+    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919057/ptqaubj0oqichejuo3vh.jpg',
+    'http://res.cloudinary.com/mplusdandev/image/upload/v1519918808/rvuu3nw3w3yfutcles2e.jpg'
+  ]
+  templateValues.cover = covers[Math.floor(Math.random() * covers.length)]
+
+  // If we are logged out, show the main homepage
+  if (user.loggedIn === false) {
+    templateValues.user = user
+    return response.render('main/index', templateValues)
+  }
+
+  if (user.staff === false && user.admin === false) {
+    templateValues.user = user
+    return response.render('main/wait', templateValues)
+  }
+
   templateValues.msg = 'Hello world!'
 
   //  Read in the config file, if there is one
@@ -19,7 +42,7 @@ exports.index = async (request, response) => {
   //  actually written parsers for.
   const rootDir = process.cwd()
   if ('xml' in configJSON) {
-    configJSON.xml = configJSON.xml.map((itemData) => {
+    configJSON.xml = configJSON.xml.map(itemData => {
       const newItem = itemData
 
       //  Check the xml file
@@ -34,9 +57,7 @@ exports.index = async (request, response) => {
 
       //  Check the parsing code
       //  NOTE: this is a _bit_ bad :)
-      const parseCode = `${rootDir}/app/cli/tmsxml2json/parsers/${
-        itemData.type
-      }/index.js`
+      const parseCode = `${rootDir}/app/cli/tmsxml2json/parsers/${itemData.type}/index.js`
       if (fs.existsSync(parseCode)) {
         newItem.parser = true
       } else {
@@ -54,7 +75,9 @@ exports.index = async (request, response) => {
     //  If we've been passed an ID then we are probably looking up an item
     //  TODO: we also need to know the 'type'/'index' of the item
     if ('search' in request.body) {
-      return response.redirect(`/view/${request.body.search}/${request.body.id}`)
+      return response.redirect(
+        `/view/${request.body.search}/${request.body.id}`
+      )
     }
 
     //  We have been passed an action, which could be all sorts of things, in
@@ -111,7 +134,7 @@ exports.index = async (request, response) => {
       //  do that here
       if (request.body.action.split(':')[0] === 'delete') {
         const xmlFile = request.body.action.split(':')[1]
-        configJSON.xml = configJSON.xml.filter((itemData) => {
+        configJSON.xml = configJSON.xml.filter(itemData => {
           if (itemData.file === xmlFile) {
             return false
           }
@@ -253,6 +276,7 @@ exports.index = async (request, response) => {
   const counts = tools.getCounts()
   const status = tools.getStatus(counts)
 
+  templateValues.user = user
   templateValues.pingData = tools.getPingData()
   templateValues.status = status
   templateValues.counts = counts
@@ -263,5 +287,24 @@ exports.index = async (request, response) => {
   templateValues.dataDir = dataDir
   templateValues.mediaDir = mediaDir
   templateValues.config = configJSON
-  return response.render('main/index', templateValues)
+  return response.render('main/status', templateValues)
+}
+
+exports.config = (request, response) => {
+  const templateValues = {}
+  const user = new User(request.user)
+
+  //  If we are not staff or admin then back
+  //  to the index page
+  if (user.staff === false && user.admin === false) {
+    return response.redirect('/')
+  }
+
+  const configJSON = tools.getConfig()
+
+  templateValues.msg = 'Hello world!'
+  templateValues.user = user
+  templateValues.pingData = tools.getPingData()
+  templateValues.config = configJSON
+  return response.render('main/config', templateValues)
 }

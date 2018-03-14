@@ -1,89 +1,94 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width">
-  <title>TMS extract/ingester</title>
-  <link href="/stylesheets/main.css" rel="stylesheet" />
+	<title>TMS extract/ingester</title>
+	<link href="/stylesheets/main.css" rel="stylesheet" />
 	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
 	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
 </head>
+
 <body>
 
-	{{> header}}
-	{{> connections}}
+	{{> header}} {{> connections}}
 
 	<div class="container">
 		<div>
 
-  		<h1>{{itemTitle}} #{{id}}</h1>
+			<h1>{{itemTitle}} #{{id}}</h1>
 
 			{{#if showResults}}
-				<table class="dataDump">
-					<tr>
-						<td>
-							<h2>Pre-ingested JSON</h2>
-							<div class="json boxme">
-								{{#if itemJSON}}
-									<pre>{{itemJSON}}</pre>
-								{{else}}
-									<p>
-										No JSON file found!
-									</p>
-								{{/if}}
-							</div>
-						</td>
-
-						<td>
-							<h2>Pre-ingested XML</h2>
-							<div class="xml boxme">
-								{{#if itemXML}}
-									<pre>{{itemXML}}</pre>
-								{{else}}
-									<p>
-										No XML file found!
-									</p>
-								{{/if}}
-							</div>
-						</td>
-					</tr>
-				</table>
-
-				<table class="dataDump">
-					<tr>
-						<td>
-							<h2>GraphQL query</h2>
-							<div class="graphql boxme">
-								<pre>{{GraphQLQuery}}</pre>
-							</div>
-
-							{{#if showQL}}
-								<div class="links">
-									<ul>
-										<li><a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a></li>
-										<li><a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a></li>
-									</ul>
-								</div>
+			<table class="dataDump">
+				<tr>
+					<td>
+						<h2>Pre-ingested JSON</h2>
+						<div class="json boxme">
+							{{#if itemJSON}}
+							<pre>{{itemJSON}}</pre> {{else}}
+							<p>
+								No JSON file found!
+							</p>
 							{{/if}}
+						</div>
+					</td>
 
-						</td>
+					<td>
+						<h2>Pre-ingested XML</h2>
+						<div class="xml boxme">
+							{{#if itemXML}}
+							<pre>{{itemXML}}</pre> {{else}}
+							<p>
+								No XML file found!
+							</p>
+							{{/if}}
+						</div>
+					</td>
+				</tr>
+			</table>
 
-						<td>
-							<h2>GraphQL Result</h2>
-							<div class="xml boxme">
-								<pre>Not implimented yet</pre>
-							</div>
-						</td>
-					</tr>
-				</table>
+			<table class="dataDump">
+				<tr>
+					<td>
+						<h2>GraphQL query</h2>
+						<div class="graphql boxme">
+							<pre>{{GraphQLQuery}}</pre>
+						</div>
+
+						{{#if showQL}}
+						<div class="links">
+							<ul>
+								<li>
+									<a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a>
+								</li>
+								<li>
+									<a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a>
+								</li>
+							</ul>
+						</div>
+						{{/if}}
+
+					</td>
+
+					<td>
+						<h2>GraphQL Result</h2>
+						<div class="xml boxme">
+							<pre>Not implimented yet</pre>
+						</div>
+					</td>
+				</tr>
+			</table>
 			{{else}}
-				<div class="norecords">
-					<p>
-						Sorry item not found.
-					</p>
-				</div>
+			<div class="norecords">
+				<p>
+					Sorry item not found.
+				</p>
+			</div>
 			{{/if}}
 
 		</div>
 	</div>
 
+	{{> footer}}
+
 </body>
+
 </html>

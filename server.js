@@ -6,15 +6,14 @@ const routes = require('./app/routes')
 const helpers = require('./app/helpers')
 const http = require('http')
 const bodyParser = require('body-parser')
+const session = require('express-session')
+const FileStore = require('session-file-store')(session)
 
-const auth = require('http-auth')
 const tools = require('./app/modules/tools')
 const tmsxml2json = require('./app/cli/tmsxml2json')
-
-const basic = auth.basic({
-  realm: 'Private area',
-  file: `${__dirname}/htpasswd`
-})
+const passport = require('passport')
+const Auth0Strategy = require('passport-auth0')
+const cookieParser = require('cookie-parser')
 
 colours.setTheme({
   info: 'green',
@@ -27,7 +26,6 @@ colours.setTheme({
 })
 
 const app = express()
-app.use(auth.connect(basic))
 const hbs = exphbs.create({
   extname: '.html',
   helpers,
@@ -37,18 +35,61 @@ const hbs = exphbs.create({
 app.engine('html', hbs.engine)
 app.set('view engine', 'html')
 app.set('views', `${__dirname}/app/templates`)
-app.use(express.static(`${__dirname}/app/public`, {
-  'no-cache': true
-}))
+app.use(
+  express.static(`${__dirname}/app/public`, {
+    'no-cache': true
+  })
+)
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({
-  extended: true
-})) // app.use express.favicon __dirname + '/public/img/favicon.ico'
+app.use(
+  bodyParser.urlencoded({
+    extended: true
+  })
+)
+app.use(cookieParser())
+app.use(
+  session({
+    // Here we are creating a unique session identifier
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    store: new FileStore({
+      ttl: 60 * 60 * 24 * 7
+    })
+  })
+)
+
+// app.use express.favicon __dirname + '/public/img/favicon.ico'
 // app.use express.logger 'dev'
 
-app.get('/', routes.main.index)
-app.post('/', routes.main.index)
-app.get('/view/:item/:id', routes.item.index)
+// Configure Passport to use Auth0
+const strategy = new Auth0Strategy(
+  {
+    domain: process.env.AUTH0_DOMAIN,
+    clientID: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_SECRET,
+    callbackURL: process.env.AUTH0_CALLBACK_URL
+  },
+  (accessToken, refreshToken, extraParams, profile, done) => {
+    return done(null, profile)
+  }
+)
+
+passport.use(strategy)
+
+// This can be used to keep a smaller payload
+passport.serializeUser(function (user, done) {
+  done(null, user)
+})
+
+passport.deserializeUser(function (user, done) {
+  done(null, user)
+})
+
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.use('/', routes)
 
 app.use((request, response) => {
   console.error('ERROR!!')
