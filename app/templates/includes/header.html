@@ -3,7 +3,7 @@
     <a href="/" class="brand-logo left">M+ Dashboard</a>
     {{#if user.loggedIn}}
     <ul>
-      {{#if (or user.admin user.staff)}}
+      {{#if user.admin}}
       <li>
         <a href="/config">Config</a>
       </li>

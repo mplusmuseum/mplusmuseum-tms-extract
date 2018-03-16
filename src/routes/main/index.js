@@ -6,16 +6,23 @@ exports.status = (request, response) => {
   const templateValues = {}
   const user = new User(request.user)
 
+  // TODO: Dynamically generate these rather than hardcode them
   const covers = [
-    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919558/ohdcbboj5hpmunrwm3rv.jpg',
-    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919371/sdeh5ygups5zc7us8tqy.jpg',
-    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919240/jan7bs5tz0ie5feeo8us.jpg',
-    'http://res.cloudinary.com/mplusdandev/image/upload/v1519919057/ptqaubj0oqichejuo3vh.jpg',
-    'http://res.cloudinary.com/mplusdandev/image/upload/v1519918808/rvuu3nw3w3yfutcles2e.jpg'
+    'http://res.cloudinary.com/mplustms/image/upload/v1519928183/pnthdtsnabaxowkem2vd.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519928094/lrngveakpkhzre0y6evf.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927989/s4lmnriknrfocwnso8jl.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927986/hrzbxs4897xxwe28i9f9.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927133/yyo11twc6wsmalbteodg.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927182/leopdqpabk7q7uini6xi.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927226/cvc9cl9ysb6aaj0jsdau.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927305/ukmxnlazox8ezawk9yxe.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927522/i4c8duacrvn1xjsi1oie.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927783/nsvufazwyoncw3lh0bqp.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927828/ypvz5hfqf8qwfov2gxmw.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927902/ybauugxofklqjzz7tu3g.jpg',
+    'http://res.cloudinary.com/mplustms/image/upload/v1519927964/wrvebn80ymtksoidh4r2.jpg'
   ]
   templateValues.cover = covers[Math.floor(Math.random() * covers.length)]
-
-  console.log(user)
 
   // If we are logged out, show the main homepage
   if (user.loggedIn === false) {
@@ -27,8 +34,6 @@ exports.status = (request, response) => {
     templateValues.user = user
     return response.render('main/wait', templateValues)
   }
-
-  templateValues.msg = 'Hello world!'
 
   //  Read in the config file, if there is one
   const configJSON = tools.getConfig()
@@ -81,7 +86,99 @@ exports.status = (request, response) => {
         `/view/${request.body.search}/${request.body.id}`
       )
     }
+  }
 
+  let dataDirExists = false
+  const dataDir = tools.getXmlDir()
+  if (fs.existsSync(dataDir)) {
+    dataDirExists = true
+  }
+
+  //  Check to see if we're using an absolute path or not
+  let usingAbsolutePath = false
+  if ('xmlPath' in configJSON) {
+    usingAbsolutePath = true
+  }
+
+  //  Check to see if we're using an absolute path or not
+  let usingMediaAbsolutePath = false
+  if ('mediaPath' in configJSON) {
+    usingMediaAbsolutePath = true
+  }
+  const mediaDir = tools.getMediaDir()
+
+  //  Now we want to do all the status stuff, we need to loop over the files
+  //  specified in the config and blend that in with the details from the counts
+  const counts = tools.getCounts()
+  const status = tools.getStatus(counts)
+
+  templateValues.user = user
+  templateValues.pingData = tools.getPingData()
+  templateValues.status = status
+  templateValues.counts = counts
+  templateValues.dataDirExists = dataDirExists
+  templateValues.usingAbsolutePath = usingAbsolutePath
+  templateValues.usingMediaAbsolutePath = usingMediaAbsolutePath
+  templateValues.dataDir = dataDir
+  templateValues.mediaDir = mediaDir
+  templateValues.config = configJSON
+  return response.render('main/status', templateValues)
+}
+
+exports.config = (request, response) => {
+  const templateValues = {}
+  const user = new User(request.user)
+
+  //  If we are not staff or admin then back
+  //  to the index page
+  if (user.admin === false) {
+    return response.redirect('/')
+  }
+
+  //  Read in the config file, if there is one
+  const configJSON = tools.getConfig()
+
+  //  Go through the config checking that the xml files we are looking for
+  //  actually exists, we'll check for the parse files here too.
+  //  NOTE: The missing/exists may seem redundant, but we're just making it
+  //  easier for the front end to toggle displays
+  //  NOTE: Checking to see if parsing code exists for the object like this
+  //  is kinda bad as we are asking the code to check on itself kinda. But it
+  //  is useful to give a less technical user who's just using the front end
+  //  feedback if they register a new XML data source for which we haven't
+  //  actually written parsers for.
+  const rootDir = process.cwd()
+  if ('xml' in configJSON) {
+    configJSON.xml = configJSON.xml.map(itemData => {
+      const newItem = itemData
+
+      //  Check the xml file
+      const xmlFile = tools.getXmlDir()
+      if (fs.existsSync(`${xmlFile}/${newItem.file}`)) {
+        newItem.missing = false
+        newItem.exists = true
+      } else {
+        newItem.missing = true
+        newItem.exists = false
+      }
+
+      //  Check the parsing code
+      //  NOTE: this is a _bit_ bad :)
+      const parseCode = `${rootDir}/app/cli/tmsxml2json/parsers/${itemData.type}/index.js`
+      if (fs.existsSync(parseCode)) {
+        newItem.parser = true
+      } else {
+        newItem.parser = false
+      }
+
+      return newItem
+    })
+  }
+
+  //  See if we've been POSTED any data, which could be searching for items,
+  //  updating the config and so on... if we have something then work out
+  //  what to do with it.
+  if ('body' in request) {
     //  We have been passed an action, which could be all sorts of things, in
     //  here we'll figure out which action we have been passed and then act
     //  on it.
@@ -236,7 +333,7 @@ exports.status = (request, response) => {
 
       if (saveConfig === true) {
         tools.putConfig(configJSON)
-        return response.redirect('/')
+        return response.redirect('/config')
       }
     }
   }
@@ -273,40 +370,14 @@ exports.status = (request, response) => {
   }
   const mediaDir = tools.getMediaDir()
 
-  //  Now we want to do all the status stuff, we need to loop over the files
-  //  specified in the config and blend that in with the details from the counts
-  const counts = tools.getCounts()
-  const status = tools.getStatus(counts)
-
   templateValues.user = user
   templateValues.pingData = tools.getPingData()
-  templateValues.status = status
-  templateValues.counts = counts
   templateValues.addableFiles = addableFiles
   templateValues.dataDirExists = dataDirExists
   templateValues.usingAbsolutePath = usingAbsolutePath
   templateValues.usingMediaAbsolutePath = usingMediaAbsolutePath
   templateValues.dataDir = dataDir
   templateValues.mediaDir = mediaDir
-  templateValues.config = configJSON
-  return response.render('main/status', templateValues)
-}
-
-exports.config = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
-
-  //  If we are not staff or admin then back
-  //  to the index page
-  if (user.staff === false && user.admin === false) {
-    return response.redirect('/')
-  }
-
-  const configJSON = tools.getConfig()
-
-  templateValues.msg = 'Hello world!'
-  templateValues.user = user
-  templateValues.pingData = tools.getPingData()
   templateValues.config = configJSON
   return response.render('main/config', templateValues)
 }
