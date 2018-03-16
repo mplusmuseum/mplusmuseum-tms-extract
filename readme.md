@@ -96,12 +96,10 @@ If you change the code that converts the XML to JSON (to add fields for example)
 There is also an admin page that allows you to inspect items to check for data integrity. To to the initial install run...
 
 ```bash
-yarn install -g htpasswd
-htpasswd -bc htpasswd [username] [password]
 cp .env.example .env
 ```
 
-...to set the auth password. After that run to build and watch for code changes...
+After that run to build and watch for code changes...
 
     $ yarn run go
 
