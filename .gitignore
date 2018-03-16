@@ -6,12 +6,15 @@ app/cli
 app/data/counts
 app/data/counts.json
 app/data/esPing.json
+app/data/users
 app/data/tms
 app/data/xml
 app/helpers
 app/modules
 app/public/stylesheets/*.css
 app/routes
+
+sessions
 
 config.json
 gulpfile.js

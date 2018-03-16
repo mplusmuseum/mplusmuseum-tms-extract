@@ -86,7 +86,15 @@ exports.ifIsNotNull = (v1, options) => {
   return options.inverse(this)
 }
 
-exports.prettyMonth = (month) => {
+exports.and = (v1, v2) => {
+  return v1 && v2
+}
+
+exports.or = (v1, v2) => {
+  return v1 || v2
+}
+
+exports.prettyMonth = month => {
   if (month === '01') {
     return 'January'
   }
@@ -126,7 +134,7 @@ exports.prettyMonth = (month) => {
   return month
 }
 
-exports.prettyDay = (d) => {
+exports.prettyDay = d => {
   const day = parseInt(d, 10)
   if (day === 1) {
     return '1<sup>st</sup>'
@@ -152,7 +160,7 @@ exports.prettyDay = (d) => {
   return `${day}<sup>th</sup>`
 }
 
-exports.prettyishDay = (d) => {
+exports.prettyishDay = d => {
   const day = parseInt(d, 10)
   if (day === 1) {
     return '1st'
@@ -178,34 +186,34 @@ exports.prettyishDay = (d) => {
   return `${day}th`
 }
 
-exports.dumpThis = (object) => {
+exports.dumpThis = object => {
   console.log(object)
   return ''
 }
 
-exports.dumpJSON = (object) => {
+exports.dumpJSON = object => {
   let pre = "<pre class='admin_view'>"
   pre += JSON.stringify(object, null, 4)
   pre += '</pre>'
   return pre
 }
 
-exports.prettyNumber = (x) => {
+exports.prettyNumber = x => {
   if (x === null || x === undefined) return ''
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
-exports.timePretty = (t) => {
+exports.timePretty = t => {
   if (t === null || t === undefined) return ''
   return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
 }
 
-exports.timeDiff = (diff) => {
+exports.timeDiff = diff => {
   if (diff === null || diff === undefined) return ''
   return moment.duration(diff).humanize()
 }
 
-exports.timeAgo = (diff) => {
+exports.timeAgo = diff => {
   if (diff === null || diff === undefined) return ''
   return moment(diff).fromNow()
 }

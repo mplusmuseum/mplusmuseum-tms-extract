@@ -1,22 +1,27 @@
 <head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
-  <title>M+ Dash</title>
+  <title>M+ Dash | Admin</title>
   <link href="/stylesheets/main.css" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
 </head>
 
-<body class="cover" style="background-image: url({{cover}});">
+<body>
 
-  {{> header}}
+  {{> header}} {{> connections}}
 
   <div class="container homepage">
-    <div class="welcome">
+    <div>
 
-      <h1>Welcome to the M+ Dashboard</h1>
-      <p>Please
-        <a href="/login">login</a> to continue</p>
+      <h1>Admin</h1>
+      <p>
+        <ul>
+          <li>
+            <a href="/admin/users">Users</a>
+          </li>
+        </ul>
+      </p>
     </div>
   </div>
 

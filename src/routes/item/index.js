@@ -1,8 +1,11 @@
 const fs = require('fs')
 const tools = require('../../modules/tools')
+const User = require('../../modules/user')
 
 exports.index = (request, response) => {
   const templateValues = {}
+  const user = new User(request.user)
+
   templateValues.msg = 'Hello world!'
 
   const config = tools.getConfig()
@@ -66,6 +69,8 @@ exports.index = (request, response) => {
     encodedQL = `${config.graphql.host}/graphql?query=${encodedQuery}`
     encodedAPI = `${config.graphql.host}/api-explorer?query=${encodedQuery}`
   }
+
+  templateValues.user = user
   templateValues.id = id
   templateValues.showResults = showResults
   templateValues.itemTitle = itemTitle
