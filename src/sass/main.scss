@@ -28,6 +28,11 @@ body {
       text-align: center;
     }
   }
+  table {
+    &.admin {
+      width: 100%;
+    }
+  }
 }
 
 a {
@@ -86,6 +91,7 @@ nav {
         margin-top: 7px;
         padding-right: 15px;
         vertical-align: top;
+        width: 50px;
       }
     }
   }

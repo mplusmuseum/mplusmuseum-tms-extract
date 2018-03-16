@@ -15,6 +15,8 @@ exports.status = (request, response) => {
   ]
   templateValues.cover = covers[Math.floor(Math.random() * covers.length)]
 
+  console.log(user)
+
   // If we are logged out, show the main homepage
   if (user.loggedIn === false) {
     templateValues.user = user

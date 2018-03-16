@@ -20,17 +20,18 @@ class User {
       this.auth0 = auth0id
       this.id = auth0id.id
       this.hash = crypto.createHash('md5').update(this.id).digest('hex')
-    } else {
-      // TODO: Go and fetch the object from just ID
-    }
 
-    /*
-     * Now we have the auth0 go and check to see if
-     * we have data for it in the data store.
-     */
-    if (!this.userExists() && this.id !== null) {
-      console.log('We need to make the user file')
-      this.save()
+      /*
+      * Now we have the auth0 go and check to see if
+      * we have data for it in the data store.
+      */
+      if (!this.userExists() && this.id !== null) {
+        console.log('We need to make the user file')
+        this.save()
+      }
+    } else {
+      //  Assume we've been given a hash
+      this.hash = auth0id
     }
 
     this.load()
@@ -40,9 +41,6 @@ class User {
     const userDir = process.cwd()
     if (!fs.existsSync(`${userDir}/app/data`)) {
       fs.mkdirSync(`${userDir}/app/data`)
-    }
-    if (!fs.existsSync(`${userDir}/app/data/users`)) {
-      fs.mkdirSync(`${userDir}/app/data/users`)
     }
     if (!fs.existsSync(`${userDir}/app/data/users`)) {
       fs.mkdirSync(`${userDir}/app/data/users`)

@@ -15,6 +15,10 @@ router.post('/', main.status)
 router.get('/config', ensureLoggedIn, main.config)
 router.get('/settings', ensureLoggedIn, user.settings)
 router.get('/admin', ensureLoggedIn, admin.index)
+router.get('/admin/users', ensureLoggedIn, admin.users)
+router.get('/admin/user/:hash', ensureLoggedIn, admin.user)
+router.post('/admin/user/:hash', ensureLoggedIn, admin.user)
+
 router.get('/view/:item/:id', ensureLoggedIn, item.index)
 
 // Perform the login
