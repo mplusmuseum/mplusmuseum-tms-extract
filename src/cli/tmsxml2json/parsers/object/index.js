@@ -1,4 +1,111 @@
 /*
+const knownFields = {
+  areacategories: true,
+  areacategory_concat: true,
+  authors: true,
+  authors_concat: true,
+  copyrightcreditlines: true,
+  creditlines: true,
+  datebegin: true,
+  dated: true,
+  dateend: true,
+  dimensions: true,
+  exhibitions: true,
+  exhibitions_concat: true,
+  exhlabels: true,
+  id: true,
+  medias: true,
+  mediums: true,
+  MPlusRights: true,
+  MPlusRightsFlexFields: true,
+  objectnumber: true,
+  objectstatus: true,
+  PublicAccess: true,
+  summaries: true,
+  titles: true
+}
+*/
+
+/* Current GraphQL query
+{
+  artwork(id: 1814) {
+    id
+    objectNumber
+    area {
+      id
+    }
+    areacategories {
+      rank
+      type
+    }
+    dated
+    category {
+      id
+    }
+    creditLines {
+      lang
+      text
+    }
+    dated
+    dateEnd
+    dateBegin
+    dimensions {
+      lang
+      text
+    }
+    makers {
+      id
+      birthyear_yearformed
+      deathyear
+      name
+      rank
+      roles {
+        lang
+        text
+      }
+    }
+    medium {
+      id
+      artworks {
+        id
+      }
+      makers {
+        id
+      }
+      name {
+        lang
+        text
+      }
+
+    }
+    medias {
+      rank
+      primarydisplay
+      filename
+      exists
+      remote
+      width
+      height
+      baseUrl
+      squareUrl
+      smallUrl
+      mediumUrl
+      largeUrl
+    }
+    objectNumber
+    objectStatus {
+      lang
+      text
+    }
+    titles {
+      lang
+      text
+    }
+  }
+}
+*/
+
+/*
 These are all the cool parse functions to get the data into the right format
 */
 const parseInnerText = text => ({
@@ -102,19 +209,29 @@ const parseMedia = entry => {
     delete item.alttext
     if (Object.entries(item).length > 0) console.log(item)
     */
-    return {
+    const rtnObject = {
       rank: parseInt(item.rank, 10),
       PublicAccess: parseInt(item.PublicAccess, 10) === 1,
       primarydisplay: parseInt(item.primarydisplay, 10) === 1,
       filename: item.filename,
-      imagecreditlines: item.imagecreditlines
-        ? parseText(item.imagecreditlines.imagecreditline)
-        : null,
-      imagecaption: item.imagecaption
-        ? parseText(item.imagecaption.imagecaption)
-        : null,
       alttext: item.alttext ? parseText(item.alttext.alttext) : null
     }
+
+    if (item.imagecreditlines) {
+      rtnObject.imagecreditlines = parseText(
+        item.imagecreditlines.imagecreditline
+      )
+    } else {
+      rtnObject.imagecreditlines = null
+    }
+
+    if (item.imagecaption) {
+      rtnObject.imagecaption = parseText(item.imagecaption.imagecaption)
+    } else {
+      rtnObject.imagecaption = null
+    }
+
+    return rtnObject
   })
   return rtnArray
 }
@@ -279,6 +396,26 @@ const parseMPlusRights = entry => {
   return rtnArray
 }
 
+const parseExhlabels = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item._
+    delete item.lang
+    delete item.purpose
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      text: item._,
+      lang: item.lang,
+      purpose: item.purpose
+    }
+  })
+  return rtnArray
+}
+
 const parseMPlusRightsFlexFields = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -321,11 +458,6 @@ const parseMPlusRightsFlexFieldsConcat = entry => {
 }
 
 const parseObject = o => {
-  /*
-  if ('exhlabels' in o) {
-    console.log(o.exhlabels)
-  }
-  */
   const newObject = {
     id: parseInt(o.id, 10),
     areacategories: parseObjectOrArray(o.areacategories, parseAreaCategory),
@@ -346,6 +478,7 @@ const parseObject = o => {
       o.exhibitions_concat,
       parseExhibitionsConcat
     ),
+    exhlabels: parseObjectOrArray(o.exhlabels, parseExhlabels),
     medias: parseObjectOrArray(o.medias, parseMedia),
     mediums: parseObjectOrArray(o.mediums, parseText),
     MPlusRights: parseObjectOrArray(o.MPlusRights, parseMPlusRights),
@@ -359,118 +492,13 @@ const parseObject = o => {
     ),
     objectnumber: o.objectnumber,
     objectstatus: parseObjectOrArray(o.objectstatus, parseText),
+    PublicAccess: parseInt(o.PublicAccess, 10) === 1,
     summaries: parseObjectOrArray(o.summaries, parseText),
     titles: parseObjectOrArray(o.titles, parseText)
-    // exhlabels
   }
   return newObject
 }
 
-exports.parseJson = json => parseObject(json)
-
-/*
-const knownFields = {
-  areacategories: true,
-  areacategory_concat: true,
-  authors: true,
-  authors_concat: true,
-  copyrightcreditlines: true,
-  creditlines: true,
-  datebegin: true,
-  dated: true,
-  dateend: true,
-  dimensions: true,
-  exhibitions: true,
-  exhibitions_concat: true,
-  id: true,
-  medias: true,
-  mediums: true,
-  MPlusRights: true,
-  MPlusRightsFlexFields: true,
-  objectnumber: true,
-  objectstatus: true,
-  PublicAccess: true,
-  summaries: true,
-  titles: true,
-  exhlabels: true
+exports.parseJson = json => {
+  return parseObject(json)
 }
-*/
-
-/* Current GraphQL query
-{
-  artwork(id: 1814) {
-    id
-    objectNumber
-    area {
-      id
-    }
-    areacategories {
-      rank
-      type
-    }
-    dated
-    category {
-      id
-    }
-    creditLines {
-      lang
-      text
-    }
-    dated
-    dateEnd
-    dateBegin
-    dimensions {
-      lang
-      text
-    }
-    makers {
-      id
-      birthyear_yearformed
-      deathyear
-      name
-      rank
-      roles {
-        lang
-        text
-      }
-    }
-    medium {
-      id
-      artworks {
-        id
-      }
-      makers {
-        id
-      }
-      name {
-        lang
-        text
-      }
-
-    }
-    medias {
-      rank
-      primarydisplay
-      filename
-      exists
-      remote
-      width
-      height
-      baseUrl
-      squareUrl
-      smallUrl
-      mediumUrl
-      largeUrl
-    }
-    objectNumber
-    objectStatus {
-      lang
-      text
-    }
-    titles {
-      lang
-      text
-    }
-  }
-}
-*/
