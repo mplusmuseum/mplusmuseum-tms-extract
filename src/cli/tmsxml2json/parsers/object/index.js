@@ -105,59 +105,7 @@ const knownFields = {
 }
 */
 
-/*
-These are all the cool parse functions to get the data into the right format
-*/
-const parseInnerText = text => ({
-  text: text._,
-  lang: text.lang
-})
-
-const parseText = text => {
-  if (Array.isArray(text)) {
-    return parseObjectOrArray(text, parseInnerText)
-  }
-  return parseInnerText(text)
-}
-
-const parseObjectOrArray = (obj, fn) => {
-  if (obj === null || obj === undefined) return null
-  let rtnObject = null
-
-  if (Array.isArray(obj)) {
-    rtnObject = obj.map(fn)
-  }
-  if (typeof obj === 'object') {
-    rtnObject = Object.values(obj).map(fn)
-  }
-  if (rtnObject !== null) {
-    //  See if we have a single array inside an array
-    //  if so pop it up
-    if (
-      Array.isArray(rtnObject) &&
-      rtnObject.length === 1 &&
-      Array.isArray(rtnObject[0])
-    ) {
-      rtnObject = rtnObject[0]
-    }
-    //  Get rid of empty arrays
-    rtnObject = rtnObject.filter(arr => {
-      if (Array.isArray(arr) && arr.length === 0) return false
-      return true
-    })
-    //  Check for array in array _again_
-    if (
-      Array.isArray(rtnObject) &&
-      rtnObject.length === 1 &&
-      Array.isArray(rtnObject[0])
-    ) {
-      rtnObject = rtnObject[0]
-    }
-    return rtnObject
-  }
-  return null
-}
-
+/* areacategories */
 const parseAreaCategory = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -178,6 +126,7 @@ const parseAreaCategory = entry => {
   return rtnArray
 }
 
+/* areacategory_concat */
 const parseAreaCategoryConcat = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -194,6 +143,153 @@ const parseAreaCategoryConcat = entry => {
   return rtnArray
 }
 
+/* authors (called makers) */
+const parseAuthors = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item.rank
+    delete item.author
+    delete item.authornameid
+    delete item.nationality
+    delete item.name
+    delete item.birthyear_yearformed
+    delete item.deathyear
+    delete item.roles
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      rank: parseInt(item.rank, 10),
+      maker: parseInt(item.author, 10),
+      makernameid: parseInt(item.authornameid, 10),
+      nationality: item.nationality,
+      name: item.name,
+      birthyear_yearformed: parseInt(item.birthyear_yearformed, 10),
+      deathyear: parseInt(item.deathyear, 10),
+      roles: parseObjectOrArray(item.roles, parseText)
+    }
+  })
+  return rtnArray
+}
+
+/* authors_concat (called makers) */
+const parseAuthorsConcat = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item.ID
+    delete item.authorNames
+    delete item.authorNationalities
+    delete item.authorBeginDate
+    delete item.authorEndDate
+    delete item.authors
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      id: item.ID,
+      makerNames: item.authorNames,
+      makerNationalities: item.authorNationalities,
+      makerBeginDate: item.authorBeginDate,
+      makerEndDate: item.authorEndDate,
+      makers: item.authors
+    }
+  })
+  return rtnArray
+}
+
+/* exhibitions */
+const parseExhibitions = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item.begindate
+    delete item.enddate
+    delete item.title
+    delete item.venues
+    delete item.ExhibitionID
+    delete item.Section
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      begindate: parseDate(item.begindate),
+      enddate: parseDate(item.enddate),
+      ExhibitionID: item.ExhibitionID,
+      Section: item.Section,
+      title: parseObjectOrArray(item.title, parseText),
+      venues: parseObjectOrArray(item.venues, parseVenues)
+    }
+  })
+  return rtnArray
+}
+
+/* exhibitions > venues */
+const parseVenues = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item.begindate
+    delete item.enddate
+    delete item.name
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      begindate: parseDate(item.begindate),
+      enddate: parseDate(item.enddate),
+      name: parseObjectOrArray(item.name, parseText)
+    }
+  })
+  return rtnArray
+}
+
+/* exhibitions_concat */
+const parseExhibitionsConcat = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item.ObjectID
+    delete item.exhinfo
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      ObjectID: item.ObjectID,
+      exhinfo: item.exhinfo
+    }
+  })
+  return rtnArray
+}
+
+/* exhlabels */
+const parseExhlabels = entry => {
+  if (entry === null || entry === undefined) return null
+  let newEntry = entry
+  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
+  const rtnArray = newEntry.map(item => {
+    /* A curios way to check we have all the fields
+    delete item._
+    delete item.lang
+    delete item.purpose
+    if (Object.entries(item).length > 0) console.log(item)
+    */
+    return {
+      text: item._,
+      lang: item.lang,
+      purpose: item.purpose
+    }
+  })
+  return rtnArray
+}
+
+/* medias */
 const parseMedia = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -236,128 +332,7 @@ const parseMedia = entry => {
   return rtnArray
 }
 
-const parseAuthors = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.rank
-    delete item.author
-    delete item.authornameid
-    delete item.nationality
-    delete item.name
-    delete item.birthyear_yearformed
-    delete item.deathyear
-    delete item.roles
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      rank: parseInt(item.rank, 10),
-      maker: parseInt(item.author, 10),
-      makernameid: parseInt(item.authornameid, 10),
-      nationality: item.nationality,
-      name: item.name,
-      birthyear_yearformed: parseInt(item.birthyear_yearformed, 10),
-      deathyear: parseInt(item.deathyear, 10),
-      roles: parseObjectOrArray(item.roles, parseText)
-    }
-  })
-  return rtnArray
-}
-
-const parseAuthorsConcat = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.ID
-    delete item.authorNames
-    delete item.authorNationalities
-    delete item.authorBeginDate
-    delete item.authorEndDate
-    delete item.authors
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      id: item.ID,
-      makerNames: item.authorNames,
-      makerNationalities: item.authorNationalities,
-      makerBeginDate: item.authorBeginDate,
-      makerEndDate: item.authorEndDate,
-      makers: item.authors
-    }
-  })
-  return rtnArray
-}
-
-const parseExhibitionsConcat = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.ObjectID
-    delete item.exhinfo
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      ObjectID: item.ObjectID,
-      exhinfo: item.exhinfo
-    }
-  })
-  return rtnArray
-}
-
-const parseDate = date => new Date(date)
-
-const parseVenues = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.begindate
-    delete item.enddate
-    delete item.name
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      begindate: parseDate(item.begindate),
-      enddate: parseDate(item.enddate),
-      name: parseObjectOrArray(item.name, parseText)
-    }
-  })
-  return rtnArray
-}
-
-const parseExhibitions = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.begindate
-    delete item.enddate
-    delete item.title
-    delete item.venues
-    delete item.ExhibitionID
-    delete item.Section
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      begindate: parseDate(item.begindate),
-      enddate: parseDate(item.enddate),
-      ExhibitionID: item.ExhibitionID,
-      Section: item.Section,
-      title: item.title ? parseText(item.title.title) : null,
-      venues: parseObjectOrArray(item.venues, parseVenues)
-    }
-  })
-  return rtnArray
-}
-
+/* MPlusRights */
 const parseMPlusRights = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -396,26 +371,7 @@ const parseMPlusRights = entry => {
   return rtnArray
 }
 
-const parseExhlabels = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item._
-    delete item.lang
-    delete item.purpose
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      text: item._,
-      lang: item.lang,
-      purpose: item.purpose
-    }
-  })
-  return rtnArray
-}
-
+/* MPlusRightsFlexFields */
 const parseMPlusRightsFlexFields = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -441,6 +397,7 @@ const parseMPlusRightsFlexFields = entry => {
   return rtnArray
 }
 
+/* MPlusRightsFlexFieldsConcat */
 const parseMPlusRightsFlexFieldsConcat = entry => {
   if (entry === null || entry === undefined) return null
   let newEntry = entry
@@ -457,6 +414,68 @@ const parseMPlusRightsFlexFieldsConcat = entry => {
   return rtnArray
 }
 
+// #########################################################################
+/*
+These are all the cool parse functions to get the data into the right format
+*/
+// #########################################################################
+const parseInnerText = text => ({
+  text: text._,
+  lang: text.lang
+})
+
+const parseText = text => {
+  if (Array.isArray(text)) {
+    return parseObjectOrArray(text, parseInnerText)
+  }
+  return parseInnerText(text)
+}
+
+const parseDate = date => new Date(date)
+
+const parseObjectOrArray = (obj, fn) => {
+  if (obj === null || obj === undefined) return null
+  let rtnObject = null
+
+  if (Array.isArray(obj)) {
+    rtnObject = obj.map(fn)
+  }
+  if (typeof obj === 'object') {
+    rtnObject = Object.values(obj).map(fn)
+  }
+  if (rtnObject !== null) {
+    //  See if we have a single array inside an array
+    //  if so pop it up
+    if (
+      Array.isArray(rtnObject) &&
+      rtnObject.length === 1 &&
+      Array.isArray(rtnObject[0])
+    ) {
+      rtnObject = rtnObject[0]
+    }
+    //  Get rid of empty arrays
+    rtnObject = rtnObject.filter(arr => {
+      if (Array.isArray(arr) && arr.length === 0) return false
+      return true
+    })
+    //  Check for array in array _again_
+    if (
+      Array.isArray(rtnObject) &&
+      rtnObject.length === 1 &&
+      Array.isArray(rtnObject[0])
+    ) {
+      rtnObject = rtnObject[0]
+    }
+    return rtnObject
+  }
+  return null
+}
+
+// #########################################################################
+/*
+ * The actual object parsing
+ */
+// #########################################################################
 const parseObject = o => {
   const newObject = {
     id: parseInt(o.id, 10),
