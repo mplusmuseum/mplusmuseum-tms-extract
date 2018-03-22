@@ -1,4 +1,4 @@
-const parseLangText = (text) => {
+const parseLangText = text => {
   const rtnText = {}
   if ('_' in text) rtnText.text = text._
   if ('lang' in text) rtnText.lang = text.lang
@@ -27,16 +27,16 @@ const parseLangText = (text) => {
  * We do have other places where we may have an array or object, but
  * we need to handle those in their own way
  */
-const arrayObject = (thing) => {
+const arrayObject = thing => {
   let mapThis = thing
   if (Array.isArray(mapThis) === false) mapThis = [mapThis]
-  const newThing = mapThis.map((p) => {
+  const newThing = mapThis.map(p => {
     return parseLangText(p)
   })
   return newThing
 }
 
-const cleanNotNullText = (text) => {
+const cleanNotNullText = text => {
   if (typeof text === 'string') {
     return text
   }
@@ -71,15 +71,19 @@ const parseObjectOrArray = (obj, fn) => {
   //  The correct thing to do is sort out why we're getting nested arrays
   //  but for the moment lets just unpack them.
   if (rtnObject !== null) {
-    if (Array.isArray(rtnObject) && rtnObject.length === 1 && Array.isArray(rtnObject[0])) {
-      [rtnObject] = rtnObject
+    if (
+      Array.isArray(rtnObject) &&
+      rtnObject.length === 1 &&
+      Array.isArray(rtnObject[0])
+    ) {
+      ;[rtnObject] = rtnObject
     }
     return rtnObject
   }
   return null
 }
 
-const parseName = (name) => {
+const parseName = name => {
   const newName = {}
 
   //  Grab all the easy to grab things
@@ -100,7 +104,7 @@ const parseName = (name) => {
   return newName
 }
 
-const parsePlace = (place) => {
+const parsePlace = place => {
   const newPlace = {}
 
   //  Grab all the easy to grab things
@@ -127,7 +131,7 @@ const parsePlace = (place) => {
   return newPlace
 }
 
-const parseAuthor = (a) => {
+const parseAuthor = a => {
   const newAuthor = {}
   newAuthor.id = parseInt(a.id, 10)
   /*
