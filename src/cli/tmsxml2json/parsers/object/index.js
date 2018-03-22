@@ -254,8 +254,8 @@ const parseAuthors = entry => {
     */
     return {
       rank: parseInt(item.rank, 10),
-      author: parseInt(item.author, 10),
-      authornameid: parseInt(item.authornameid, 10),
+      maker: parseInt(item.author, 10),
+      makernameid: parseInt(item.authornameid, 10),
       nationality: item.nationality,
       name: item.name,
       birthyear_yearformed: parseInt(item.birthyear_yearformed, 10),
@@ -282,11 +282,11 @@ const parseAuthorsConcat = entry => {
     */
     return {
       id: item.ID,
-      authorNames: item.authorNames,
-      authorNationalities: item.authorNationalities,
-      authorBeginDate: item.authorBeginDate,
-      authorEndDate: item.authorEndDate,
-      authors: item.authors
+      makerNames: item.authorNames,
+      makerNationalities: item.authorNationalities,
+      makerBeginDate: item.authorBeginDate,
+      makerEndDate: item.authorEndDate,
+      makers: item.authors
     }
   })
   return rtnArray
@@ -465,8 +465,8 @@ const parseObject = o => {
       o.areacategory_concat,
       parseAreaCategoryConcat
     ),
-    authors: parseObjectOrArray(o.authors, parseAuthors),
-    authors_concat: parseObjectOrArray(o.authors_concat, parseAuthorsConcat),
+    makers: parseObjectOrArray(o.authors, parseAuthors),
+    makers_concat: parseObjectOrArray(o.authors_concat, parseAuthorsConcat),
     copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
     creditlines: parseObjectOrArray(o.creditlines, parseText),
     datebegin: parseFloat(o.datebegin),
