@@ -39,6 +39,26 @@ body {
       margin-top: 2rem;
       margin-bottom: 2rem;
     }
+    ul {
+      &.fields {
+        font-family: monospace;
+        &.level1 li {
+          font-weight: bold;
+          list-style: none;
+          margin-top: 0.5em;
+        }
+        &.level2 li {
+          font-weight: normal;
+          margin-top: 0;
+        }
+        &.level3 li {
+          font-size: 0.9em;
+        }
+        &.level4 li {
+          font-size: 0.9em;
+        }
+      }
+    }
   }
   table {
     &.admin {
@@ -186,7 +206,7 @@ nav {
       }
     }
   }
-  ul {
+  ul.cards {
     padding-left: 0;
     list-style-type: none;
     li {

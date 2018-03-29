@@ -1,0 +1,42 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>M+ Dash | Developer Tools</title>
+  <link href="/stylesheets/main.css" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+
+  {{> header}} {{> connections}}
+
+  <div class="container admin-layout">
+    <div>
+
+      <p>
+        A lot more developer tools will be appearing here soon, including your token. In the mean time, there's a couple of smaller
+        tools to be getting on with.
+      </p>
+
+      {{#if config.xml}}
+      <h2>JSON fields</h2>
+      <p>
+        To view what fields are currently in the XML files please click the item you'd like to check below
+      </p>
+      <ul>
+        {{#each config.xml}}
+        <li>
+          <a href="/developer/fields/{{index}}">{{index}}</li>
+        {{/each}}
+      </ul>
+      {{/if}}
+
+    </div>
+  </div>
+
+  {{> footer}}
+
+</body>
+
+</html>

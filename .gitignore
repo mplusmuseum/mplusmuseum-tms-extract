@@ -6,6 +6,7 @@ app/cli
 app/data/counts
 app/data/counts.json
 app/data/esPing.json
+app/data/fields
 app/data/users
 app/data/tms
 app/data/xml

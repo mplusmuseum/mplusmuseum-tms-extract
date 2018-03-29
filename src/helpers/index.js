@@ -217,3 +217,45 @@ exports.timeAgo = diff => {
   if (diff === null || diff === undefined) return ''
   return moment(diff).fromNow()
 }
+
+//  Here we are going to be constucting a whole bunch of HTML
+//  which is also going to be horrible nested, you have been warned
+//  please feel free to recurse this up
+exports.displayFields = fields => {
+  let html = '<ul class="fields level1">'
+  Object.entries(fields).forEach(level1Node => {
+    html += `<li>${level1Node[0]}`
+    const level1Root = fields[level1Node[0]]
+    const level1Entries = Object.entries(level1Root)
+    if (level1Entries.length > 0) {
+      html += '<ul class="fields level2">'
+      level1Entries.forEach(level2Node => {
+        html += `<li>${level2Node[0]}`
+        const level2Root = level1Root[level2Node[0]]
+        const level2Entries = Object.entries(level2Root)
+        if (level2Entries.length > 0) {
+          html += '<ul class="fields level3">'
+          level2Entries.forEach(level3Node => {
+            html += `<li>${level3Node[0]}`
+            const level3Root = level2Root[level3Node[0]]
+            const level3Entries = Object.entries(level3Root)
+            if (level3Entries.length > 0) {
+              html += '<ul class="fields level4">'
+              level3Entries.forEach(level4Node => {
+                html += `<li>${level4Node[0]}</li>`
+              })
+              html += '</ul>'
+            }
+            html += '</li>'
+          })
+          html += '</ul>'
+        }
+        html += '</li>'
+      })
+      html += '</ul>'
+    }
+    html += '</li>'
+  })
+  html += '</ul>'
+  return html
+}

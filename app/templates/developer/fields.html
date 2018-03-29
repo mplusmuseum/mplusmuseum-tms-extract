@@ -1,0 +1,45 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>M+ Dash | Developer Tools</title>
+  <link href="/stylesheets/main.css" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+
+  {{> header}} {{> connections}}
+
+  <div class="container admin-layout">
+    <div>
+
+      <h1>Fields for {{index}}</h1>
+
+      <p>
+        Below is the list of fields found in the {{index}} JSON files. These fields should be in the GraphQL results, if they're
+        not showing up then please contact us.
+      </p>
+      <p>
+        <strong>Note:</strong> the image fields and artisanal integer fields are added directly to the data store and won't appear
+        in the below list.
+      </p>
+      <p>
+        <strong>Note 2:</strong> The JSON files are generated every 4 hours. If new fields have very recently been added then it
+        may take a couple of hours to show up. I will be adding how long it's been since the files were generated here.
+      </p>
+      <p>
+        {{{displayFields fields}}}
+      </p>
+      <hr>
+      <p>
+        Fields generated in {{ms}}ms
+      </p>
+    </div>
+  </div>
+
+  {{> footer}}
+
+</body>
+
+</html>

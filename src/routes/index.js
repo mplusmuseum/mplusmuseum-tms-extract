@@ -5,10 +5,11 @@ const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 
 // Break out all the seperate parts of the site
 /* eslint-disable import/no-unresolved */
-const main = require('./main')
-const item = require('./item')
-const user = require('./user')
 const admin = require('./admin')
+const developer = require('./developer')
+const item = require('./item')
+const main = require('./main')
+const user = require('./user')
 
 router.get('/', main.status)
 router.post('/', main.status)
@@ -19,6 +20,8 @@ router.get('/admin', ensureLoggedIn, admin.index)
 router.get('/admin/users', ensureLoggedIn, admin.users)
 router.get('/admin/user/:hash', ensureLoggedIn, admin.user)
 router.post('/admin/user/:hash', ensureLoggedIn, admin.user)
+router.get('/developer', ensureLoggedIn, developer.index)
+router.get('/developer/fields/:field', ensureLoggedIn, developer.fields)
 
 router.get('/view/:item/:id', ensureLoggedIn, item.index)
 

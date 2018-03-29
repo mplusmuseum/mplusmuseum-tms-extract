@@ -11,6 +11,7 @@ const FileStore = require('session-file-store')(session)
 
 const tools = require('./app/modules/tools')
 const tmsxml2json = require('./app/cli/tmsxml2json')
+const getjsonfields = require('./app/cli/getjsonfields')
 const passport = require('passport')
 const Auth0Strategy = require('passport-auth0')
 const cookieParser = require('cookie-parser')
@@ -103,6 +104,9 @@ if (process.env.NODE_ENV !== 'DEV') {
   })
 }
 
+console.log(`>> Connect to: http://localhost:${process.env.PORT}`.alert)
+http.createServer(app).listen(process.env.PORT)
+
 //  This is where we are going to do some extra checking
 tools.startPinging()
 
@@ -110,5 +114,19 @@ setInterval(() => {
   tmsxml2json.start()
 }, 1000 * 60 * 60 * 4) // Check every fours hours, starts after four hours.
 
-console.log(`>> Connect to: http://localhost:${process.env.PORT}`.alert)
-http.createServer(app).listen(process.env.PORT)
+//  And we are going to kick off the field checking too
+if (process.env.NODE_ENV !== 'DEV') {
+  const checkFields = async function () {
+    const config = tools.getConfig()
+    if ('xml' in config) {
+      config.xml.forEach(xml => {
+        getjsonfields.start(xml.index, true)
+      })
+    }
+    return true
+  }
+  setInterval(() => {
+    tmsxml2json.checkFields()
+  }, 1000 * 60 * 60 * 24) // Check every fours hours, starts after four hours.
+  checkFields()
+}
