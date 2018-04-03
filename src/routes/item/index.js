@@ -17,7 +17,9 @@ exports.index = (request, response) => {
   }
 
   //  Grab the id
-  const { id } = request.params
+  const {
+    id
+  } = request.params
   const itemName = request.params.item
   let itemTitle = 'Unknown'
   switch (itemName) {
@@ -54,11 +56,147 @@ exports.index = (request, response) => {
     showResults = false
   }
 
-  const GraphQLQuery = `{
-  author(id: ${id}) {
-    id
+  let GraphQLQuery = 'query{}'
+  if (itemName === 'objects') {
+    GraphQLQuery = `query{
+      artwork(id: ${id}) {
+        id
+        areacategories {
+          rank
+          type
+          areacat {
+            lang
+            text
+          }
+        }
+        areacategory_concat {
+          value
+        }
+        makers {
+          maker
+          rank
+          nationality
+          name
+          makernameid
+          birthyear_yearformed
+          deathyear
+          roles {
+            lang
+            text
+          }
+        }
+        makers_concat {
+          id
+        }
+        copyrightcreditlines {
+          lang
+          text
+        }
+        creditlines {
+          lang
+          text
+        }
+        datebegin
+        dateend
+        dimensions {
+          lang
+          text
+        }
+        exhibitions {
+          begindate
+          enddate
+          ExhibitionID
+          Section
+          title {
+            lang
+            text
+          }
+          venues {
+            begindate
+            enddate
+            name {
+              lang
+              text
+            }
+          }
+        }
+        exhibitions_concat {
+          ObjectID
+          exhinfo
+        }
+         exhlabels {
+           text
+           lang
+           purpose
+         }
+        medias {
+          rank
+          PublicAccess
+          primarydisplay
+          filename
+          alttext
+          imagecreditlines
+          imagecaption
+          exists
+          remote
+          width
+          height
+          baseUrl
+          squareUrl
+          smallUrl
+          mediumUrl
+          largeUrl
+        }
+        mediums {
+          lang
+          text
+        }
+        MPlusRights {
+          ObjRightsID
+          ObjectID
+          ObjRightsTypeID
+          ObjRightsType
+          ContractNumber
+          CopyrightRegNumber
+          Copyright
+          Restrictions
+          AgreementSentISO
+          AgreementSignedISO
+          ExpirationISODate
+          CreditLineRepro
+        }
+        MPlusRightsFlexFields {
+          RightGroup
+          Value
+          Date
+          Remarks
+        }
+        MPlusRightsFlexFieldsConcat {
+          Rights
+        }
+        objectnumber
+        objectstatus {
+          lang
+          text
+        }
+        PublicAccess
+        summaries
+        titles {
+          lang
+          text
+        }
+        dated
+        
+      }
+    }`
   }
-}`
+  if (itemName === 'authors') {
+    GraphQLQuery = `{
+      author(id: ${id}) {
+        id
+      }
+    }`
+  }
   const encodedQuery = encodeURIComponent(GraphQLQuery)
   let encodedQL = null
   let encodedAPI = null
