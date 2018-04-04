@@ -9,6 +9,12 @@ exports.index = (request, response) => {
 
   const configJSON = tools.getConfig()
 
+  //  Check to see if the user has a developer key, if not generate one
+  if (!('apitoken' in user)) {
+    user.generateToken()
+    user.save()
+  }
+
   templateValues.user = user
   templateValues.config = configJSON
   templateValues.pingData = tools.getPingData()
