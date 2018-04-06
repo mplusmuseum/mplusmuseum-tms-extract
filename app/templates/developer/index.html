@@ -62,21 +62,29 @@
                 <a href="#maker">Maker</a>
               </li>
               <li>
-                <a href="#collections">Collections</a>
-              </li>
-              <li>
                 <a href="#mediums">Mediums</a>
               </li>
               <li>
-                <a href="#media">Media</a>
+                <a href="#collections">Categories</a>
+              </li>
+              <li>
+                <a href="#areas">Areas</a>
               </li>
               <li>
                 <a href="#exhibitions">Exhibitions</a>
               </li>
             </ul>
           </li>
+          <li>
+            <a href="#examples">Examples</a>
+          </li>
+          <li>
+            <a href="#fields">JSON fields</a>
+          </li>
         </ul>
       </p>
+
+
 
       <h2>
         <a name="about-graphql">About GraphQL</a>
@@ -146,6 +154,7 @@
         <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>example query in the explorer here</a>, you will need to press the "run" button to see the results of the query.
       </p>
 
+      <hr>
 
       <h1>
         <a name="graphql-queries">GraphQL Queries</a>
@@ -154,6 +163,8 @@
       <p>
         Below you'll find a list of the current queries you can make against the data store.
       </p>
+
+
 
       <h2>
         <a name="introspection">Introspection</a>
@@ -183,6 +194,8 @@
 
       <pre class="query">{{showQuery queries.type '(name: "Artwork")'}}</pre>
 
+
+
       <h2>
         <a name="artworks">Artworks</a>
       </h2>
@@ -197,9 +210,9 @@
         Valid filters are:
         <code class="red">area</code>,
         <code class="red">category</code>,
-        <code class="red">category</code>,
         <code class="red">maker</code>,
-        <code class="red">medium</code> &amp;
+        <code class="red">medium</code>,
+        <code class="red">ExhibitionID</code> &amp;
         <code class="red">limit</code>.
       </p>
 
@@ -207,6 +220,7 @@
         <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
       </p>
       <pre class="query">{{showQuery queries.artworks '(limit: 20)'}}</pre>
+
 
 
       <h2>
@@ -222,6 +236,8 @@
         <a href='{{exploreQuery queries.artwork "(id: 1814)" config.graphql.host}}'>Run in explore</a>
       </p>
       <pre class="query">{{showQuery queries.artwork '(id: 1814)'}}</pre>
+
+
 
       <h2>
         <a name="makers">Makers</a>
@@ -241,6 +257,8 @@
       </p>
       <pre class="query">{{showQuery queries.makers '(limit: 20)'}}</pre>
 
+
+
       <h2>
         <a name="maker">Maker</a>
       </h2>
@@ -256,32 +274,181 @@
       <pre class="query">{{showQuery queries.maker '(id: 1430)'}}</pre>
 
 
-      <h2>
-        <a name="collections">Collections</a>
-      </h2>
+
       <h2>
         <a name="mediums">Mediums</a>
       </h2>
+
+      <p>
+        This query selects all of the mediums.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">limit</code> &amp;
+        <code class="red">lang</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.mediums "(lang:\"zh-hans\")" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.mediums '(lang:"zh-hans")'}}</pre>
+
+
+
       <h2>
-        <a name="media">Media</a>
+        <a name="categories">Categories</a>
       </h2>
+
+      <p>
+        This query selects all of the categories.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">limit</code> &amp;
+        <code class="red">lang</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.categories "(lang:\"en\", limit: 100)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.categories '(lang:"en", limit: 100)'}}</pre>
+
+
+
+      <h2>
+        <a name="areas">Areas</a>
+      </h2>
+
+      <p>
+        This query selects all of the areas.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">limit</code> &amp;
+        <code class="red">lang</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.areas "" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.areas ''}}</pre>
+
+
+
       <h2>
         <a name="exhibitions">Exhibitions</a>
       </h2>
+
+      <p>
+        Coming soon.
+      </p>
+
+      <hr>
+
+      <h1>
+        <a name="examples">Examples</a>
+      </h1>
+
+      <p>
+        Here is a example of a sequence of queries we may run into. To start with we could display the first 30 artworks returned
+        from the system, we could use this query
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artworksMedium "(limit: 30)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artworksMedium '(limit: 30)'}}</pre>
+
+      <p>
+        From there a user may select a single peice of artwork, lets say ID
+        <code class="red">10063</code>, we would then query the artwork as follows...
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artwork "(id: 10063)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artwork '(id: 10063)'}}</pre>
+
+      <p>
+        The user may then be interested in other artworks from the same maker, from the data returned in the query we can see first
+        maker is
+        <code class="red">Rocco Yim</code> in the roll of
+        <code class="red">Architect</code>, with an id of
+        <code class="red">"543"</code>. Looking for other objects from the same maker we could use the following query.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artworks "(maker: \"543\")" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artworks '(maker: "543")'}}</pre>
+
+      <p>
+        Alternatively we could ask the system for a list of mediums the objects have been created in. We use the mediums query.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.mediums "(lang:\"en\")" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.mediums '(lang:"en")'}}</pre>
+
+      <p>
+        And from the results select
+        <code class="red">porcelain</code>, plugging that back into the artworks query again we can get other porcelain objects.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artworksMedium "(medium: \"porcelain\")" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artworksMedium '(medium: "porcelain")'}}</pre>
+
+      <hr>
 
       <h1>
         <a name="json-fields">JSON Fields</a>
       </h1>
 
       <p>
-        To view what fields are currently in the original data source files please click the item you'd like to check below
+        While the above documentation should be correct, sometimes it's useful to check what's actually in the data. We can use the
+        following links to inspect what fields are
+        <em>actually</em> in the JSON representation of the objects.
+      </p>
+      <p class="note">
+        <strong>Note:</strong> Internally
+        <code class="red">makers</code> that are referenced in queries and is the parameter you should use are called "authors" and
+        <code class="red">artworks</code> are called "objects".
       </p>
       <ul>
         {{#each config.xml}}
         <li>
-          <a href="/developer/fields/{{index}}">{{index}}</li>
+          <a href="/developer/fields/{{index}}">{{index}}</a>
+        </li>
         {{/each}}
       </ul>
+
+      <h2 name="search">Search</h2>
+      <p>
+        You can also search for items directly to inspect the original XML and JSON to check for consistency between the results
+        from queries and the original data we had.
+      </p>
+
+      {{#each config.xml}}
+      <p>
+        <form method="post">
+          <table>
+            <td>Search for {{index}}</td>
+            <td>
+              <input type="text" name="id" required placeholder="{{index}} ID">
+            </td>
+            <td>
+              <button type="submit" name="search" value="{{index}}">Search</button>
+            </td>
+          </table>
+        </form>
+      </p>
+      {{/each}}
 
     </div>
   </div>

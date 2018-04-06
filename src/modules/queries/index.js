@@ -188,6 +188,209 @@ exports.artwork = `query {
   }
 }`
 
+exports.artworksMedium = `query {
+  artworks[[]] {
+    id
+    areacategories {
+      rank
+      type
+      areacat {
+        lang
+        text
+      }
+    }
+    makers {
+      maker
+      rank
+      nationality
+      name
+      makernameid
+      birthyear_yearformed
+      deathyear
+      roles {
+        lang
+        text
+      }
+    }
+    exhibitions {
+      begindate
+      enddate
+      ExhibitionID
+      title {
+        lang
+        text
+      }
+    }
+    medias {
+      rank
+      PublicAccess
+      primarydisplay
+      filename
+      alttext
+      imagecreditlines
+      imagecaption
+      exists
+      remote
+      width
+      height
+      baseUrl
+      squareUrl
+      smallUrl
+      mediumUrl
+      largeUrl
+    }
+    mediums {
+      lang
+      text
+    }
+    objectnumber
+    objectstatus {
+      lang
+      text
+    }
+    titles {
+      lang
+      text
+    }
+  }
+}`
+
+exports.artworksLong = `query {
+  artworks[[]] {
+    id
+    areacategories {
+      rank
+      type
+      areacat {
+        lang
+        text
+      }
+    }
+    areacategory_concat {
+      value
+    }
+    makers {
+      maker
+      rank
+      nationality
+      name
+      makernameid
+      birthyear_yearformed
+      deathyear
+      roles {
+        lang
+        text
+      }
+    }
+    makers_concat {
+      id
+      makerNames
+      makerNationalities
+      makerBeginDate
+      makerEndDate
+      makers
+    }
+    copyrightcreditlines {
+      lang
+      text
+    }
+    creditlines {
+      lang
+      text
+    }
+    datebegin
+    dateend
+    dimensions {
+      lang
+      text
+    }
+    exhibitions {
+      begindate
+      enddate
+      ExhibitionID
+      Section
+      title {
+        lang
+        text
+      }
+      venues {
+        begindate
+        enddate
+        name {
+          lang
+          text
+        }
+      }
+    }
+    exhibitions_concat {
+      ObjectID
+      exhinfo
+    }
+    exhlabels {
+      text
+      lang
+      purpose
+    }
+    medias {
+      rank
+      PublicAccess
+      primarydisplay
+      filename
+      alttext
+      imagecreditlines
+      imagecaption
+      exists
+      remote
+      width
+      height
+      baseUrl
+      squareUrl
+      smallUrl
+      mediumUrl
+      largeUrl
+    }
+    mediums {
+      lang
+      text
+    }
+    MPlusRights {
+      ObjRightsID
+      ObjectID
+      ObjRightsTypeID
+      ObjRightsType
+      ContractNumber
+      CopyrightRegNumber
+      Copyright
+      Restrictions
+      AgreementSentISO
+      AgreementSignedISO
+      ExpirationISODate
+      CreditLineRepro
+    }
+    MPlusRightsFlexFields {
+      RightGroup
+      Value
+      Date
+      Remarks
+    }
+    MPlusRightsFlexFieldsConcat {
+      Rights
+    }
+    objectnumber
+    objectstatus {
+      lang
+      text
+    }
+    PublicAccess
+    summaries
+    titles {
+      lang
+      text
+    }
+    dated
+  }
+}`
+
 exports.makers = `query {
   makers[[]] {
     id
@@ -234,5 +437,26 @@ exports.maker = `query {
       lang
       text
     }
+  }
+}`
+
+exports.categories = `query {
+  categories[[]] {
+    text
+    lang
+  }
+}`
+
+exports.mediums = `query {
+  mediums[[]] {
+    text
+    lang
+  }
+}`
+
+exports.areas = `query {
+  areas[[]] {
+    text
+    lang
   }
 }`

@@ -48,22 +48,25 @@
 			<table class="dataDump">
 				<tr>
 					<td>
-						<h2>GraphQL query</h2>
-						<div class="graphql boxme">
-							<pre>{{GraphQLQuery}}</pre>
-						</div>
-
 						{{#if showQL}}
+						<h2>GraphQL query</h2>
 						<div class="links">
 							<ul>
 								<li>
-									<a href="{{encodedQL}}" target="_blank">Launch GraphQL query</a>
-								</li>
-								<li>
-									<a href="{{encodedAPI}}" target="_blank">Launch API Explorer</a>
+									{{#ifEqual itemName "objects"}}
+									<a href='{{exploreQuery ../queries.artwork ../filter ../config.graphql.host}}'>Run in explore</a>
+									{{/ifEqual}} {{#ifEqual itemName "authors"}}
+									<a href='{{exploreQuery ../queries.maker ../filter ../config.graphql.host}}'>Run in explore</a>
+									{{/ifEqual}}
 								</li>
 							</ul>
 						</div>
+						<div class="graphql boxme">
+							{{#ifEqual itemName "objects"}}
+							<pre>{{showQuery ../queries.artwork ../filter}}</pre> {{/ifEqual}} {{#ifEqual itemName "authors"}}
+							<pre>{{showQuery ../queries.maker ../filter}}</pre> {{/ifEqual}}
+						</div>
+
 						{{/if}}
 
 					</td>

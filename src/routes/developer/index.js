@@ -16,6 +16,19 @@ exports.index = (request, response) => {
     user.save()
   }
 
+  //  See if we've been POSTED any data, which could be searching for items,
+  //  updating the config and so on... if we have something then work out
+  //  what to do with it.
+  if ('body' in request) {
+    //  If we've been passed an ID then we are probably looking up an item
+    //  TODO: we also need to know the 'type'/'index' of the item
+    if ('search' in request.body) {
+      return response.redirect(
+        `/view/${request.body.search}/${request.body.id}`
+      )
+    }
+  }
+
   templateValues.queries = queries
   templateValues.user = user
   templateValues.config = configJSON
