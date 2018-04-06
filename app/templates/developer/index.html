@@ -11,16 +11,268 @@
 
   {{> header}} {{> connections}}
 
-  <div class="container admin-layout">
+  <div class="container admin-layout documentaion">
     <div>
 
+      <h1>Developer Documention</h1>
+
       <p>
-        A lot more developer tools will be appearing here soon, including your token. In the mean time, there's a couple of smaller
-        tools to be getting on with.
+        Hello and welcome to the developer portal for the M+ site, below you will find your API key and the details you need to start
+        making calls to our GraphQL server.
+        <form>
+          <table>
+            <tr>
+              <td>API token</td>
+              <td>{{user.apitoken}}</td>
+            </tr>
+          </table>
+        </form>
       </p>
 
-      {{#if config.xml}}
-      <h2>JSON fields</h2>
+      <h2>Table of Contents</h2>
+      <p>
+        <ul class="toc">
+          <li>
+            <a href="#about-graphql">About GraphQL</a>
+            <ul>
+              <li>
+                <a href="#comminicating-with-graphql">Communicating with GraphQL</a>
+              </li>
+              <li>
+                <a href="#graphql-explorer">GraphQL explorer</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="#graphql-queries">GraphQL Queries</a>
+            <ul>
+              <li>
+                <a href="#introspection">Introspection</a>
+              </li>
+              <li>
+                <a href="#artworks">Artworks</a>
+              </li>
+              <li>
+                <a href="#artwork">Artwork</a>
+              </li>
+              <li>
+                <a href="#makers">Makers</a>
+              </li>
+              <li>
+                <a href="#maker">Maker</a>
+              </li>
+              <li>
+                <a href="#collections">Collections</a>
+              </li>
+              <li>
+                <a href="#mediums">Mediums</a>
+              </li>
+              <li>
+                <a href="#media">Media</a>
+              </li>
+              <li>
+                <a href="#exhibitions">Exhibitions</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </p>
+
+      <h2>
+        <a name="about-graphql">About GraphQL</a>
+      </h2>
+
+      <p>
+        GraphQL is a data query language you'll use to request information from the M+ data store. Traditionally GraphQL allows two
+        types of operations,
+        <em>queries</em> and
+        <em>mutations</em> these can be thought of as
+        <em>read</em> and
+        <em>write</em> operations.
+      </p>
+      <p>
+        As well as one more operation called
+        <em>introspective</em>, which allows you to ask the GraphQL endpoint about itself.
+      </p>
+      <p>
+        Below you will find examples of various calls to can make to the GraphQL endpoint.
+      </p>
+
+
+
+      <h3>
+        <a name="comminicating-with-graphql">Communicating with GraphQL</a>
+      </h3>
+
+      <p>
+        The single endpoint for all GraphQL calls is...
+      </p>
+      <p>
+        <code>{{config.graphql.host}}/graphql</code>
+      </p>
+      <p>
+        GraphQL operations consist of multiline JSON, an example query that gets the ID for
+        <code class="red">artworks</code> would look like this:
+      </p>
+      <p>
+        <pre class="query">{{showQuery queries.artworks ''}}</pre>
+      </p>
+      <p>
+        To query GraphQL using cURL, make a
+        <code>POST</code> request with a JSON payload. The payload must contain a string called query.
+      </p>
+      <p>
+        <pre class="query terminal">{{curlQuery queries.artworks '' config.graphql.host user.apitoken}}</pre>
+      </p>
+      <p>
+        Using Nodejs it may look like this.
+      </p>
+      <p>
+        <pre class="query node">{{nodeQuery queries.artworks '' config.graphql.host user.apitoken}}</pre>
+      </p>
+
+
+
+      <h3>
+        <a name="graphql-explorer">GraphQL explorer</a>
+      </h3>
+      <p>
+        Probably the easiest way to try out GRaphQL queries is to use the exporer which can be found here:
+        <a href="{{config.graphql.host}}/api-explorer">{{config.graphql.host}}/api-explorer</a>
+      </p>
+
+      <p>
+        You can see an
+        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>example query in the explorer here</a>, you will need to press the "run" button to see the results of the query.
+      </p>
+
+
+      <h1>
+        <a name="graphql-queries">GraphQL Queries</a>
+      </h1>
+
+      <p>
+        Below you'll find a list of the current queries you can make against the data store.
+      </p>
+
+      <h2>
+        <a name="introspection">Introspection</a>
+      </h2>
+
+      <p>
+        The
+        <em>introspection</em> operation is the only operation you can call using
+        <code>GET</code>. Introspection allows you to query the GraphQL schema for details about itself. Query
+        <code class="red">__schema</code> to list all types defined in the schema and get details about each:
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>Run in explore</a>
+      </p>
+
+      <pre class="query">{{showQuery queries.schema}}</pre>
+
+      <p>
+        Query
+        <code class="red">__type</code> to get details about any type:
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.type "(name:\"Artwork\")" config.graphql.host}}'>Run in explore</a>
+      </p>
+
+      <pre class="query">{{showQuery queries.type '(name: "Artwork")'}}</pre>
+
+      <h2>
+        <a name="artworks">Artworks</a>
+      </h2>
+
+      <p>
+        This query selects all of the artworks and can be filtered by certain fields shown below. Note: filters are
+        <em>additive</em> rather than
+        <em>or</em>, filtering two fields will only return records that match both.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">area</code>,
+        <code class="red">category</code>,
+        <code class="red">category</code>,
+        <code class="red">maker</code>,
+        <code class="red">medium</code> &amp;
+        <code class="red">limit</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artworks '(limit: 20)'}}</pre>
+
+
+      <h2>
+        <a name="artwork">Artwork</a>
+      </h2>
+
+      <p>
+        This query will return an artwork based on the
+        <code class="red">id</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artwork "(id: 1814)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.artwork '(id: 1814)'}}</pre>
+
+      <h2>
+        <a name="makers">Makers</a>
+      </h2>
+
+      <p>
+        This query selects all of the makers.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">limit</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.makers "(limit: 20)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.makers '(limit: 20)'}}</pre>
+
+      <h2>
+        <a name="maker">Maker</a>
+      </h2>
+
+      <p>
+        This query will return a maker based on the
+        <code class="red">id</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.maker "(id: 1430)" config.graphql.host}}'>Run in explore</a>
+      </p>
+      <pre class="query">{{showQuery queries.maker '(id: 1430)'}}</pre>
+
+
+      <h2>
+        <a name="collections">Collections</a>
+      </h2>
+      <h2>
+        <a name="mediums">Mediums</a>
+      </h2>
+      <h2>
+        <a name="media">Media</a>
+      </h2>
+      <h2>
+        <a name="exhibitions">Exhibitions</a>
+      </h2>
+
+      <h1>
+        <a name="json-fields">JSON Fields</a>
+      </h1>
+
       <p>
         To view what fields are currently in the original data source files please click the item you'd like to check below
       </p>
@@ -30,7 +282,6 @@
           <a href="/developer/fields/{{index}}">{{index}}</li>
         {{/each}}
       </ul>
-      {{/if}}
 
     </div>
   </div>

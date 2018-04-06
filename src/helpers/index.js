@@ -1,4 +1,5 @@
 const moment = require('moment')
+const querystring = require('querystring')
 
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
@@ -258,4 +259,81 @@ exports.displayFields = (fields, index) => {
   })
   html += '</ul>'
   return html
+}
+
+const showQuery = (query, filter) => {
+  if (filter === null || filter === undefined || filter === '') {
+    return query.replace('[[]]', '')
+  }
+  return query.replace('[[]]', filter)
+}
+exports.showQuery = showQuery
+
+exports.exploreQuery = (query, filter, graphQL) => {
+  const newQuery = showQuery(query, filter)
+  const newUrl = `${graphQL}/api-explorer?query=${querystring.escape(newQuery)}`
+  return newUrl
+}
+
+exports.curlQuery = (query, filter, graphQL, token) => {
+  let newQuery = showQuery(query, filter)
+  //  We are going to do an ugly thing here to remove the
+  //  first and last line of our query, as we want to
+  //  replace them without horrid regex, we are making an
+  //  assumption that the first and last line are generally
+  //  'query {' and '}'
+  let querySplit = newQuery.split('\n')
+  querySplit.pop() //  remove first line
+  querySplit.shift() // remove last line
+  newQuery = querySplit.map(line => `${line} \\`).join('\n')
+  const rtn = `curl -H "Authorization: bearer ${token}" \\
+-H "Content-Type: application/json" \\
+-X POST -d \\
+"{\\"query\\": \\
+\\"{ \\
+${newQuery}
+}\\"}" \\
+${graphQL}/graphql`
+  return rtn
+}
+
+exports.nodeQuery = (query, filter, graphQL, token) => {
+  let newQuery = showQuery(query, filter)
+  let querySplit = newQuery.split('\n')
+  querySplit.pop() //  remove first line
+  querySplit.shift() // remove last line
+  newQuery = querySplit.map(line => `  ${line}`).join('\n')
+  const rtn = `const request = require('request')
+
+const payload = {
+  query: \`{
+${newQuery}
+  }\`
+}
+
+request(
+  {
+    url: '${graphQL}/graphql',
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      Authorization: 'bearer ${token}'
+    },
+    json: payload
+  },
+  (error, resp, body) => {
+    if (error) {
+      console.log(error)
+      // do something
+    }
+    if ('errors' in body) {
+      console.log(body.errors)
+      // do something else
+    }
+    console.log(body.data)
+  }
+)
+`
+
+  return rtn
 }

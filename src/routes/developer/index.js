@@ -1,5 +1,6 @@
 const fs = require('fs')
 const tools = require('../../modules/tools')
+const queries = require('../../modules/queries')
 const User = require('../../modules/user')
 const getjsonfields = require('../../cli/getjsonfields')
 
@@ -15,6 +16,7 @@ exports.index = (request, response) => {
     user.save()
   }
 
+  templateValues.queries = queries
   templateValues.user = user
   templateValues.config = configJSON
   templateValues.pingData = tools.getPingData()
@@ -183,6 +185,7 @@ exports.field = (request, response) => {
       .sort((a, b) => a[0] - b[0])
       .map(a => a[1])
   }
+
   templateValues.totalRecords = winningIds.length
   templateValues.errorMsg = errorMsg
   templateValues.field = field
