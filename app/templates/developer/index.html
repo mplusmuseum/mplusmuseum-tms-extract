@@ -30,6 +30,10 @@
         </form>
       </p>
 
+      <p class="note">
+        <strong>NOTE:</strong> This documentation is very new and evolving but should be enough to get you up and running, we will
+        be expanding it in the near future.
+      </p>
       <hr>
 
       <h1>Table of Contents</h1>
@@ -125,21 +129,26 @@
         <code>{{config.graphql.host}}/graphql</code>
       </p>
       <p>
-        GraphQL operations consist of multiline JSON, an example query that gets the ID for
+        GraphQL operations consist of multiline JSON, an example GraphQL query that gets the ID for
         <code class="red">artworks</code> would look like this:
       </p>
-      <p>
-        <pre class="query">{{{graphQLQuery queries.artworks ''}}}</pre>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
       </p>
+      <pre class="query">{{{graphQLQuery queries.artworks '(limit: 20)'}}}</pre>
+
       <p>
         To query GraphQL using cURL, make a
-        <code>POST</code> request with a JSON payload. The payload must contain a string called query.
+        <code>POST</code> request with a JSON payload. The payload must contain a string called query and your API token as
+        <code>bearer</code> authorization.
       </p>
       <p>
         <pre class="query terminal">{{{curlQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
       </p>
       <p>
-        Using Nodejs it may look like this.
+        Using Nodejs it may look like this, making sure to pass in your API token as a
+        <code>bearer</code> token as shown.
       </p>
       <p>
         <pre class="query node">{{{nodeQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
