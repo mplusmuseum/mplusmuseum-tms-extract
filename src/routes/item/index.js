@@ -18,9 +18,7 @@ exports.index = (request, response) => {
   }
 
   //  Grab the id
-  const {
-    id
-  } = request.params
+  const { id } = request.params
   const itemName = request.params.item
   let itemTitle = 'Unknown'
   switch (itemName) {
@@ -199,6 +197,7 @@ exports.index = (request, response) => {
     }`
   }
 
+  let showQL = false
   let filter = null
   if ('graphql' in config && 'host' in config.graphql) {
     showQL = true
