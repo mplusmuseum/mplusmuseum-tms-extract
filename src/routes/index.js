@@ -21,6 +21,7 @@ router.get('/admin/users', ensureLoggedIn, admin.users)
 router.get('/admin/user/:hash', ensureLoggedIn, admin.user)
 router.post('/admin/user/:hash', ensureLoggedIn, admin.user)
 router.get('/developer', ensureLoggedIn, developer.index)
+router.post('/developer', ensureLoggedIn, developer.index)
 router.get('/developer/fields/:index', ensureLoggedIn, developer.fields)
 router.get('/developer/field/:index/:field', ensureLoggedIn, developer.field)
 
