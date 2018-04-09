@@ -80,8 +80,16 @@ class User {
       .update(`${Math.random()}`)
       .digest('hex')
     let oldToken = null
-    if ('apitoken' in this) {
-      if (!('oldTokens' in this)) {
+    if (
+      'apitoken' in this &&
+      this.apitoken !== null &&
+      this.apitoken !== undefined
+    ) {
+      if (
+        !('oldTokens' in this) ||
+        this.oldTokens === null ||
+        this.oldTokens === undefined
+      ) {
         this.oldTokens = []
       }
       oldToken = this.apitoken
