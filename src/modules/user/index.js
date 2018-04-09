@@ -8,6 +8,8 @@ class User {
     this.id = null
     this.hash = null
     this.loggedIn = false
+    this.apitoken = null
+    this.oldTokens = []
 
     /*
      * Check to see if we've been passed an object,

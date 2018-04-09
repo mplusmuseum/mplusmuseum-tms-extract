@@ -11,7 +11,11 @@ exports.index = (request, response) => {
   const configJSON = tools.getConfig()
 
   //  Check to see if the user has a developer key, if not generate one
-  if (!('apitoken' in user)) {
+  if (
+    !('apitoken' in user) ||
+    user.apitoken === null ||
+    user.apitoken === undefined
+  ) {
     user.generateToken()
     user.save()
   }
