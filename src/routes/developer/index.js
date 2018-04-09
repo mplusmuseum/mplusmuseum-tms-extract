@@ -1,5 +1,6 @@
 const fs = require('fs')
 const tools = require('../../modules/tools')
+const queries = require('../../modules/queries')
 const User = require('../../modules/user')
 const getjsonfields = require('../../cli/getjsonfields')
 
@@ -9,6 +10,26 @@ exports.index = (request, response) => {
 
   const configJSON = tools.getConfig()
 
+  //  Check to see if the user has a developer key, if not generate one
+  if (!('apitoken' in user)) {
+    user.generateToken()
+    user.save()
+  }
+
+  //  See if we've been POSTED any data, which could be searching for items,
+  //  updating the config and so on... if we have something then work out
+  //  what to do with it.
+  if ('body' in request) {
+    //  If we've been passed an ID then we are probably looking up an item
+    //  TODO: we also need to know the 'type'/'index' of the item
+    if ('search' in request.body) {
+      return response.redirect(
+        `/view/${request.body.search}/${request.body.id}`
+      )
+    }
+  }
+
+  templateValues.queries = queries
   templateValues.user = user
   templateValues.config = configJSON
   templateValues.pingData = tools.getPingData()
@@ -177,6 +198,7 @@ exports.field = (request, response) => {
       .sort((a, b) => a[0] - b[0])
       .map(a => a[1])
   }
+
   templateValues.totalRecords = winningIds.length
   templateValues.errorMsg = errorMsg
   templateValues.field = field

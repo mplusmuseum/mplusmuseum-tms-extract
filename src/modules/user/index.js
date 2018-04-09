@@ -26,7 +26,6 @@ class User {
       * we have data for it in the data store.
       */
       if (!this.userExists() && this.id !== null) {
-        console.log('We need to make the user file')
         this.save()
       }
     } else {
@@ -68,18 +67,49 @@ class User {
     return users.length === 0
   }
 
+  /*
+   * This will generate a new api token for the user. It will
+   * check to see if there's an old on and if so it'll add them
+   * to the list of older tokens
+   */
+  generateToken () {
+    const newToken = crypto
+      .createHash('md5')
+      .update(`${Math.random()}`)
+      .digest('hex')
+    let oldToken = null
+    if ('apitoken' in this) {
+      if (!('oldTokens' in this)) {
+        this.oldTokens = []
+      }
+      oldToken = this.apitoken
+      this.oldTokens.push(oldToken)
+    }
+    this.apitoken = newToken
+
+    //  TODO: we need to tell the graphQL server, if it's set up
+    //  that this is a valid token. Rather like this...
+    //  GraphQL.registerApiToken(newToken, oldToken)
+  }
+
   save () {
     //  Do the dates/times
     if (!('created' in this)) this.created = new Date().getTime()
     this.updated = new Date().getTime()
 
     //  Set user roles
-    if (!('developer' in this)) this.developer = false
+    if (!('developer' in this)) this.developer = true
     if (!('staff' in this)) this.staff = false
     if (!('admin' in this)) this.admin = false
     if (this.firstUser()) {
       this.admin = true
     }
+
+    //  Make sure we have an apitoken
+    if (!('apitoken' in this)) {
+      this.generateToken()
+    }
+
     const userDir = `${process.cwd()}/app/data/users`
     const userJSONPretty = JSON.stringify(this, null, 4)
     fs.writeFileSync(`${userDir}/${this.hash}.json`, userJSONPretty, 'utf-8')
@@ -100,6 +130,8 @@ class User {
       this.developer = user.developer
       this.staff = user.staff
       this.admin = user.admin
+      this.apitoken = user.apitoken
+      this.oldTokens = user.oldTokens
       this.loggedIn = true
     }
   }

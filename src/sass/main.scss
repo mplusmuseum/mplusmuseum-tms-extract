@@ -341,6 +341,76 @@ nav {
       }
     }
   }
+  &.documentaion {
+    h1,
+    h2,
+    h3 {
+      a {
+        color: inherit;
+      }
+    }
+    ul.toc {
+      font-size: 1.2rem;
+      list-style-type: none;
+      line-height: 1.5rem;
+      ul {
+        font-size: 1rem;
+      }
+    }
+    p.runinexplore {
+      margin-bottom: 0;
+      a {
+        font-size: 1rem;
+      }
+    }
+    code {
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+      display: inline-block;
+      font-size: 1.2rem;
+      padding-left: 6px;
+      padding-right: 6px;
+      &.red {
+        color: #DD0000;
+        padding: 0;
+        border: none;
+        background-color: inherit;
+        font-size: 1.5rem;
+        font-weight: 100;
+      }
+    }
+    p.note {
+      color: #264c72;
+      border: 1px solid #97c1da;
+      background-color: #d8ebf8;
+      position: relative;
+      padding: 15px 15px 15px;
+      margin-bottom: 20px;
+      border-radius: 3px;
+      font-weight: 400;
+    }
+    pre {
+      &.query {
+        margin: 0 0 32px;
+        background-color: #f5f5f5;
+        border: 1px solid #e5e5e5;
+        border-radius: 6px;
+        line-height: 1.4em;
+        padding: 10px;
+        overflow: auto;
+        font-size: 1.2rem
+      }
+    }
+    table.api {
+      font-size: 1.6rem;
+      td.token {
+        font-family: monospace;
+        font-weight: bold;
+        font-size: 2rem;
+      }
+    }
+  }
 }
 
 @media only screen and (min-width: 601px) {

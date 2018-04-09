@@ -30,6 +30,10 @@ exports.status = (request, response) => {
     return response.render('main/index', templateValues)
   }
 
+  if (user.staff === false && user.admin === false && user.developer === true) {
+    return response.redirect('/developer')
+  }
+
   if (user.staff === false && user.admin === false) {
     templateValues.user = user
     return response.render('main/wait', templateValues)

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const tools = require('../../modules/tools')
 const User = require('../../modules/user')
+const queries = require('../../modules/queries')
 
 exports.index = (request, response) => {
   const templateValues = {}
@@ -197,26 +198,22 @@ exports.index = (request, response) => {
       }
     }`
   }
-  const encodedQuery = encodeURIComponent(GraphQLQuery)
-  let encodedQL = null
-  let encodedAPI = null
 
-  let showQL = false
+  let filter = null
   if ('graphql' in config && 'host' in config.graphql) {
     showQL = true
-    encodedQL = `${config.graphql.host}/graphql?query=${encodedQuery}`
-    encodedAPI = `${config.graphql.host}/api-explorer?query=${encodedQuery}`
+    filter = `(id: ${id})`
   }
 
   templateValues.user = user
   templateValues.id = id
+  templateValues.queries = queries
   templateValues.showResults = showResults
+  templateValues.itemName = itemName
   templateValues.itemTitle = itemTitle
+  templateValues.filter = filter
   templateValues.itemJSON = itemJSON
   templateValues.itemXML = itemXML
-  templateValues.GraphQLQuery = GraphQLQuery
-  templateValues.encodedQL = encodedQL
-  templateValues.encodedAPI = encodedAPI
   templateValues.showQL = showQL
   templateValues.pingData = tools.getPingData()
   templateValues.config = config
