@@ -1,5 +1,8 @@
 const moment = require('moment')
 const querystring = require('querystring')
+const Prism = require('prismjs')
+var loadLanguages = require('prismjs/components/index.js')
+loadLanguages(['Bash', 'GraphQL'])
 
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
@@ -275,6 +278,11 @@ exports.exploreQuery = (query, filter, graphQL) => {
   return newUrl
 }
 
+exports.graphQLQuery = (query, filter) => {
+  const rtn = showQuery(query, filter)
+  return Prism.highlight(rtn, Prism.languages.graphql, 'graphql')
+}
+
 exports.curlQuery = (query, filter, graphQL, token) => {
   let newQuery = showQuery(query, filter)
   //  We are going to do an ugly thing here to remove the
@@ -294,7 +302,7 @@ exports.curlQuery = (query, filter, graphQL, token) => {
 ${newQuery}
 }\\"}" \\
 ${graphQL}/graphql`
-  return rtn
+  return Prism.highlight(rtn, Prism.languages.bash, 'bash')
 }
 
 exports.nodeQuery = (query, filter, graphQL, token) => {
@@ -335,5 +343,5 @@ request(
 )
 `
 
-  return rtn
+  return Prism.highlight(rtn, Prism.languages.javascript, 'javascript')
 }

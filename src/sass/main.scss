@@ -342,9 +342,11 @@ nav {
     }
   }
   &.documentaion {
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       a {
-        color:inherit;
+        color: inherit;
       }
     }
     ul.toc {
@@ -397,7 +399,15 @@ nav {
         line-height: 1.4em;
         padding: 10px;
         overflow: auto;
-        font-size: 1.2rem        
+        font-size: 1.2rem
+      }
+    }
+    table.api {
+      font-size: 1.6rem;
+      td.token {
+        font-family: monospace;
+        font-weight: bold;
+        font-size: 2rem;
       }
     }
   }

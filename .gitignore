@@ -27,3 +27,5 @@ objects.json
 
 package-lock.json
 .vscode
+
+!app/public/stylesheets/prism.css

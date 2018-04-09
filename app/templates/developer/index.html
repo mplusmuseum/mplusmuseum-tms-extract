@@ -3,6 +3,7 @@
   <meta name="viewport" content="width=device-width">
   <title>M+ Dash | Developer Tools</title>
   <link href="/stylesheets/main.css" rel="stylesheet" />
+  <link href="/stylesheets/prism.css" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
 </head>
@@ -20,16 +21,18 @@
         Hello and welcome to the developer portal for the M+ site, below you will find your API key and the details you need to start
         making calls to our GraphQL server.
         <form>
-          <table>
+          <table class="api">
             <tr>
-              <td>API token</td>
-              <td>{{user.apitoken}}</td>
+              <td>API token:</td>
+              <td class="token">{{user.apitoken}}</td>
             </tr>
           </table>
         </form>
       </p>
 
-      <h2>Table of Contents</h2>
+      <hr>
+
+      <h1>Table of Contents</h1>
       <p>
         <ul class="toc">
           <li>
@@ -81,10 +84,13 @@
           <li>
             <a href="#fields">JSON fields</a>
           </li>
+          <li>
+            <a href="#search">Search</a>
+          </li>
         </ul>
       </p>
 
-
+      <hr>
 
       <h2>
         <a name="about-graphql">About GraphQL</a>
@@ -123,20 +129,20 @@
         <code class="red">artworks</code> would look like this:
       </p>
       <p>
-        <pre class="query">{{showQuery queries.artworks ''}}</pre>
+        <pre class="query">{{{graphQLQuery queries.artworks ''}}}</pre>
       </p>
       <p>
         To query GraphQL using cURL, make a
         <code>POST</code> request with a JSON payload. The payload must contain a string called query.
       </p>
       <p>
-        <pre class="query terminal">{{curlQuery queries.artworks '' config.graphql.host user.apitoken}}</pre>
+        <pre class="query terminal">{{{curlQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
       </p>
       <p>
         Using Nodejs it may look like this.
       </p>
       <p>
-        <pre class="query node">{{nodeQuery queries.artworks '' config.graphql.host user.apitoken}}</pre>
+        <pre class="query node">{{{nodeQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
 
@@ -181,7 +187,7 @@
         <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>Run in explore</a>
       </p>
 
-      <pre class="query">{{showQuery queries.schema}}</pre>
+      <pre class="query">{{{graphQLQuery queries.schema}}}</pre>
 
       <p>
         Query
@@ -192,7 +198,7 @@
         <a href='{{exploreQuery queries.type "(name:\"Artwork\")" config.graphql.host}}'>Run in explore</a>
       </p>
 
-      <pre class="query">{{showQuery queries.type '(name: "Artwork")'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.type '(name: "Artwork")'}}}</pre>
 
 
 
@@ -219,8 +225,21 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artworks '(limit: 20)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artworks '(limit: 20)'}}}</pre>
 
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.artworks '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.artworks '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
+      </p>
 
 
       <h2>
@@ -235,7 +254,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artwork "(id: 1814)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artwork '(id: 1814)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artwork '(id: 1814)'}}}</pre>
 
 
 
@@ -255,8 +274,21 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.makers "(limit: 20)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.makers '(limit: 20)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.makers '(limit: 20)'}}}</pre>
 
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.makers '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.makers '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
+      </p>
 
 
       <h2>
@@ -271,7 +303,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.maker "(id: 1430)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.maker '(id: 1430)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.maker '(id: 1430)'}}}</pre>
 
 
 
@@ -292,8 +324,14 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.mediums "(lang:\"zh-hans\")" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.mediums '(lang:"zh-hans")'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.mediums '(lang:"zh-hans")'}}}</pre>
 
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.mediums '(lang:"zh-hans")' config.graphql.host user.apitoken}}}</pre>
+      </p>
 
 
       <h2>
@@ -313,8 +351,14 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.categories "(lang:\"en\", limit: 100)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.categories '(lang:"en", limit: 100)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.categories '(lang:"en", limit: 100)'}}}</pre>
 
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.categories '(lang:"en", limit: 100)' config.graphql.host user.apitoken}}}</pre>
+      </p>
 
 
       <h2>
@@ -334,7 +378,14 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.areas "" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.areas ''}}</pre>
+      <pre class="query">{{{graphQLQuery queries.areas ''}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.areas '' config.graphql.host user.apitoken}}}</pre>
+      </p>
 
 
 
@@ -360,7 +411,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artworksMedium "(limit: 30)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artworksMedium '(limit: 30)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artworksMedium '(limit: 30)'}}}</pre>
 
       <p>
         From there a user may select a single peice of artwork, lets say ID
@@ -370,7 +421,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artwork "(id: 10063)" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artwork '(id: 10063)'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artwork '(id: 10063)'}}}</pre>
 
       <p>
         The user may then be interested in other artworks from the same maker, from the data returned in the query we can see first
@@ -383,7 +434,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artworks "(maker: \"543\")" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artworks '(maker: "543")'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artworks '(maker: "543")'}}}</pre>
 
       <p>
         Alternatively we could ask the system for a list of mediums the objects have been created in. We use the mediums query.
@@ -392,7 +443,7 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.mediums "(lang:\"en\")" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.mediums '(lang:"en")'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.mediums '(lang:"en")'}}}</pre>
 
       <p>
         And from the results select
@@ -402,7 +453,12 @@
       <p class="runinexplore">
         <a href='{{exploreQuery queries.artworksMedium "(medium: \"porcelain\")" config.graphql.host}}'>Run in explore</a>
       </p>
-      <pre class="query">{{showQuery queries.artworksMedium '(medium: "porcelain")'}}</pre>
+      <pre class="query">{{{graphQLQuery queries.artworksMedium '(medium: "porcelain")'}}}</pre>
+
+      <p>
+        And again in NodeJS
+      </p>
+      <pre class="query">{{{nodeQuery queries.artworksMedium '(medium: "porcelain")' config.graphql.host user.apitoken}}}</pre>
 
       <hr>
 
@@ -428,7 +484,9 @@
         {{/each}}
       </ul>
 
-      <h2 name="search">Search</h2>
+      <hr>
+
+      <h1 name="search">Search</h1>
       <p>
         You can also search for items directly to inspect the original XML and JSON to check for consistency between the results
         from queries and the original data we had.
