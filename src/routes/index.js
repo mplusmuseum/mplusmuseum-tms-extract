@@ -11,6 +11,20 @@ const item = require('./item')
 const main = require('./main')
 const user = require('./user')
 
+// ############################################################################
+//
+/*
+ * Always create a templateValues object that gets passed to the
+ * templates. The config object from global (this allows use to
+ * manipulate it here if we need to) and the user if one exists
+ */
+//
+// ############################################################################
+router.use(function (req, res, next) {
+  req.templateValues = {}
+  next()
+})
+
 router.get('/', main.status)
 router.post('/', main.status)
 router.get('/config', ensureLoggedIn, main.config)

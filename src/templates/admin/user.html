@@ -1,0 +1,70 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>M+ Dash | Admin | users</title>
+  <link href="/css/main.css" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+
+  {{> header}} {{> connections}}
+
+  <div class="container admin-layout">
+    <div>
+
+      <h1>
+        <a href="/admin">Admin</a> /
+        <a href="/admin/users">Users</a> / {{selectedUser.auth0.nickname}}</h1>
+      <p>
+        <form method="POST">
+          <table class="admin">
+            <tbody>
+              <tr>
+                <td>ID</td>
+                <td>{{selectedUser.id}}</td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{{timePretty selectedUser.created}}</td>
+              </tr>
+              <tr>
+                <td>Developer</td>
+                <td>
+                  <input type="checkbox" name="developer" {{#ifEqual selectedUser.developer true}}checked{{/ifEqual}} />
+                </td>
+              </tr>
+              <tr>
+                <td>Staff</td>
+                <td>
+                  <input type="checkbox" name="staff" {{#ifEqual selectedUser.staff true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
+                <td>Admin</td>
+                <td>
+                  <input type="checkbox" name="admin" {{#ifEqual selectedUser.admin true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <button type="hidden" name="action" value="update">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </form>
+
+      </p>
+
+
+    </div>
+  </div>
+
+  {{> footer}}
+
+</body>
+
+</html>

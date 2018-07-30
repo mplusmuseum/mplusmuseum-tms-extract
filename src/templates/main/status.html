@@ -1,0 +1,101 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>M+ Dash | Status</title>
+	<link href="/css/main.css" rel="stylesheet" />
+	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+
+	{{> header}} {{> connections}}
+
+	<div class="container admin-layout">
+		<div>
+
+			{{> fullStatus}}
+
+			<hr>
+
+			<h2>Search</h2>
+
+			{{#if config.xml}} {{#each config.xml}}
+			<p>
+				<form method="post">
+					<table>
+						<td>Search for {{index}}</td>
+						<td>
+							<input type="text" name="id" required placeholder="{{index}} ID">
+						</td>
+						<td>
+							<button type="submit" name="search" value="{{index}}">Search</button>
+						</td>
+					</table>
+				</form>
+			</p>
+			{{/each}} {{/if}}
+
+			<hr>
+
+			<h2>Item XML data</h2>
+			<p>
+				{{#if config.xml}}
+				<table>
+					<tr>
+						<th scope="col">File</th>
+						<th scope="col">Index</th>
+						<th scope="col">Type</th>
+						<th scope="col">Status</th>
+					</tr>
+					{{#each config.xml}}
+					<tr>
+						<th scope="row">{{file}}</th>
+						<td>{{index}}</td>
+						<td>{{type}}</td>
+						{{#if missing}}
+						<td class="error">Missing</td>{{else}}{{#if parser}}
+						<td>Exists</td>{{else}}
+						<td class="error">Missing parser code</td>{{/if}}{{/if}}
+					</tr>
+					{{/each}}
+				</table>
+				</form>
+				{{else}} No TMS XML data files have been registered with the system yet. {{/if}}
+			</p>
+
+			<p>
+				{{#if usingAbsolutePath}} We are looking in the
+				<em>absolute</em> path:
+				<code>{{dataDir}}</code>. {{else}} We are looking for the default location of:
+				<code>/app/data/xml</code>
+				{{/if}}
+			</p>
+
+			<hr>
+
+			<h2>Media directory location</h2>
+			<p>
+				{{#if usingMediaAbsolutePath}} We are looking for media in the
+				<em>absolute</em> path:
+				<code>{{mediaDir}}</code>. {{else}} We are looking for media files in the default location of
+				<code>/app/data/media</code>
+				{{/if}}
+			</p>
+
+			<hr>
+
+			<h2>Cloudinary</h2>
+			<p>
+				We are currently using
+				<a href="https://cloudinary.com">Cloudinary</a> to host images.
+			</p>
+
+		</div>
+	</div>
+
+	{{> footer}}
+
+</body>
+
+</html>

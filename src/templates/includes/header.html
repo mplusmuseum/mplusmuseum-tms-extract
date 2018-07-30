@@ -1,0 +1,39 @@
+<nav class="header">
+  <div class="nav-wrapper">
+    <a href="/" class="brand-logo left">M+ Dashboard</a>
+    {{#if user.loggedIn}}
+    <ul>
+      <li>
+        <a href="/developer">Developer</a>
+      </li>
+      {{#if user.admin}}
+      <li>
+        <a href="/config">Config</a>
+      </li>
+      {{/if}}
+    </ul>
+
+    {{/if}} {{#if user.loggedIn}}
+    <ul class="right">
+      <li>
+        <a href="/settings">
+          <img class="avatar" src="{{user.auth0.picture}}" />{{user.auth0.nickname}}</a>
+      </li>
+      {{#if user.admin}}
+      <li>
+        <a href="/admin">Admin</a>
+      </li>
+      {{/if}}
+      <li>
+        <a href="/logout">Logout</a>
+      </li>
+    </ul>
+    {{else}}
+    <ul class="right">
+      <li>
+        <a href="/login">Login</a>
+      </li>
+    </ul>
+    {{/if}}
+  </div>
+</nav>

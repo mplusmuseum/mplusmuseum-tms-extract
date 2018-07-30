@@ -1,0 +1,94 @@
+<h1>Status</h1>
+
+{{#if counts.startProcessing}}
+  <p>
+    <table>
+      <tr>
+        <td>Last process started at:</td><td>{{timePretty counts.startProcessing}}</td>
+      </tr>
+      <tr>
+        <td>Last process action at:</td><td>{{timePretty counts.lastSave}} ({{timeAgo counts.lastSave}})</td>
+      </tr>
+      <tr>
+        <td>Total processing time:</td><td>{{timeDiff counts.processingTime}}</td>
+      </tr>
+    </table>
+  </p>
+
+  {{#each status.xmls}}
+  <p>
+    <h2>{{index}}: {{file}}</h2>
+    {{#if exists}}
+      <table>
+        <tr><td>Status:</td><td>Exists{{#if processed}}{{#if finished}}, processed.{{else}}, processing.{{/if}}{{/if}}</td></tr>
+        <tr><td>Generated</td><td>{{timePretty stat.mtime}} ({{timeAgo stat.mtime}})</td></tr>
+        {{#if processed}}
+          {{#if finished}}
+            {{#if counts.lastUpsert}}
+              <tr><td>Finished</td><td>{{timePretty counts.lastUpsert}} ({{timeAgo counts.lastUpsert}})</td></tr>
+            {{else}}
+              <tr><td>Finished</td><td>{{timePretty counts.bulkUpload.lastChecked}} ({{timeAgo counts.bulkUpload.lastChecked}})</td></tr>
+            {{/if}}
+            <tr><td>Processing duration</td><td>{{timeDiff processingTime}}</td></tr>
+            <tr><td>Total items in file</td><td>{{prettyNumber counts.xmlCount}}</td></tr>
+            {{#if counts.itemsUploaded}}<tr><td>Total items processes</td><td>{{prettyNumber counts.itemsUploaded}}</td></tr>{{/if}}
+          {{else}}
+            {{#if notStarted}}
+              <tr><td colspan="2">XML converted to JSON, upsert not started yet.</td></tr>
+            {{else}}
+            <tr><td>Last upsert</td><td>{{timeAgo counts.lastUpsert}}</td></tr>
+              <tr><td>Total items in file</td><td>{{prettyNumber counts.xmlCount}}</td></tr>
+              <tr><td>Items processed</td>
+                <td style="position: relative">
+                  <div class="progress-back">&nbsp;&nbsp;{{prettyNumber counts.itemsUploaded}} of {{prettyNumber counts.totalItemsToUpload}}</div>
+                  <div class="progress-front" style="width: {{percent}}%">&nbsp;&nbsp;{{prettyNumber counts.itemsUploaded}} of {{prettyNumber counts.totalItemsToUpload}}</div>
+                </td>
+              </tr>
+            {{/if}}
+          {{/if}}
+        {{else}}
+
+          <tr><td>This file processed</td><td>Not yet</td></tr>
+          <tr><td>Previous processing duration</td><td>{{timeDiff processingTime}}</td></tr>
+          {{#if finished}}
+            <tr><td>Previous file processed</td><td>{{timeAgo counts.lastUpsert}}</td></tr>
+            <tr><td>Total items to processes</td><td>{{prettyNumber counts.itemsUploaded}}</td></tr>
+          {{else}}
+          {{/if}}
+
+        {{/if}}
+
+        {{#if counts.jsonCount}}
+          {{#if counts.jsonCount.new}}<tr><td>New items</td><td>{{prettyNumber counts.jsonCount.new}}</td></tr>{{/if}}
+          {{#if counts.jsonCount.modified}}<tr><td>Modified items</td><td>{{prettyNumber counts.jsonCount.modified}}</td></tr>{{/if}}
+        {{/if}}
+
+      </table>
+    {{else}}
+      <table>
+        <tr><td>Status:</td><td>New file is missing</td></tr>
+        {{#if processed}}
+        {{else}}
+          {{#if finished}}
+            <tr><td>Previous file processed</td><td>{{timeAgo counts.lastUpsert}}</td></tr>
+            <tr><td>Total items processes</td><td>{{prettyNumber counts.itemsUploaded}}</td></tr>
+          {{else}}
+            <tr><td>Previous file processing</td><td>Last item upserted {{timeAgo counts.lastUpsert}}</td></tr>
+            <tr><td>Total items processes</td><td>{{prettyNumber counts.itemsUploaded}} of {{prettyNumber counts.totalItemsToUpload}}</td></tr>
+          {{/if}}
+        {{/if}}
+        <tr><td>New items</td><td>{{prettyNumber counts.jsonCount.new}}</td></tr>
+        <tr><td>Modified items</td><td>{{prettyNumber counts.jsonCount.modified}}</td></tr>
+      </table>
+    {{/if}}
+  </p>
+  {{/each}}
+{{else}}
+  <p>
+    <table>
+      <tr>
+        <td>Upserting has never been run.</td>
+      </tr>
+    </table>
+  </p>
+{{/if}}

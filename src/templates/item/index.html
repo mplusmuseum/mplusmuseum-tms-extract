@@ -1,0 +1,97 @@
+<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width">
+	<title>TMS extract/ingester</title>
+	<link href="/css/main.css" rel="stylesheet" />
+	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+</head>
+
+<body>
+
+	{{> header}} {{> connections}}
+
+	<div class="container">
+		<div>
+
+			<h1>{{itemTitle}} #{{id}}</h1>
+
+			{{#if showResults}}
+			<table class="dataDump">
+				<tr>
+					<td>
+						<h2>Pre-ingested JSON</h2>
+						<div class="json boxme">
+							{{#if itemJSON}}
+							<pre>{{itemJSON}}</pre> {{else}}
+							<p>
+								No JSON file found!
+							</p>
+							{{/if}}
+						</div>
+					</td>
+
+					<td>
+						<h2>Pre-ingested XML</h2>
+						<div class="xml boxme">
+							{{#if itemXML}}
+							<pre>{{itemXML}}</pre> {{else}}
+							<p>
+								No XML file found!
+							</p>
+							{{/if}}
+						</div>
+					</td>
+				</tr>
+			</table>
+
+			<table class="dataDump">
+				<tr>
+					<td>
+						{{#if showQL}}
+						<h2>GraphQL query</h2>
+						<div class="links">
+							<ul>
+								<li>
+									{{#ifEqual itemName "objects"}}
+									<a href='{{exploreQuery ../queries.artwork ../filter ../config.graphql.host}}'>Run in explore</a>
+									{{/ifEqual}} {{#ifEqual itemName "authors"}}
+									<a href='{{exploreQuery ../queries.maker ../filter ../config.graphql.host}}'>Run in explore</a>
+									{{/ifEqual}}
+								</li>
+							</ul>
+						</div>
+						<div class="graphql boxme">
+							{{#ifEqual itemName "objects"}}
+							<pre>{{showQuery ../queries.artwork ../filter}}</pre> {{/ifEqual}} {{#ifEqual itemName "authors"}}
+							<pre>{{showQuery ../queries.maker ../filter}}</pre> {{/ifEqual}}
+						</div>
+
+						{{/if}}
+
+					</td>
+
+					<td>
+						<h2>GraphQL Result</h2>
+						<div class="xml boxme">
+							<pre>Not implimented yet</pre>
+						</div>
+					</td>
+				</tr>
+			</table>
+			{{else}}
+			<div class="norecords">
+				<p>
+					Sorry item not found.
+				</p>
+			</div>
+			{{/if}}
+
+		</div>
+	</div>
+
+	{{> footer}}
+
+</body>
+
+</html>
