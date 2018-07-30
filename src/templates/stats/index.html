@@ -1,0 +1,169 @@
+<html>
+
+<head>
+  <title>Dashboard - stats</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Stats</h1>
+      <p>
+        This is where we keep a bunch of stats to keep an eye on how the server is running.
+      </p>
+      <p>
+        You can also view some logs over on the
+        <a href="/stats/logs">logs page</a>.
+      </p>
+
+      <hr> {{#if tms}}
+      <h2>TMS systems</h2>
+      {{#each tms}}
+      <h4 style="margin-bottom: 1rem">{{stub}}</h4>
+      <table>
+        <tr>
+          <td style="width:40%">Total objects found so far</td>
+          <td>{{prettyNumber totalFiles}}</td>
+        </tr>
+        <tr>
+          <td>Objects with images</td>
+          <td>{{prettyNumber haveImageSources}}</td>
+        </tr>
+        <tr>
+          <td>Images uploaded</td>
+          <td>{{prettyNumber imagesUploaded}}</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Images remaining</td>
+          <td>{{prettyNumber imagesRemaining}} (Finishes {{timeAgo finishAt}}, estimate) {{#if ../user.roles.isAdmin}}
+            <small>
+              <br /> *If you have a lot of files to upload, you can adjust this time in the
+              <a href="/config#cloudinary">Cloudinary section</a> of the config page.</small>
+            {{/if}}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Object files waiting to be processed</td>
+          <td>{{prettyNumber waitingToBeProcessed}} {{#iflte waitingToBeProcessed imagesRemaining}} (Finished {{timeAgo ../finishAt}},
+            estimate)
+            <small>
+              <br /> *Note, the speed to upsert items is gated by the images being uploaded, an item will only be uploaded when
+              a corresponding image has been uploaded. Items that don't have an image at all will just be uploaded asap.
+            </small>
+            {{else}} (Finished {{timeAgo ../timeToUpsertItems}}, estimate) {{#if ../../user.roles.isAdmin}}
+            <small>
+              <br /> *If you have a lot of files to upload, you can adjust this time in the
+              <a href="/config#elasticsearch">ElasticSearch section</a> of the config page.
+            </small>
+            {{/if}} {{/iflte}}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Total events processed</td>
+          <td>{{prettyNumber eventsProcessed}}</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Events files waiting to be processed</td>
+          <td>{{prettyNumber eventsWaitingToBeProcessed}} (Finishes {{timeAgo timeToUpsertEvents}}, estimate) {{#if ../user.roles.isAdmin}}
+            <small>
+              <br /> *If you have a lot of files to upload, you can adjust this time in the
+              <a href="/config#elasticsearch">ElasticSearch section</a> of the config page.</small>
+            {{/if}}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Total exhibitions processed</td>
+          <td>{{prettyNumber exhibitionsProcessed}}</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Exhibitions files waiting to be processed</td>
+          <td>{{prettyNumber exhibitionsWaitingToBeProcessed}} (Finishes {{timeAgo timeToUpsertExhibitions}}, estimate) {{#if
+            ../user.roles.isAdmin}}
+            <small>
+              <br /> *If you have a lot of files to upload, you can adjust this time in the
+              <a href="/config#elasticsearch">ElasticSearch section</a> of the config page.</small>
+            {{/if}}
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Results generated in</td>
+          <td>{{prettyNumber ms}}ms</td>
+        </tr>
+      </table>
+
+      <p>
+        <form method="post">
+          <table class="api">
+            <tr>
+              <td style="width: 25%">Search object by id:</td>
+              <td>
+                <input type="text" name="objectID">
+              </td>
+              <td>
+                <input type="hidden" name="tms" value="{{stub}}">
+                <button type="submit" value="search" name="action">Go</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      <p>
+        <form method="post">
+          <table class="api">
+            <tr>
+              <td style="width: 25%">Search event by id:</td>
+              <td>
+                <input type="text" name="eventID">
+              </td>
+              <td>
+                <input type="hidden" name="tms" value="{{stub}}">
+                <button type="submit" value="search" name="action">Go</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      <p>
+        <form method="post">
+          <table class="api">
+            <tr>
+              <td style="width: 25%">Search exhibition by id:</td>
+              <td>
+                <input type="text" name="exhibitionID">
+              </td>
+              <td>
+                <input type="hidden" name="tms" value="{{stub}}">
+                <button type="submit" value="search" name="action">Go</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      {{/each}} {{/if}}
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

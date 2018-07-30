@@ -11,8 +11,7 @@ exports.index = (request, response) => {
   const configJSON = tools.getConfig()
 
   //  Check to see if the user has a developer key, if not generate one
-  if (
-    !('apitoken' in user) ||
+  if (!('apitoken' in user) ||
     user.apitoken === null ||
     user.apitoken === undefined
   ) {
@@ -112,7 +111,7 @@ exports.field = (request, response) => {
 
     // Grab the files
     const rootDir = process.cwd()
-    const dataDir = `${rootDir}/app/data`
+    const dataDir = `${rootDir}/data`
     const tmsDir = `${dataDir}/tms`
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir)
     if (!fs.existsSync(tmsDir)) fs.mkdirSync(tmsDir)
