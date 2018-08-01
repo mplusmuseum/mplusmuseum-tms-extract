@@ -16,10 +16,8 @@ exports.index = (req, res) => {
       config.set('graphql', {
         host: req.body.graphql
       })
-      /*
       const pingtools = require('../../modules/pingtools')
       pingtools.pingGraphQL()
-      */
       return res.redirect('/config')
     }
 
@@ -28,10 +26,8 @@ exports.index = (req, res) => {
       config.set('elasticsearch', {
         host: req.body.elasticsearch
       })
-      /*
       const pingtools = require('../../modules/pingtools')
       pingtools.pingES()
-      */
 
       //  If we've been passed an interval, then we need to set that
       //  and restart the interval timer.

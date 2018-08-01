@@ -1,0 +1,243 @@
+<html>
+
+<head>
+  <title>Dashboard - logs</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Logs</h1>
+      <p>
+        Here are some useful(ish) logs...
+        <ul class="toc">
+          <li>
+            <a href="#entries">Last 100 entries</a>
+          </li>
+          <li>
+            <a href="#images">Last 100 images uploaded (Average ms: {{prettyNumber averageImageUploadms}}ms)</a>
+          </li>
+          <li>
+            <a href="#imagesColored">Last 100 images colored (Average ms: {{prettyNumber averageImagesColoredms}}ms)</a>
+          </li>
+          <li>
+            <a href="#items">Last 100 items upserted (Average ms: {{prettyNumber averageItemsUpsertedms}}ms)</a>
+          </li>
+          <li>
+            <a href="#events">Last 100 events upserted (Average ms: {{prettyNumber averageEventsUpsertedms}}ms)</a>
+          </li>
+          <li>
+            <a href="#exhibitions">Last 100 exhibitions upserted (Average ms: {{prettyNumber averageExhibitionsUpsertedms}}ms)</a>
+          </li>
+          <li>
+            <a href="#pages">Last 100 pages fetched from TMS (Average ms: {{prettyNumber averagePagesReceivedms}}ms)</a>
+          </li>
+        </ul>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="entries">Last 100 entries</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100Lines}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="images">Last 100 images uploaded (Average ms: {{prettyNumber averageImageUploadms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100ImagesUploaded}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="imagesColored">Last 100 images colored (Average ms: {{prettyNumber averageImagesColoredms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100ImagesColored}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="items">Last 100 items upserted (Average ms: {{prettyNumber averageItemsUpsertedms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100ItemsUpserted}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="events">Last 100 events upserted (Average ms: {{prettyNumber averageEventsUpsertedms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100EventsUpserted}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+      <hr>
+
+      <h3>
+        <a name="exhibitions">Last 100 exhibitions upserted (Average ms: {{prettyNumber averageExhibitionsUpsertedms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100ExhibitionsUpserted}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr>
+
+      <h3>
+        <a name="pages">Last 100 pages fetched from TMS (Average ms: {{prettyNumber averagePagesReceivedms}}ms)</a>
+      </h3>
+      <p>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Message</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each last100PagesReceived}}
+            <tr>
+              <td>{{timeAgo timestamp}}</td>
+              <td>{{data.action}}</td>
+              <td>{{data.message}}</td>
+              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

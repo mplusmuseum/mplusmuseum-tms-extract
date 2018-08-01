@@ -1,25 +1,21 @@
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <title>M+ Dash | Developer Tools</title>
-  <link href="/css/main.css" rel="stylesheet" />
-  <link href="/css/prism.css" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+<html>
+
+<head>
+  <title>Dashboard - developer</title>
+  {{> head}}
 </head>
 
-<body>
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
 
-  {{> nav}} {{> connections}}
+  {{> nav}}
 
-  <div class="container admin-layout documentaion">
-    <div>
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
 
-      <h1>Developer Documention</h1>
-
+      <h1>Developer Help</h1>
       <p>
-        Hello and welcome to the developer portal for the M+ site, below you will find your API key and the details you need to start
-        making calls to our GraphQL server.
+        Hello and welcome to the developer portal for the WCMA api, below you will find your API key and the details you need to
+        start making calls to our GraphQL server.
         <form>
           <table class="api">
             <tr>
@@ -30,498 +26,35 @@
         </form>
       </p>
 
-      <p class="note">
-        <strong>NOTE:</strong> This documentation is very new and evolving but should be enough to get you up and running, we will
-        be expanding it in the near future.
-      </p>
       <hr>
 
-      <h1>Table of Contents</h1>
+      <h2>GraphQL</h2>
+      {{#if config.graphql}}
       <p>
-        <ul class="toc">
+        <ul>
           <li>
-            <a href="#about-graphql">About GraphQL</a>
-            <ul>
-              <li>
-                <a href="#comminicating-with-graphql">Communicating with GraphQL</a>
-              </li>
-              <li>
-                <a href="#graphql-explorer">GraphQL explorer</a>
-              </li>
-            </ul>
+            <a href="/developer/graphql">GraphQL Documentation</a>
           </li>
           <li>
-            <a href="#graphql-queries">GraphQL Queries</a>
-            <ul>
-              <li>
-                <a href="#introspection">Introspection</a>
-              </li>
-              <li>
-                <a href="#artworks">Artworks</a>
-              </li>
-              <li>
-                <a href="#artwork">Artwork</a>
-              </li>
-              <li>
-                <a href="#makers">Makers</a>
-              </li>
-              <li>
-                <a href="#maker">Maker</a>
-              </li>
-              <li>
-                <a href="#mediums">Mediums</a>
-              </li>
-              <li>
-                <a href="#collections">Categories</a>
-              </li>
-              <li>
-                <a href="#areas">Areas</a>
-              </li>
-              <li>
-                <a href="#exhibitions">Exhibitions</a>
-              </li>
-            </ul>
+            <a href="/developer/graphql/status">GraphQL Status</a>
           </li>
+          {{#if user.roles.isAdmin}}
           <li>
-            <a href="#examples">Examples</a>
+            <a href="/config">GraphQL Configuration</a>
           </li>
-          <li>
-            <a href="#fields">JSON fields</a>
-          </li>
-          <li>
-            <a href="#search">Search</a>
-          </li>
+          {{/if}}
         </ul>
       </p>
-
-      <hr>
-
-      <h2>
-        <a name="about-graphql">About GraphQL</a>
-      </h2>
-
+      {{else}}
       <p>
-        GraphQL is a data query language you'll use to request information from the M+ data store. Traditionally GraphQL allows two
-        types of operations,
-        <em>queries</em> and
-        <em>mutations</em> these can be thought of as
-        <em>read</em> and
-        <em>write</em> operations.
+        GraphQL has not been configured yet. {{#if user.roles.isAdmin}}You can
+        <a href="/config">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up now.{{/if}}
       </p>
-      <p>
-        As well as one more operation called
-        <em>introspective</em>, which allows you to ask the GraphQL endpoint about itself.
-      </p>
-      <p>
-        Below you will find examples of various calls to can make to the GraphQL endpoint.
-      </p>
-
-
-
-      <h3>
-        <a name="comminicating-with-graphql">Communicating with GraphQL</a>
-      </h3>
-
-      <p>
-        The single endpoint for all GraphQL calls is...
-      </p>
-      <p>
-        <code>{{config.graphql.host}}/graphql</code>
-      </p>
-      <p>
-        GraphQL operations consist of multiline JSON, an example GraphQL query that gets the ID for
-        <code class="red">artworks</code> would look like this:
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artworks '(limit: 20)'}}}</pre>
-
-      <p>
-        To query GraphQL using cURL, make a
-        <code>POST</code> request with a JSON payload. The payload must contain a string called query and your API token as
-        <code>bearer</code> authorization.
-      </p>
-      <p>
-        <pre class="query terminal">{{{curlQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
-      </p>
-      <p>
-        Using Nodejs it may look like this, making sure to pass in your API token as a
-        <code>bearer</code> token as shown.
-      </p>
-      <p>
-        <pre class="query node">{{{nodeQuery queries.artworks '' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-
-      <h3>
-        <a name="graphql-explorer">GraphQL explorer</a>
-      </h3>
-      <p>
-        Probably the easiest way to try out GRaphQL queries is to use the exporer which can be found here:
-        <a href="{{config.graphql.host}}/api-explorer">{{config.graphql.host}}/api-explorer</a>
-      </p>
-
-      <p>
-        You can see an
-        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>example query in the explorer here</a>, you will need to press the "run" button to see the results of the query.
-      </p>
-
-      <hr>
-
-      <h1>
-        <a name="graphql-queries">GraphQL Queries</a>
-      </h1>
-
-      <p>
-        Below you'll find a list of the current queries you can make against the data store.
-      </p>
-
-
-
-      <h2>
-        <a name="introspection">Introspection</a>
-      </h2>
-
-      <p>
-        The
-        <em>introspection</em> operation is the only operation you can call using
-        <code>GET</code>. Introspection allows you to query the GraphQL schema for details about itself. Query
-        <code class="red">__schema</code> to list all types defined in the schema and get details about each:
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>Run in explore</a>
-      </p>
-
-      <pre class="query">{{{graphQLQuery queries.schema}}}</pre>
-
-      <p>
-        Query
-        <code class="red">__type</code> to get details about any type:
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.type "(name:\"Artwork\")" config.graphql.host}}'>Run in explore</a>
-      </p>
-
-      <pre class="query">{{{graphQLQuery queries.type '(name: "Artwork")'}}}</pre>
-
-
-
-      <h2>
-        <a name="artworks">Artworks</a>
-      </h2>
-
-      <p>
-        This query selects all of the artworks and can be filtered by certain fields shown below. Note: filters are
-        <em>additive</em> rather than
-        <em>or</em>, filtering two fields will only return records that match both.
-      </p>
-
-      <p>
-        Valid filters are:
-        <code class="red">area</code>,
-        <code class="red">category</code>,
-        <code class="red">maker</code>,
-        <code class="red">medium</code>,
-        <code class="red">ExhibitionID</code> &amp;
-        <code class="red">limit</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artworks "(limit: 20)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artworks '(limit: 20)'}}}</pre>
-
-      <p>
-        cURL
-      </p>
-      <p>
-        <pre class="query terminal">{{{curlQuery queries.artworks '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-      <p>
-        NodeJS.
-      </p>
-      <p>
-        <pre class="query node">{{{nodeQuery queries.artworks '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-      <h2>
-        <a name="artwork">Artwork</a>
-      </h2>
-
-      <p>
-        This query will return an artwork based on the
-        <code class="red">id</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artwork "(id: 1814)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artwork '(id: 1814)'}}}</pre>
-
-
-
-      <h2>
-        <a name="makers">Makers</a>
-      </h2>
-
-      <p>
-        This query selects all of the makers.
-      </p>
-
-      <p>
-        Valid filters are:
-        <code class="red">limit</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.makers "(limit: 20)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.makers '(limit: 20)'}}}</pre>
-
-      <p>
-        cURL
-      </p>
-      <p>
-        <pre class="query terminal">{{{curlQuery queries.makers '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-      <p>
-        NodeJS.
-      </p>
-      <p>
-        <pre class="query node">{{{nodeQuery queries.makers '(limit: 20)' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-      <h2>
-        <a name="maker">Maker</a>
-      </h2>
-
-      <p>
-        This query will return a maker based on the
-        <code class="red">id</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.maker "(id: 1430)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.maker '(id: 1430)'}}}</pre>
-
-
-
-      <h2>
-        <a name="mediums">Mediums</a>
-      </h2>
-
-      <p>
-        This query selects all of the mediums.
-      </p>
-
-      <p>
-        Valid filters are:
-        <code class="red">limit</code> &amp;
-        <code class="red">lang</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.mediums "(lang:\"zh-hans\")" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.mediums '(lang:"zh-hans")'}}}</pre>
-
-      <p>
-        NodeJS.
-      </p>
-      <p>
-        <pre class="query node">{{{nodeQuery queries.mediums '(lang:"zh-hans")' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-      <h2>
-        <a name="categories">Categories</a>
-      </h2>
-
-      <p>
-        This query selects all of the categories.
-      </p>
-
-      <p>
-        Valid filters are:
-        <code class="red">limit</code> &amp;
-        <code class="red">lang</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.categories "(lang:\"en\", limit: 100)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.categories '(lang:"en", limit: 100)'}}}</pre>
-
-      <p>
-        NodeJS.
-      </p>
-      <p>
-        <pre class="query node">{{{nodeQuery queries.categories '(lang:"en", limit: 100)' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-      <h2>
-        <a name="areas">Areas</a>
-      </h2>
-
-      <p>
-        This query selects all of the areas.
-      </p>
-
-      <p>
-        Valid filters are:
-        <code class="red">limit</code> &amp;
-        <code class="red">lang</code>.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.areas "" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.areas ''}}}</pre>
-
-      <p>
-        cURL
-      </p>
-      <p>
-        <pre class="query terminal">{{{curlQuery queries.areas '' config.graphql.host user.apitoken}}}</pre>
-      </p>
-
-
-
-      <h2>
-        <a name="exhibitions">Exhibitions</a>
-      </h2>
-
-      <p>
-        Coming soon.
-      </p>
-
-      <hr>
-
-      <h1>
-        <a name="examples">Examples</a>
-      </h1>
-
-      <p>
-        Here is a example of a sequence of queries we may run into. To start with we could display the first 30 artworks returned
-        from the system, we'd use this query
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artworksMedium "(limit: 30)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artworksMedium '(limit: 30)'}}}</pre>
-
-      <p>
-        From there a user may select a single piece of artwork, lets say ID
-        <code class="red">10063</code>, we would then query the artwork as follows...
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artwork "(id: 10063)" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artwork '(id: 10063)'}}}</pre>
-
-      <p>
-        The user may then be interested in other artworks from the same maker, from the data returned in the query we can see first
-        maker is
-        <code class="red">Rocco Yim</code> in the roll of
-        <code class="red">Architect</code>, with an id of
-        <code class="red">"543"</code>. Looking for other objects from the same maker we could use the following query.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artworks "(maker: \"543\")" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artworks '(maker: "543")'}}}</pre>
-
-      <p>
-        Alternatively we could ask the system for a list of mediums the objects have been created in. We use the mediums query.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.mediums "(lang:\"en\")" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.mediums '(lang:"en")'}}}</pre>
-
-      <p>
-        And from the results select
-        <code class="red">porcelain</code>, plugging that back into the artworks query again we can get other porcelain objects.
-      </p>
-
-      <p class="runinexplore">
-        <a href='{{exploreQuery queries.artworksMedium "(medium: \"porcelain\")" config.graphql.host}}'>Run in explore</a>
-      </p>
-      <pre class="query">{{{graphQLQuery queries.artworksMedium '(medium: "porcelain")'}}}</pre>
-
-      <p>
-        And again in NodeJS
-      </p>
-      <pre class="query">{{{nodeQuery queries.artworksMedium '(medium: "porcelain")' config.graphql.host user.apitoken}}}</pre>
-
-      <hr>
-
-      <h1>
-        <a name="json-fields">JSON Fields</a>
-      </h1>
-
-      <p>
-        While the above documentation should be correct, sometimes it's useful to check what's actually in the data. We can use the
-        following links to inspect what fields are
-        <em>actually</em> in the JSON representation of the objects.
-      </p>
-      <p class="note">
-        <strong>Note:</strong> Internally
-        <code class="red">makers</code> that are referenced in queries and is the parameter you should use are called "authors" and
-        <code class="red">artworks</code> are called "objects".
-      </p>
-      <ul>
-        {{#each config.xml}}
-        <li>
-          <a href="/developer/fields/{{index}}">{{index}}</a>
-        </li>
-        {{/each}}
-      </ul>
-
-      <hr>
-
-      <h1 name="search">Search</h1>
-      <p>
-        You can also search for items directly to inspect the original XML and JSON to check for consistency between the results
-        from queries and the original data we had.
-      </p>
-
-      {{#each config.xml}}
-      <p>
-        <form method="post">
-          <table>
-            <td>Search for {{index}}</td>
-            <td>
-              <input type="text" name="id" required placeholder="{{index}} ID">
-            </td>
-            <td>
-              <button type="submit" name="search" value="{{index}}">Search</button>
-            </td>
-          </table>
-        </form>
-      </p>
-      {{/each}}
-
+      {{/if}}
     </div>
   </div>
 
   {{> tail}}
-
 </body>
 
 </html>
