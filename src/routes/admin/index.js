@@ -1,74 +1,40 @@
-const tools = require('../../modules/tools')
-const User = require('../../modules/user')
-const Users = require('../../modules/users')
+const User = require('../../classes/user')
+const Users = require('../../classes/users')
 
-exports.index = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
+exports.index = (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
 
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
-  }
-
-  const configJSON = tools.getConfig()
-
-  templateValues.user = user
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/index', templateValues)
+  return res.render('admin/index', req.templateValues)
 }
 
-exports.user = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
+exports.users = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  const users = await new Users().get()
+  req.templateValues.users = users
+  return res.render('admin/users', req.templateValues)
+}
 
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
-  }
+exports.user = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  const userObj = await new User()
 
-  const configJSON = tools.getConfig()
+  const selectedUser = await userObj.get(req.params.id)
 
-  const selectedUser = new User(request.params.hash)
-
-  //  Check to see if we have been passed a user hash, if so
-  //  then we update the user
-  if ('action' in request.body) {
-    if (request.body.action === 'update') {
-      selectedUser.developer = 'developer' in request.body
-      selectedUser.staff = 'staff' in request.body
-      selectedUser.admin = 'admin' in request.body
-      selectedUser.save()
-      return response.redirect(`/admin/user/${selectedUser.hash}`)
+  if ('action' in req.body) {
+    if (req.body.action === 'update') {
+      const roles = {
+        isAdmin: 'admin' in req.body,
+        isStaff: 'staff' in req.body,
+        isDeveloper: 'developer' in req.body
+      }
+      await userObj.setRoles(selectedUser.user_id, roles)
+      return res.redirect(`/admin/user/${req.params.id}`)
     }
   }
 
-  templateValues.user = user
-  templateValues.selectedUser = selectedUser
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/user', templateValues)
-}
-
-exports.users = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
-  const users = new Users().get()
-
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
-  }
-
-  const configJSON = tools.getConfig()
-
-  templateValues.user = user
-  templateValues.users = users
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/users', templateValues)
+  req.templateValues.selectedUser = selectedUser
+  return res.render('admin/user', req.templateValues)
 }

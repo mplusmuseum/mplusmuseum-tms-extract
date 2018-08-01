@@ -1,18 +1,16 @@
-<head prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width">
-  <title>M+ Dash | Admin</title>
-  <link href="/css/main.css" rel="stylesheet" />
-  <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
-  <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
 </head>
 
-<body>
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
 
-  {{> nav}} {{> connections}}
+  {{> nav}}
 
-  <div class="container homepage">
-    <div>
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
 
       <h1>Admin</h1>
       <p>
@@ -21,12 +19,12 @@
             <a href="/admin/users">Users</a>
           </li>
         </ul>
+
       </p>
     </div>
   </div>
 
   {{> tail}}
-
 </body>
 
 </html>

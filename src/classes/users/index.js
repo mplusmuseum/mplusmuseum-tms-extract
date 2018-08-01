@@ -3,7 +3,7 @@ const auth0 = require('../../modules/auth0')
 const Config = require('../config')
 
 class Users {
-  async get(role = null, page = 1, perPage = 50) {
+  async get (role = null, page = 1, perPage = 50) {
     const auth0Token = await auth0.getAuth0Token()
     const payload = {}
 
@@ -14,14 +14,14 @@ class Users {
     }
 
     const users = await request({
-        url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
-        method: 'GET',
-        headers: {
+      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
+      method: 'GET',
+      headers: {
           'content-type': 'application/json',
           Authorization: `bearer ${auth0Token}`
         },
-        json: payload
-      })
+      json: payload
+    })
       .then(response => {
         return response
       })
