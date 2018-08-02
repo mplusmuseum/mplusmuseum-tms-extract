@@ -1,9 +1,7 @@
 const Config = require('../../classes/config')
 const formidable = require('formidable')
-const fs = require('fs')
-const path = require('path')
-const rootDir = path.join(__dirname, '../../../data')
 const logging = require('../../modules/logging')
+const processObjects = require('../../modules/processingFiles/objects')
 
 exports.index = (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
@@ -18,7 +16,7 @@ exports.index = (req, res) => {
   return res.render('uploadFile/index', req.templateValues)
 }
 
-exports.getfile = (req, res) => {
+exports.getfile = async (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
     return res.redirect('/')
   }
@@ -57,81 +55,12 @@ exports.getfile = (req, res) => {
     }
 
     const tms = fields.tms
-
     if ('objectFile' in files) {
-      processObjectFile(req, res, tms, files.objectFile.path)
-    }
-
-    if ('authorsFile' in files) {
-      processAuthorsFile(req, res, tms, files.eventsFile.path)
+      //  TODO: Wrap this in a promise!!
+      const results = await processObjects.processFile(tms, files.objectFile.path)
+      console.log(results)
+      console.log('About to render template')
+      return res.render('uploadFile/results', req.templateValues)
     }
   })
-}
-
-const processObjectFile = (req, res, tms, filename) => {
-  //  TODO: Check what type of XML file we have been passed, we will do this
-  //  based on the 'action' field. And will then validate (as best we can)
-  //  the contents of the file based on what we've been passed
-  let newObjects = 0
-  let modifiedObjects = 0
-  let totalObjects = 0
-  const startTime = new Date().getTime()
-  const tmsLogger = logging.getTMSLogger()
-
-  /* ##########################################################################
-
-  This is where the PROCESSING STARTS
-
-  ########################################################################## */
-
-  /* ##########################################################################
-
-  This is where the PROCESSING ENDS
-
-  ########################################################################## */
-
-  //  As a seperate thing, I want to see all the fields that exist
-  //  and let us know if we've found any new ones
-
-  //  Check to see if we already have a file containing all the fields, if so read it in
-
-  //  Now go through all the objects looking at all the keys
-  //  checking to see if we already have a record of them, if so
-  //  mark them as new
-
-  //  Now write the fields back out so we can compare against them next time
-}
-
-const processAuthorsFile = (req, res, tms, filename) => {
-  //  TODO: Check what type of XML file we have been passed, we will do this
-  //  based on the 'action' field. And will then validate (as best we can)
-  //  the contents of the file based on what we've been passed
-  let newEvents = 0
-  let modifiedEvents = 0
-  let totalEvents = 0
-  const startTime = new Date().getTime()
-  const tmsLogger = logging.getTMSLogger()
-
-  /* ##########################################################################
-
-  This is where the PROCESSING STARTS
-
-  ########################################################################## */
-
-  /* ##########################################################################
-
-  This is where the PROCESSING ENDS
-
-  ########################################################################## */
-
-  //  As a seperate thing, I want to see all the fields that exist
-  //  and let us know if we've found any new ones
-
-  //  Check to see if we already have a file containing all the fields, if so read it in
-
-  //  Now go through all the objects looking at all the keys
-  //  checking to see if we already have a record of them, if so
-  //  mark them as new
-
-  //  Now write the fields back out so we can compare against them next time
 }
