@@ -1,7 +1,7 @@
 const Config = require('../../classes/config')
 
 const checkItems = async () => {
-  console.log('checking items')
+  // console.log('checking items')
 }
 
 exports.startUpserting = () => {
