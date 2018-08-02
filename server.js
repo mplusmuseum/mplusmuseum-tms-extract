@@ -437,6 +437,20 @@ const pingtools = require('./app/modules/pingtools')
 pingtools.startPingingGraphQL()
 pingtools.startPingingES()
 
+//  This starts off checking for images to upload to cloudinary
+//  and getting colour information
+const cloudinary = require('./app/modules/cloudinary')
+cloudinary.startUploading()
+cloudinary.startColoring()
+
+//  This starts off checking for images to upload to elastic search
+const elasticsearch = require('./app/modules/elasticsearch')
+elasticsearch.startUpserting()
+
+//  This starts off checking for images to upload to elastic search
+const auth0Users = require('./app/modules/auth0')
+auth0Users.startGettingAllUserTokens()
+
 //  Now we kick off the regular tasks that do things periodically
 //  kinda like cron jobs
 /*
@@ -468,7 +482,3 @@ if (process.env.NODE_ENV !== 'DEV') {
   checkFields()
 }
 */
-
-//  This starts off checking for images to upload to elastic search
-const auth0Users = require('./app/modules/auth0')
-auth0Users.startGettingAllUserTokens()

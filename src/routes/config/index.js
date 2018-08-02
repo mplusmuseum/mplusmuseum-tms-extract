@@ -1,6 +1,6 @@
 const Config = require('../../classes/config')
-// const cloudinary = require('../../modules/cloudinary')
-// const elasticsearch = require('../../modules/elasticsearch')
+const cloudinary = require('../../modules/cloudinary')
+const elasticsearch = require('../../modules/elasticsearch')
 
 exports.index = (req, res) => {
   if (req.user.roles.isAdmin !== true) {
@@ -37,22 +37,14 @@ exports.index = (req, res) => {
           const newInterval = parseInt(req.body.interval, 10)
           if (newInterval > 0) {
             config.set('timers.elasticsearch', parseInt(req.body.interval, 10))
-            /*
             elasticsearch.startUpserting()
-            elasticsearch.startUpsertingEvents()
-            elasticsearch.startUpsertingExhibitions()
-            */
           }
         } catch (err) {
           console.error(err)
         }
       } else {
         config.set('timers.elasticsearch', 20000)
-        /*
         elasticsearch.startUpserting()
-        elasticsearch.startUpsertingEvents()
-        elasticsearch.startUpsertingExhibitions()
-        */
       }
 
       return res.redirect('/config')
@@ -124,18 +116,14 @@ exports.index = (req, res) => {
           const newInterval = parseInt(req.body.interval, 10)
           if (newInterval > 0) {
             config.set('timers.cloudinary', parseInt(req.body.interval, 10))
-            /*
             cloudinary.startUploading()
-            */
           }
         } catch (err) {
           console.error(err)
         }
       } else {
         config.set('timers.cloudinary', 20000)
-        /*
         cloudinary.startUploading()
-        */
       }
 
       //  Same for color interval
@@ -144,18 +132,14 @@ exports.index = (req, res) => {
           const newIntervalColor = parseInt(req.body.intervalColor, 10)
           if (newIntervalColor > 0) {
             config.set('timers.cloudinaryColoring', parseInt(req.body.intervalColor, 10))
-            /*
             cloudinary.startColoring()
-            */
           }
         } catch (err) {
           console.error(err)
         }
       } else {
         config.set('timers.intervalColor', 20000)
-        /*
         cloudinary.startColoring()
-        */
       }
 
       return res.redirect('/config')

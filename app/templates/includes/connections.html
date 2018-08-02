@@ -1,27 +1,12 @@
-{{#if config}}
 <div class="connections">
   <div class="graphQL">
-    GraphQL: {{#if config.graphql.host}}Configured{{else}}Not configured{{/if}}
+    GraphQL: {{#if config.graphql.host}}
+    <a href="/developer/graphql/status">{{{graphQLStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
+    <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
   </div>
-  <div class="elasticsearch" {{#if pingData.haveData}} title="
-{{#each pingData.pings}}
-{{#ifEqual ms null}}
-failed, {{../timeAgo}} ago.
-{{else}}
-{{../ms}}ms, {{../timeAgo}} ago.
-{{/ifEqual}}
-{{/each}}
-" {{else}} title="
-No data" {{/if}}>
-    Elastic Search: {{#if pingData.haveData}} {{#if pingData.averagePing}}
-    <span class="average">Averge ping: {{pingData.averagePing}}ms.</span>{{/if}} {{#if pingData.timetoLastPing}}
-    <span class="last">Last ping: {{pingData.timetoLastPing}}s.</span>{{/if}} {{#if pingData.mostRecentIsDead}} {{#if pingData.lastFiveAreDead}}
-    <span class="alert">Last 5 pings failed!</span>
-    {{else}}
-    <span class="warn">Last ping failed.</span>
-    {{/if}} {{/if}} {{else}}
-    <span class="error">No data found</span>
-    {{/if}}
+  <div class="elasticsearch">
+    Elastic Search: {{#if config.elasticsearch.host}}
+    <a href="/developer/elasticsearch/status">{{{elasticsearchStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
+    <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
   </div>
 </div>
-{{/if}}

@@ -202,6 +202,58 @@ exports.dumpJSON = object => {
   return pre
 }
 
+exports.graphQLStatus = () => {
+  if (!('graphqlping' in global)) {
+    return '<span class="warn">Not connected</span>'
+  }
+  //  Find out when the last successful connection was
+  const valid = global.graphqlping.filter((ping) => {
+    return ping.valid
+  })
+  if (valid.length === 0) {
+    return '<span class="alert">Disconnected</span>'
+  }
+
+  const mostRecentValid = valid[0]
+  const diff = new Date().getTime() - mostRecentValid.timestamp
+  //  If the last valid connection was more than 5 minutes ago
+  //  then say we are disconnected
+  if (diff > 5 * 60 * 1000) {
+    return '<span class="alert">Disconnected</span>'
+  }
+  const pings = valid.map((ping) => {
+    return ping.ms
+  })
+  const averagePing = Math.floor(pings.reduce((p, c) => p + c, 0) / pings.length)
+  return `<span class="good">Ave ping: ${averagePing}ms</span>`
+}
+
+exports.elasticsearchStatus = () => {
+  if (!('elasticsearchping' in global)) {
+    return '<span class="warn">Not connected</span>'
+  }
+  //  Find out when the last successful connection was
+  const valid = global.elasticsearchping.filter((ping) => {
+    return ping.valid
+  })
+  if (valid.length === 0) {
+    return '<span class="alert">Disconnected</span>'
+  }
+
+  const mostRecentValid = valid[0]
+  const diff = new Date().getTime() - mostRecentValid.timestamp
+  //  If the last valid connection was more than 5 minutes ago
+  //  then say we are disconnected
+  if (diff > 5 * 60 * 1000) {
+    return '<span class="alert">Disconnected</span>'
+  }
+  const pings = valid.map((ping) => {
+    return ping.ms
+  })
+  const averagePing = Math.floor(pings.reduce((p, c) => p + c, 0) / pings.length)
+  return `<span class="good">Ave ping: ${averagePing}ms</span>`
+}
+
 exports.prettyNumber = x => {
   if (x === null || x === undefined) return ''
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
