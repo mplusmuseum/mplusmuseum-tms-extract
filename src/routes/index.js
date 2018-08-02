@@ -13,6 +13,7 @@ const developer = require('./developer')
 const item = require('./item')
 const main = require('./main')
 const stats = require('./stats')
+const uploadFile = require('./uploadFile')
 const user = require('./user')
 
 //  Redirect to https, make sure...
@@ -135,6 +136,8 @@ router.get('/developer/elasticsearch/status', ensureLoggedIn, developer.status.e
 router.get('/stats', ensureLoggedIn, stats.index)
 router.get('/stats/logs', ensureLoggedIn, stats.logs)
 router.post('/stats', ensureLoggedIn, stats.index)
+router.get('/uploadFile', ensureLoggedIn, uploadFile.index)
+router.post('/uploadFile', ensureLoggedIn, uploadFile.getfile)
 
 router.get('/view/:item/:id', ensureLoggedIn, item.index)
 

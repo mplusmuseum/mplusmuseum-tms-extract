@@ -59,7 +59,8 @@ exports.index = (req, res) => {
     }
 
     //  ADD/UPDATE TMS
-    if (req.body.action === 'updatetms' && 'tmsstub' in req.body && req.body.tmsstub !== '' && 'tmsurl' in req.body && req.body.tmsurl !== '' && 'key' in req.body && req.body.key !== '') {
+    /* NOTE: We have removed the eMuseum key and url here as we are not connecting directly to the TMS system */
+    if (req.body.action === 'updatetms' && 'tmsstub' in req.body && req.body.tmsstub !== '' /* && 'tmsurl' in req.body && req.body.tmsurl !== '' && 'key' in req.body && req.body.key !== '' */) {
       //  If there's no TMS entry in config, then we create it
       if (config.get('tms') === null) {
         config.set('tms', [])
@@ -70,16 +71,16 @@ exports.index = (req, res) => {
       let foundMatch = false
       tms.forEach((thisTMS) => {
         if (thisTMS.stub === req.body.tmsstub) {
-          thisTMS.url = req.body.tmsurl
-          thisTMS.key = req.body.key
+          // thisTMS.url = req.body.tmsurl
+          // thisTMS.key = req.body.key
           foundMatch = true
         }
       })
       if (foundMatch === false) {
         tms.push({
-          stub: req.body.tmsstub,
-          url: req.body.tmsurl,
-          key: req.body.key
+          stub: req.body.tmsstub // ,
+          // url: req.body.tmsurl,
+          // key: req.body.key
         })
       }
       config.set('tms', tms)

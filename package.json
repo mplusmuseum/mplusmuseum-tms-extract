@@ -23,6 +23,7 @@
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
+    "formidable": "^1.2.1",
     "get-stdin": "^5.0.1",
     "http-auth": "^3.2.3",
     "is-running": "^2.1.0",
