@@ -22,3 +22,5 @@ package-lock.json
 /.pid
 /config.json.old
 /data
+/data.old
+/logs
