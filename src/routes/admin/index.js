@@ -1,5 +1,8 @@
 const User = require('../../classes/user')
 const Users = require('../../classes/users')
+const Config = require('../../classes/config')
+const logging = require('../../modules/logging')
+const elasticsearch = require('elasticsearch')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
@@ -37,4 +40,43 @@ exports.user = async (req, res) => {
 
   req.templateValues.selectedUser = selectedUser
   return res.render('admin/user', req.templateValues)
+}
+
+exports.blowaway = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const startTime = new Date().getTime()
+
+  const tmsLogger = logging.getTMSLogger()
+
+  //  Check to see that we have elasticsearch configured
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  if (elasticsearchConfig === null) {
+    return res.redirect('/admin')
+  }
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+
+  //  Deletes the index if we need to
+  const index = req.params.index
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists === true) {
+    await esclient.indices.delete({
+      index
+    })
+  }
+
+  const endTime = new Date().getTime()
+  tmsLogger.object(`Deleting index for ${index}`, {
+    action: 'deleteIndex',
+    index: index,
+    ms: endTime - startTime
+  })
+
+  return res.redirect('/admin')
 }
