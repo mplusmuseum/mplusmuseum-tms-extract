@@ -57,10 +57,17 @@ exports.getfile = async (req, res) => {
     const tms = fields.tms
     if ('objectFile' in files) {
       //  TODO: Wrap this in a promise!!
-      const results = await processObjects.processFile(tms, files.objectFile.path)
-      console.log(results)
-      console.log('About to render template')
-      return res.render('uploadFile/results', req.templateValues)
+      new Promise((resolve, reject) => {
+        resolve(processObjects.processFile(tms, files.objectFile.path))
+      }).then((results) => {
+        req.templateValues.fields = results.fields
+        req.templateValues.type = results.type
+        req.templateValues.newObjects = results.newObjects
+        req.templateValues.modifiedObjects = results.modifiedObjects
+        req.templateValues.totalObjects = results.totalObjects
+        req.templateValues.ms = results.ms
+        return res.render('uploadFile/results', req.templateValues)
+      })
     }
   })
 }

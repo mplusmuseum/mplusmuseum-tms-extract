@@ -28,12 +28,16 @@ async function requestWithRetry (options, maxRetries = 10) {
 async function createArtisanalInt () {
   const json = await requestWithRetry({
     method: 'POST',
-    uri: 'http://api.brooklynintegers.com/rest/',
-    formData: { method: 'brooklyn.integers.create' },
+    uri: 'https://api.brooklynintegers.com/rest/',
+    formData: {
+      method: 'brooklyn.integers.create'
+    },
     json: true
   })
 
   return json.integers[0].integer
 }
 
-module.exports = { createArtisanalInt }
+module.exports = {
+  createArtisanalInt
+}

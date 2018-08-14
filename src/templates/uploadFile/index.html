@@ -60,6 +60,7 @@
         </table>
       </form>
 
+      {{!---
       <form method="post" enctype="multipart/form-data">
         <table class="api">
           <tr>
@@ -89,8 +90,7 @@
           </tr>
         </table>
       </form>
-
-      {{else}} {{#if user.role.isAdmin}}
+      ---}} {{else}} {{#if user.role.isAdmin}}
       <p>
         Before you can upload an objects file, you need to register a TMS system that the file has supplemental information for.
         You can do that on the

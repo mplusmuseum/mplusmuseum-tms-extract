@@ -1,3 +1,4 @@
+const Config = require('../../../classes/config')
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser({
   trim: true,
@@ -9,6 +10,7 @@ const fs = require('fs')
 const path = require('path')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../logging')
+const artisanalints = require('../../artisanalints')
 
 /*
 const knownFields = {
@@ -490,7 +492,17 @@ const parseObjectOrArray = (obj, fn) => {
 // #########################################################################
 const parseObject = o => {
   const newObject = {
-    id: parseInt(o.id, 10),
+    objectID: parseInt(o.id, 10),
+    publicAccess: parseInt(o.PublicAccess, 10) === 1,
+    objectNumber: o.objectnumber,
+    titles: parseObjectOrArray(o.titles, parseText),
+    displayDate: o.dated,
+    beginDate: parseFloat(o.datebegin),
+    endDate: parseFloat(o.dateend),
+    dimensions: parseObjectOrArray(o.dimensions, parseText),
+    mediums: parseObjectOrArray(o.mediums, parseText),
+    creditLines: parseObjectOrArray(o.creditlines, parseText),
+    /*
     areacategories: parseObjectOrArray(o.areacategories, parseAreaCategory),
     areacategory_concat: parseObjectOrArray(
       o.areacategory_concat,
@@ -499,11 +511,6 @@ const parseObject = o => {
     makers: parseObjectOrArray(o.authors, parseAuthors),
     makers_concat: parseObjectOrArray(o.authors_concat, parseAuthorsConcat),
     copyrightcreditlines: parseObjectOrArray(o.copyrightcreditlines, parseText),
-    creditlines: parseObjectOrArray(o.creditlines, parseText),
-    datebegin: parseFloat(o.datebegin),
-    dated: o.dated,
-    dateend: parseFloat(o.dateend),
-    dimensions: parseObjectOrArray(o.dimensions, parseText),
     exhibitions: parseObjectOrArray(o.exhibitions, parseExhibitions),
     exhibitions_concat: parseObjectOrArray(
       o.exhibitions_concat,
@@ -511,7 +518,6 @@ const parseObject = o => {
     ),
     exhlabels: parseObjectOrArray(o.exhlabels, parseExhlabels),
     medias: parseObjectOrArray(o.medias, parseMedia),
-    mediums: parseObjectOrArray(o.mediums, parseText),
     MPlusRights: parseObjectOrArray(o.MPlusRights, parseMPlusRights),
     MPlusRightsFlexFields: parseObjectOrArray(
       o.MPlusRightsFlexFields,
@@ -521,11 +527,10 @@ const parseObject = o => {
       o.MPlusRightsFlexFields,
       parseMPlusRightsFlexFieldsConcat
     ),
-    objectnumber: o.objectnumber,
     objectstatus: parseObjectOrArray(o.objectstatus, parseText),
-    PublicAccess: parseInt(o.PublicAccess, 10) === 1,
     summaries: parseObjectOrArray(o.summaries, parseText),
-    titles: parseObjectOrArray(o.titles, parseText)
+    */
+    id: parseInt(o.id, 10)
   }
   return newObject
 }
@@ -687,7 +692,6 @@ const processFile = async (tms, filename) => {
     ms: endTime - startTime
   })
 
-  console.log('DONE DONE DONE DONE DONE DONE DONE DONE DONE DONE')
   return {
     fields: objectFieldsMap,
     type: 'objects',
@@ -698,3 +702,66 @@ const processFile = async (tms, filename) => {
   }
 }
 exports.processFile = processFile
+
+//  Go look in the process folder for files that we need to make a perfect version of
+//  and make sure we have all the information in there we need
+const makePerfect = async () => {
+  const config = new Config()
+  const tmsses = config.get('tms')
+  let foundItemToUpload = false
+  let processFilename = null
+  let perfectFilename = null
+
+  tmsses.forEach((tms) => {
+    if (foundItemToUpload === true) return
+    const tmsProcessDir = path.join(rootDir, 'objects', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'objects', tms.stub, 'perfect')
+    if (fs.existsSync(tmsProcessDir)) {
+      if (foundItemToUpload === true) return
+      const subFolders = fs.readdirSync(tmsProcessDir)
+      subFolders.forEach((subFolder) => {
+        if (foundItemToUpload === true) return
+        const files = fs.readdirSync(path.join(tmsProcessDir, subFolder)).filter(file => {
+          const fileFragments = file.split('.')
+          if (fileFragments.length !== 2) return false
+          if (fileFragments[1] !== 'json') return false
+          return true
+        })
+        files.forEach((file) => {
+          if (foundItemToUpload === true) return
+          //  Make sure the directories exists
+          if (!fs.existsSync(tmsPerfectDir)) fs.mkdirSync(tmsPerfectDir)
+          if (!fs.existsSync(path.join(tmsPerfectDir, subFolder))) fs.mkdirSync(path.join(tmsPerfectDir, subFolder))
+          const testPerfectFilename = path.join(tmsPerfectDir, subFolder, file)
+          if (!(fs.existsSync(testPerfectFilename))) {
+            foundItemToUpload = true
+            processFilename = path.join(tmsProcessDir, subFolder, file)
+            perfectFilename = path.join(tmsPerfectDir, subFolder, file)
+          }
+        })
+      })
+    }
+  })
+
+  if (foundItemToUpload && processFilename !== null) {
+    const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
+    const processFileJSON = JSON.parse(processFileRaw)
+    processFileJSON.artInt = await artisanalints.createArtisanalInt()
+    const perfectFilePretty = JSON.stringify(processFileJSON, null, 4)
+    fs.writeFileSync(perfectFilename, perfectFilePretty, 'utf-8')
+  }
+}
+
+const startMakingPerfect = () => {
+  const config = new Config()
+  const timers = config.get('timers')
+  let interval = 20000
+  if (timers !== null && 'elasticsearch' in timers) {
+    interval = parseInt(timers.elasticsearch, 10)
+  }
+  setInterval(() => {
+    makePerfect()
+  }, interval / 2)
+  makePerfect()
+}
+exports.startMakingPerfect = startMakingPerfect
