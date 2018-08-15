@@ -1,10 +1,6 @@
-const fs = require('fs')
-const tools = require('../../modules/tools')
-const User = require('../../modules/user')
 const decortation = require('../../modules/decoration')
 
 exports.status = (req, res) => {
-
   // If we are logged out, show the main homepage
   if (req.user === null) {
     const design = decortation.pickLoggedOutDesign()
