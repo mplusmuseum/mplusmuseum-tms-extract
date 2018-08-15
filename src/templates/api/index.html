@@ -1,0 +1,79 @@
+<html>
+
+<head>
+  <title>Dashboard - config</title>
+  {{> head}}
+  <link href="/css/prism.css" rel="stylesheet" />
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+
+      <h1>API</h1>
+
+      <p>
+        The dashboard currently offers one API function, but may soon end up offering more. To communicate with the API securely
+        a "handshake" token will need to be passed over, normally in a
+        <code>POST</code> operation and normally as an "
+        <code>Authorization: bearer [xxxxxxxxxxxxxxxxxxxxxxxxxx]</code>" token. See examples below for details.
+      </p>
+
+      <h2>Developers API token test</h2>
+
+      <p>
+        To test to see if a developers API token is valid you should call the following API endpoint.
+      </p>
+      <p>
+        <code>http://{{host}}/api/checkToken</code>
+      </p>
+      <p>
+        This is a
+        <code>POST</code> operation and you will need to pass the developers token you are checking as a
+        <code class="red">token</code> parameter and the secret handshake token in the headers as
+        <code>Authorization: bearer</code>.
+      </p>
+
+      <h3>cURL</h3>
+
+      <p>
+        This is how you would check your own token using cURL.
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlCode curlCode}}}</pre>
+      </p>
+      <p>
+        This is what a success response looks like.
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlCode responseCode}}}</pre>
+      </p>
+
+      <h3>Node</h3>
+
+      <p>
+        And this code is how you would check your own developers token using node.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeCode nodeCode}}}</pre>
+      </p>
+
+      <h4>Caching and expiring</h4>
+      <p>
+        You
+        <em>should
+          <strong>not</strong>
+        </em> check the developers token each time they make a GraphQL call. The
+        <code>expires_in</code> tells you in seconds how long you should cache the check for before requesting a new check.
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

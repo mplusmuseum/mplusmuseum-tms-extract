@@ -1,74 +1,83 @@
-const tools = require('../../modules/tools')
-const User = require('../../modules/user')
-const Users = require('../../modules/users')
+const User = require('../../classes/user')
+const Users = require('../../classes/users')
+const Config = require('../../classes/config')
+const logging = require('../../modules/logging')
+const elasticsearch = require('elasticsearch')
 
-exports.index = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
+exports.index = (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
 
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
-  }
-
-  const configJSON = tools.getConfig()
-
-  templateValues.user = user
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/index', templateValues)
+  return res.render('admin/index', req.templateValues)
 }
 
-exports.user = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
+exports.users = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  const users = await new Users().get()
+  req.templateValues.users = users
+  return res.render('admin/users', req.templateValues)
+}
 
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
-  }
+exports.user = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  const userObj = await new User()
 
-  const configJSON = tools.getConfig()
+  const selectedUser = await userObj.get(req.params.id)
 
-  const selectedUser = new User(request.params.hash)
-
-  //  Check to see if we have been passed a user hash, if so
-  //  then we update the user
-  if ('action' in request.body) {
-    if (request.body.action === 'update') {
-      selectedUser.developer = 'developer' in request.body
-      selectedUser.staff = 'staff' in request.body
-      selectedUser.admin = 'admin' in request.body
-      selectedUser.save()
-      return response.redirect(`/admin/user/${selectedUser.hash}`)
+  if ('action' in req.body) {
+    if (req.body.action === 'update') {
+      const roles = {
+        isAdmin: 'admin' in req.body,
+        isStaff: 'staff' in req.body,
+        isVendor: 'vendor' in req.body,
+        isDeveloper: 'developer' in req.body
+      }
+      await userObj.setRoles(selectedUser.user_id, roles)
+      return res.redirect(`/admin/user/${req.params.id}`)
     }
   }
 
-  templateValues.user = user
-  templateValues.selectedUser = selectedUser
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/user', templateValues)
+  req.templateValues.selectedUser = selectedUser
+  return res.render('admin/user', req.templateValues)
 }
 
-exports.users = (request, response) => {
-  const templateValues = {}
-  const user = new User(request.user)
-  const users = new Users().get()
+exports.blowaway = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
 
-  //  If we admin then back
-  if (user.admin === false) {
-    return response.redirect('/')
+  const startTime = new Date().getTime()
+
+  const tmsLogger = logging.getTMSLogger()
+
+  //  Check to see that we have elasticsearch configured
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  if (elasticsearchConfig === null) {
+    return res.redirect('/admin')
+  }
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+
+  //  Deletes the index if we need to
+  const index = req.params.index
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists === true) {
+    await esclient.indices.delete({
+      index
+    })
   }
 
-  const configJSON = tools.getConfig()
+  const endTime = new Date().getTime()
+  tmsLogger.object(`Deleting index for ${index}`, {
+    action: 'deleteIndex',
+    index: index,
+    ms: endTime - startTime
+  })
 
-  templateValues.user = user
-  templateValues.users = users
-  templateValues.config = configJSON
-  templateValues.pingData = tools.getPingData()
-
-  return response.render('admin/users', templateValues)
+  return res.redirect('/admin')
 }

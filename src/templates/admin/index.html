@@ -1,0 +1,45 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Admin</h1>
+      <p>
+        <ul>
+          <li>
+            <a href="/admin/users">Users</a>
+          </li>
+        </ul>
+
+        <h3>DANGER!</h3>
+
+        <ul>
+          <li>
+            <form method="POST" action="/admin/blow/away/index/objects">
+              <button type="submit" style="font-size: 1.5rem; padding: 6px; background: red; cursor: pointer;">Blow away index for objects</button>
+            </form>
+          </li>
+          <li>
+            <form method="POST" action="/admin/blow/away/index/authors">
+              <button type="submit" style="font-size: 1.5rem; padding: 6px; background: red; cursor: pointer;">Blow away index for authors</button>
+            </form>
+          </li>
+        </ul>
+
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

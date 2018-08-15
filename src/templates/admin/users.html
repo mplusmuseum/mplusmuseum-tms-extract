@@ -1,0 +1,31 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Admin / Users</h1>
+      <p>
+        <ul>
+          {{#each users}}
+          <li>
+            <a href="/admin/user/{{user_id}}">{{nickname}}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

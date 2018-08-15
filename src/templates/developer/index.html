@@ -1,0 +1,62 @@
+<html>
+
+<head>
+  <title>Dashboard - developer</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Developer Help</h1>
+      <p>
+        Hello and welcome to the developer portal for the WCMA api, below you will find your API key and the details you need to
+        start making calls to our GraphQL server.
+        <form>
+          <table class="api">
+            <tr>
+              <td>API token:</td>
+              <td class="token">{{user.apitoken}}</td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      <hr>
+
+      <h2>GraphQL</h2>
+      {{#if config.graphql}}
+      <p>
+        <ul>
+          {{!---
+          <li>
+            <a href="/developer/graphql">GraphQL Documentation</a>
+          </li>
+          ---}}
+          <li>
+            <a href="/developer/graphql/status">GraphQL Status</a>
+          </li>
+          {{#if user.roles.isAdmin}}
+          <li>
+            <a href="/config#graphql">GraphQL Configuration</a>
+          </li>
+          {{/if}}
+        </ul>
+      </p>
+      {{else}}
+      <p>
+        GraphQL has not been configured yet. {{#if user.roles.isAdmin}}You can
+        <a href="/config">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up now.{{/if}}
+      </p>
+      {{/if}}
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

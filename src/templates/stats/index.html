@@ -1,0 +1,77 @@
+<html>
+
+<head>
+  <title>Dashboard - stats</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Stats</h1>
+      <p>
+        This is where we keep a bunch of stats to keep an eye on how the server is running.
+      </p>
+      <p>
+        You can also view some logs over on the
+        <a href="/stats/logs">logs page</a>.
+      </p>
+
+      <hr> {{#if tms}}
+      <h2>TMS systems</h2>
+      {{#each tms}}
+      <h4 style="margin-bottom: 1rem">{{stub}}</h4>
+      <table>
+        <tr>
+          <td style="vertical-align: top">Total objects processed</td>
+          <td>{{prettyNumber objectsProcessed}}</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">Object files waiting to be processed</td>
+          <td>{{prettyNumber objectsWaitingToBeProcessed}} (Finishes {{timeAgo timeToUpsertObjects}}, estimate) {{#if ../user.roles.isAdmin}}
+            <small>
+              <br /> *If you have a lot of files to upload, you can adjust this time in the
+              <a href="/config#elasticsearch">ElasticSearch section</a> of the config page.</small>
+            {{/if}}
+          </td>
+        </tr>
+
+        <tr>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+        <tr>
+          <td>Results generated in</td>
+          <td>{{prettyNumber ms}}ms</td>
+        </tr>
+      </table>
+
+
+      <p>
+        <form method="post">
+          <table class="api">
+            <tr>
+              <td style="width: 25%">Search object by id:</td>
+              <td>
+                <input type="text" name="objectID">
+              </td>
+              <td>
+                <input type="hidden" name="tms" value="{{stub}}">
+                <button type="submit" value="search" name="action">Go</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      {{/each}} {{/if}}
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

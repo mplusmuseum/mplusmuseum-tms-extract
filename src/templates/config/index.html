@@ -1,0 +1,332 @@
+<html>
+
+<head>
+  <title>Dashboard - config</title>
+  {{> head}}
+  <link href="/css/prism.css" rel="stylesheet" />
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Config</h1>
+
+      <h2>
+        <a name="handshake">Handshake</a>
+      </h2>
+      <p>
+        If your app needs to communicate with the Dashboard you should store the handshake value in your own
+        <code>.env</code>,
+        <code>config</code> or other environment settings that are
+        <em>
+          <strong>not stored in git.</strong>
+        </em>
+      </p>
+      <form>
+        <table class="api">
+          <tr>
+            <td>Handshake token:</td>
+            <td class="token">{{config.handshake}}</td>
+          </tr>
+        </table>
+      </form>
+
+      <hr />
+
+      <h2>
+        <a name="graphql">GraphQL</a>
+      </h2>
+      {{#if config.graphql}}
+      <p>
+        Congratulations graphQL has been set up, visit it here:
+        <a href="{{config.graphql.host}}/playground">{{config.graphql.host}}/playground</a>, or check it's
+        <a href="/developer/graphql/status">status here</a>.
+      </p>
+      <p>
+        You can reconfigure it below if needed.
+      </p>
+      {{else}}
+      <p>
+        You need to set GraphQL up, you can check out the repository from here
+        <a href="https://github.com/wcmaart/api">https://github.com/wcmaart/api</a>, follow the instructions found there to get things up and running. Once you have
+        it running enter the host URL in the form below.
+      </p>
+      <p>
+        {{#ifEqual NODE_ENV 'development'}} This will probably be something like
+        <code>http://localhost:4000</code>
+        {{else}} This will be your domain URL that you've exposed as your graphQL server, you should
+        <em>not</em> include the
+        <code>/graphql</code> path, we will add that. For example...
+        <br /> Yes:
+        <code>https://somedomain.com</code>
+        <br /> No:
+        <code>https://somedomain.com/graphql</code>. {{/ifEqual}}
+      </p>
+      {{/if}}
+
+      <p>
+        <form method="post">
+          <table>
+            <tr>
+              <td>GraphQL</td>
+              <td>
+                <input type="text" name="graphql" placeholder="{{#ifEqual NODE_ENV 'development'}}http://localhost:4000{{else}}https://domain.com{{/ifEqual}}"
+                  {{#if config.graphql.host}}value="{{config.graphql.host}}" {{/if}}>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updategraphql" name="action">Update</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>
+
+      <hr />
+
+      <h2>
+        <a name="elasticsearch">Elastic Search</a>
+      </h2>
+      {{#if config.elasticsearch}}
+      <p>
+        Congratulations ElasticSearch has been set up
+      </p>
+      <p>
+        You can reconfigure it below if needed.
+      </p>
+      {{/if}}
+      <p>
+        <form method="post">
+          <table>
+            <tr>
+              <td>Elastic Search</td>
+              <td>
+                <input type="text" name="elasticsearch" placeholder="{{#ifEqual NODE_ENV 'development'}}http://localhost:9200{{else}}https://domain.com{{/ifEqual}}"
+                  {{#if config.elasticsearch.host}}value="{{config.elasticsearch.host}}" {{/if}}>
+              </td>
+            </tr>
+            <tr>
+              <td style="width: 20%; vertical-align: top;">
+                <br />
+                <p>Interval in ms</p>
+              </td>
+              <td>
+                <br />
+                <p>
+                  <strong>Note:</strong> This sets the intervals in the cycle of checking for items that need sending to the database
+                  and sending them. When the system is running normally with a few regular updates this just be set to something
+                  low like 20000 (the default 20 seconds) or even 60000 (once a minute). When we are first importing a large
+                  number of items you should let it run for an hour and then check the
+                  <a href="/stats/logs#upserts">logs page</a> for the average upload speed, then set the interval to around 1000 ms longer than the average.
+                  You can see the estimated item upserting time on the
+                  <a href="/stats">stats page</a>.
+                </p>
+                <input type="text" name="interval" placeholder="20000" {{#if config.timers.elasticsearch}}value="{{config.timers.elasticsearch}}"
+                  {{/if}}>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updateelasticsearch" name="action">Update</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>
+
+      <hr />
+      <h2>
+        <a name="spelunker">Spelunker</a>
+      </h2>
+      {{#if config.spelunker}}
+      <p>
+        Congratulations the Spelunker has been set up
+      </p>
+      <p>
+        You can reconfigure it below if needed.
+      </p>
+      {{/if}}
+      <p>
+        <form method="post">
+          <table>
+            <tr>
+              <td>Spelunker</td>
+              <td>
+                <input type="text" name="spelunker" placeholder="{{#ifEqual NODE_ENV 'development'}}http://localhost:4001{{else}}https://spelunker.com{{/ifEqual}}"
+                  {{#if config.spelunker.host}}value="{{config.spelunker.host}}" {{/if}}>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updatespelunker" name="action">Update</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>
+
+      <hr />
+      <h2>
+        <a name="tms"></a>TMS</h2>
+      {{#if config.tms}}
+      <p>
+        These are your current TMS setups.
+      </p>
+      {{#each config.tms}}
+      <p>
+        <form method="post">
+          <input type="hidden" name="tmsstub" value="{{stub}}">
+          <table>
+            <tr>
+              <td>&nbsp;</td>
+              <td>
+                <strong>{{stub}}</strong>
+              </td>
+            </tr>
+            {{!---
+            <tr>
+              <td>Url endpoint</td>
+              <td>
+                <input type="text" name="tmsurl" placeholder="http://tmssystem.somename.com" value="{{url}}">
+              </td>
+            </tr>
+            <tr>
+              <td>eMuseum Key</td>
+              <td>
+                <input type="text" name="key" placeholder="a1b2c3d4e5f6g7h8i9j0" value="{{key}}">
+              </td>
+            </tr>
+            ---}}
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updatetms" name="action">Update</button>
+                <button type="submit" value="deletetms" name="action">Remove</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>{{/each}} {{else}} {{/if}}
+      <p>
+        Please use the form below to register a new TMS system.
+      </p>
+      <p>
+        <form method="post">
+          <table>
+            <tr>
+              <td>Short name</td>
+              <td>
+                <input type="text" name="tmsstub" placeholder="i.e. a stub like 'williams', for use in urls" value="">
+              </td>
+            </tr>
+            {{!---
+            <tr>
+              <td>Url endpoint</td>
+              <td>
+                <input type="text" name="tmsurl" placeholder="http://tmssystem.somename.com" value="">
+              </td>
+            </tr>
+            <tr>
+              <td>eMuseum Key</td>
+              <td>
+                <input type="text" name="key" placeholder="a1b2c3d4e5f6g7h8i9j0" value="">
+              </td>
+            </tr>
+            ---}}
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updatetms" name="action">Add</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>
+
+      <hr />
+      <h2>
+        <a name="cloudinary">Cloudinary</a>
+      </h2>
+      <p>
+        We are currently using
+        <a href="https://cloudinary.com">Cloudinary</a> to host images (they are ultimately stored on S3), you will need to set up a free cloudinary account
+        and add your credentials here.
+        <form method="post">
+          <table>
+            <tr>
+              <td>Cloud name</td>
+              <td>
+                <input type="text" name="cloud_name" placeholder="Example: mytmsimagehost" {{#if config.cloudinary.cloud_name}}value="{{config.cloudinary.cloud_name}}"
+                  {{/if}}>
+            </tr>
+            <tr>
+              <td>API key</td>
+              <td>
+                <input type="text" name="api_key" placeholder="Example: 5551234567890" {{#if config.cloudinary.api_key}}value="{{config.cloudinary.api_key}}"
+                  {{/if}}>
+            </tr>
+            <tr>
+              <td>API secret</td>
+              <td>
+                <input type="text" name="api_secret" placeholder="Example: abCD12-3Fg4Hixyz" {{#if config.cloudinary.api_secret}}value="{{config.cloudinary.api_secret}}"
+                  {{/if}}>
+            </tr>
+            <tr>
+              <td style="width: 20%; vertical-align: top;">
+                <br />
+                <p>Interval in ms</p>
+              </td>
+              <td>
+                <br />
+                <p>
+                  <strong>Note:</strong> This sets the intervals in the cycle of checking for images that need uploading and uploading
+                  them. When the system is running normally with a few regular updates this just be set to something low
+                  like 20000 (the default 20 seconds) or even 60000 (once a minute). When we are first importing a large
+                  number of items you should let it run for an hour and then check the
+                  <a href="/stats/logs#images">logs page</a> for the average upload speed, then set the interval to around 1000 ms longer than the average.
+                  You can see the estimated image uploading time on the
+                  <a href="/stats">stats page</a>.
+                </p>
+                <input type="text" name="interval" placeholder="20000" {{#if config.timers.cloudinary}}value="{{config.timers.cloudinary}}"
+                  {{/if}}>
+            </tr>
+            <tr>
+              <td style="width: 20%; vertical-align: top;">
+                <br />
+                <p>Color interval in ms</p>
+              </td>
+              <td>
+                <br />
+                <p>
+                  <strong>Note:</strong> This sets the intervals in the cycle of checking for images that need coloring, see notes
+                  above for speed and throttling. See also the
+                  <a href="/stats/logs#imagesColored">logs page</a> and
+                  <a href="/stats">stats page</a>.
+                </p>
+                <input type="text" name="intervalColor" placeholder="20000" {{#if config.timers.cloudinaryColoring}}value="{{config.timers.cloudinaryColoring}}"
+                  {{/if}}>
+            </tr>
+
+            cloudinaryColoring
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updatecloudinary" name="action">Update</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

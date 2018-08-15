@@ -1,0 +1,80 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>
+        <a href="/admin">Admin</a> /
+        <a href="/admin/users">Users</a> / {{selectedUser.nickname}}</h1>
+      <p>
+        <form method="POST">
+          <table class="admin">
+            <tbody>
+              <tr>
+                <td>ID</td>
+                <td>{{selectedUser.user_id}}</td>
+              </tr>
+              <tr>
+                <td>Created</td>
+                <td>{{timePretty selectedUser.created_at}}</td>
+              </tr>
+              <tr>
+                <td>Last Login</td>
+                <td>{{timePretty selectedUser.last_login}}</td>
+              </tr>
+              <tr>
+                <td>Login counts</td>
+                <td>{{selectedUser.logins_count}}</td>
+              </tr>
+              <tr>
+                <td>Developer</td>
+                <td>
+                  <input type="checkbox" name="developer" {{#ifEqual selectedUser.user_metadata.roles.isDeveloper true}}checked{{/ifEqual}}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Staff</td>
+                <td>
+                  <input type="checkbox" name="staff" {{#ifEqual selectedUser.user_metadata.roles.isStaff true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
+                <td>Vendor</td>
+                <td>
+                  <input type="checkbox" name="vendor" {{#ifEqual selectedUser.user_metadata.roles.isVendor true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
+                <td>Admin</td>
+                <td>
+                  <input type="checkbox" name="admin" {{#ifEqual selectedUser.user_metadata.roles.isAdmin true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <button type="hidden" name="action" value="update">Update</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+        </form>
+
+      </p>
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

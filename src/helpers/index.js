@@ -2,7 +2,7 @@ const moment = require('moment')
 const querystring = require('querystring')
 const Prism = require('prismjs')
 var loadLanguages = require('prismjs/components/index.js')
-loadLanguages(['bash', 'graphql'])
+loadLanguages(['bash', 'graphql', 'json', 'xml'])
 
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
@@ -202,6 +202,58 @@ exports.dumpJSON = object => {
   return pre
 }
 
+exports.graphQLStatus = () => {
+  if (!('graphqlping' in global)) {
+    return '<span class="warn">Not connected</span>'
+  }
+  //  Find out when the last successful connection was
+  const valid = global.graphqlping.filter((ping) => {
+    return ping.valid
+  })
+  if (valid.length === 0) {
+    return '<span class="alert">Disconnected</span>'
+  }
+
+  const mostRecentValid = valid[0]
+  const diff = new Date().getTime() - mostRecentValid.timestamp
+  //  If the last valid connection was more than 5 minutes ago
+  //  then say we are disconnected
+  if (diff > 5 * 60 * 1000) {
+    return '<span class="alert">Disconnected</span>'
+  }
+  const pings = valid.map((ping) => {
+    return ping.ms
+  })
+  const averagePing = Math.floor(pings.reduce((p, c) => p + c, 0) / pings.length)
+  return `<span class="good">Ave ping: ${averagePing}ms</span>`
+}
+
+exports.elasticsearchStatus = () => {
+  if (!('elasticsearchping' in global)) {
+    return '<span class="warn">Not connected</span>'
+  }
+  //  Find out when the last successful connection was
+  const valid = global.elasticsearchping.filter((ping) => {
+    return ping.valid
+  })
+  if (valid.length === 0) {
+    return '<span class="alert">Disconnected</span>'
+  }
+
+  const mostRecentValid = valid[0]
+  const diff = new Date().getTime() - mostRecentValid.timestamp
+  //  If the last valid connection was more than 5 minutes ago
+  //  then say we are disconnected
+  if (diff > 5 * 60 * 1000) {
+    return '<span class="alert">Disconnected</span>'
+  }
+  const pings = valid.map((ping) => {
+    return ping.ms
+  })
+  const averagePing = Math.floor(pings.reduce((p, c) => p + c, 0) / pings.length)
+  return `<span class="good">Ave ping: ${averagePing}ms</span>`
+}
+
 exports.prettyNumber = x => {
   if (x === null || x === undefined) return ''
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -283,6 +335,11 @@ exports.graphQLQuery = (query, filter) => {
   return Prism.highlight(rtn, Prism.languages.graphql, 'graphql')
 }
 
+const curlCode = (code) => {
+  return Prism.highlight(code, Prism.languages.bash, 'bash')
+}
+exports.curlCode = curlCode
+
 exports.curlQuery = (query, filter, graphQL, token) => {
   let newQuery = showQuery(query, filter)
   //  We are going to do an ugly thing here to remove the
@@ -303,6 +360,25 @@ ${newQuery}
 }\\"}" \\
 ${graphQL}/graphql`
   return Prism.highlight(rtn, Prism.languages.bash, 'bash')
+}
+
+const nodeCode = (code) => {
+  return Prism.highlight(code, Prism.languages.javascript, 'javascript')
+}
+exports.nodeCode = nodeCode
+
+exports.jsonCode = object => {
+  let jsonFormat = null
+  try {
+    jsonFormat = JSON.stringify(object, null, 4)
+  } catch (er) {
+    return object
+  }
+  return Prism.highlight(jsonFormat, Prism.languages.json, 'json')
+}
+
+exports.xmlCode = object => {
+  return Prism.highlight(object, Prism.languages.xml, 'xml')
 }
 
 exports.nodeQuery = (query, filter, graphQL, token) => {

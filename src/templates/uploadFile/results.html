@@ -1,0 +1,122 @@
+<html>
+
+<head>
+  <title>Dashboard - uploaded JSON</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Uploaded XML</h1>
+
+      {{#ifEqual type 'objects'}}
+      <h2>Object XML</h2>
+      {{#if ../error}}
+      <p>
+        You have just tried to upload an objects file, it failed with the following error...
+      </p>
+      <p>
+        {{../../error.msg}}
+      </p>
+      {{else}}
+      <p>
+        You have just uploaded an objects file...
+      </p>
+
+      <p>
+        <table>
+          <tr>
+            <td style="width: 20%">Total objects</td>
+            <td>{{../../totalObjects}}</td>
+          </tr>
+          <tr>
+            <td>New objects</td>
+            <td>{{../../newObjects}}</td>
+          </tr>
+          <tr>
+            <td>Modified objects</td>
+            <td>{{../../modifiedObjects}}</td>
+          </tr>
+        </table>
+      </p>
+      {{#if ../../fields}}
+      <p>
+        These are the fields contained in all the objects...
+      </p>
+      <p>
+        <table>
+          {{#each ../../fields}}
+          <tr>
+            <td style="width: 20%">{{@key}}</td>
+            <td>{{#if @this}}New!{{else}}&nbsp;{{/if}}</td>
+          </tr>
+          {{/each}}
+        </table>
+      </p>
+      {{/if}}
+      <p>
+        You should be able to track the progress of new uploaded via the
+        <a href="/stats">Stats</a> page.
+      </p>
+      {{/if}} {{/ifEqual}} {{#ifEqual type 'authors'}}
+      <h2>Authors XML</h2>
+      {{#if ../error}}
+      <p>
+        You have just tried to upload an authors file, it failed with the following error...
+      </p>
+      <p>
+        {{../../error.msg}}
+      </p>
+      {{else}}
+      <p>
+        You have just uploaded an authors file...
+      </p>
+
+      <p>
+        <table>
+          <tr>
+            <td style="width: 20%">Total authors</td>
+            <td>{{../../totalAuthors}}</td>
+          </tr>
+          <tr>
+            <td>New exhibitions</td>
+            <td>{{../../newAuthors}}</td>
+          </tr>
+          <tr>
+            <td>Modified exhibitions</td>
+            <td>{{../../modifiedAuthors}}</td>
+          </tr>
+        </table>
+      </p>
+      {{#if ../../fields}}
+      <p>
+        These are the fields contained in all the authors...
+      </p>
+      <p>
+        <table>
+          {{#each ../../fields}}
+          <tr>
+            <td style="width: 20%">{{@key}}</td>
+            <td>{{#if @this}}New!{{else}}&nbsp;{{/if}}</td>
+          </tr>
+          {{/each}}
+        </table>
+      </p>
+      {{/if}}
+      <p>
+        You should be able to track the progress of new uploaded via the
+        <a href="/stats">Stats</a> page.
+      </p>
+      {{/if}} {{/ifEqual}}
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

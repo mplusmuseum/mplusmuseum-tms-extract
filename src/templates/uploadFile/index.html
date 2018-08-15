@@ -1,0 +1,112 @@
+<html>
+
+<head>
+  <title>Dashboard - upload XML</title>
+  {{> head}}
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>Upload File</h1>
+
+      <h2>Object File</h2>
+      {{#if config.tms}}
+      <p>
+        If you have a JSON/XML file jam packed full of objects, then you can upload it here. Each time you upload a file it will
+        be rescanned for new and modified records. Please note when you 1st upload a file it can take a while for all objects
+        to appear in the GraphQL. After the initial batch of objects have been uploaded to the GraphQL system smaller updates
+        should happen a lot quicker.
+      </p>
+      <p>
+        You should be able to track the progress of new uploaded via the
+        <a href="/stats">Stats</a> page.
+      </p>
+      <p>
+        <strong>Note:</strong> When uploading a file you should pick the TMS instance that the objects relate to.
+      </p>
+
+      <form method="post" enctype="multipart/form-data">
+        <table class="api">
+          <tr>
+            <td style="width: 40%">Objects file:</td>
+            <td>
+              <input type="file" name="objectFile">
+            </td>
+          </tr>
+          <tr>
+            <td>Select TMS system</td>
+            <td>
+              <ul class="tmsSelect">
+                {{#each config.tms}}
+                <li>
+                  <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}}checked{{/ifEqual}}>{{stub}}
+                </li>
+                {{/each}}
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br />
+              <button type="submit" value="updateObjectFile" name="action">Upload</button>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+      </form>
+
+      {{!---
+      <form method="post" enctype="multipart/form-data">
+        <table class="api">
+          <tr>
+            <td style="width: 40%">Authors file:</td>
+            <td>
+              <input type="file" name="authorsFile">
+            </td>
+          </tr>
+          <tr>
+            <td>Select TMS system</td>
+            <td>
+              <ul class="tmsSelect">
+                {{#each config.tms}}
+                <li>
+                  <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}}checked{{/ifEqual}}>{{stub}}
+                </li>
+                {{/each}}
+              </ul>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <br />
+              <button type="submit" value="updateAuthorsFile" name="action">Upload</button>
+            </td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+      </form>
+      ---}} {{else}} {{#if user.role.isAdmin}}
+      <p>
+        Before you can upload an objects file, you need to register a TMS system that the file has supplemental information for.
+        You can do that on the
+        <a href="/config">Config</a> page.
+      </p>
+      {{else}}
+      <p>
+        Before you can upload an objects file, a TMS system needs to be registered that this file will be referenced against. Please
+        ask an Admin user to do this for you.
+      </p>
+      {{/if}} {{/if}}
+
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>
