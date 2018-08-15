@@ -46,6 +46,7 @@
     "standard": "^10.0.3",
     "winston": "^3.0.0",
     "winston-daily-rotate-file": "^3.3.0",
+    "xml-formatter": "^1.0.1",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {

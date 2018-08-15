@@ -1,5 +1,6 @@
 const Config = require('../../../classes/config')
 const xml2js = require('xml2js')
+const xmlformat = require('xml-formatter')
 const parser = new xml2js.Parser({
   trim: true,
   explicitArray: false,
@@ -546,6 +547,33 @@ const processFile = async (tms, filename) => {
 
   //  We need to read in the XML file and convert it to JSON
   const XMLRaw = fs.readFileSync(filename, 'utf-8')
+
+  //  Before we do anything with the JSON version, I want to split the
+  //  XML up into seperate chunks so we can store those too.
+  const splitRaw = XMLRaw
+    .replace('<?xml version="1.0" encoding="utf-8"?><ExportForMPlus><objects>', '')
+    .replace('</objects></ExportForMPlus>', '')
+    .split('</object>')
+    .map((xml) => `${xml}</object>`)
+
+  //  Now we need to make sure an XML directory exists to put these files into
+  if (!fs.existsSync(path.join(rootDir, 'objects'))) fs.mkdirSync(path.join(rootDir, 'objects'))
+  if (!fs.existsSync(path.join(rootDir, 'objects', tms))) fs.mkdirSync(path.join(rootDir, 'objects', tms))
+  if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'xml'))) fs.mkdirSync(path.join(rootDir, 'objects', tms, 'xml'))
+
+  splitRaw.forEach((xml) => {
+    const xmlSplit = xml.split('"')
+    if (xmlSplit.length > 2) {
+      const id = parseInt(xmlSplit[1], 10)
+      if (!isNaN(id)) {
+        const subFolder = String(Math.floor(id / 1000) * 1000)
+        if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'xml', subFolder))) fs.mkdirSync(path.join(rootDir, 'objects', tms, 'xml', subFolder))
+        const filename = path.join(rootDir, 'objects', tms, 'xml', subFolder, `${id}.xml`)
+        fs.writeFileSync(filename, xmlformat(xml), 'utf-8')
+      }
+    }
+  })
+
   //  Add try catch here
   let objectsJSON = null
   try {
@@ -702,6 +730,26 @@ const processFile = async (tms, filename) => {
   }
 }
 exports.processFile = processFile
+
+/*
+   ##################################################################################
+   ##################################################################################
+   ##################################################################################
+   ##################################################################################
+
+   The code below deals with getting the extra "perfect" details that come from
+   outside of the system. Such as artisanal integers, and in the future the
+   images.
+
+   A file can only be upserted when a perfect file exists. So these go to the effort
+   of making perfect files for each file waiting to be processed, once a perfect
+   file has been made, then the upsert can happen.
+
+   ##################################################################################
+   ##################################################################################
+   ##################################################################################
+   ##################################################################################
+*/
 
 //  Go look in the process folder for files that we need to make a perfect version of
 //  and make sure we have all the information in there we need
