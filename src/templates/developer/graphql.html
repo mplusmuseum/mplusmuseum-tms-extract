@@ -1,0 +1,297 @@
+<html>
+
+<head>
+  <title>Dashboard - GraphQL Documentation</title>
+  {{> head}}
+  <link href="/css/prism.css" rel="stylesheet" />
+</head>
+
+<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+
+  {{> nav}}
+
+  <div class="wrapper">
+    <div class="container admin-layout documentation">
+
+      <h1>GraphQL Documention</h1>
+      <p>
+        Here you can find out all about how to make GraphQL calls. Remember you will need your developer key which you can always
+        find on the main
+        <a href="/developer">Developers Help</a> page, but it's also here:
+        <code>{{user.apitoken}}</code>
+      </p>
+
+      <p class="note">
+        <strong>NOTE:</strong> This documentation is very new and evolving but should be enough to get you up and running, we will
+        be expanding it in the near future.
+      </p>
+      <hr>
+
+      <h1>Table of Contents</h1>
+      <p>
+        <ul class="toc">
+          <li>
+            <a href="#about-graphql">About GraphQL</a>
+            <ul>
+              <li>
+                <a href="#comminicating-with-graphql">Communicating with GraphQL</a>
+              </li>
+              <li>
+                <a href="#graphql-playground">GraphQL playground</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="#graphql-queries">GraphQL Queries</a>
+            <ul>
+              <li>
+                <a href="#introspection">Introspection</a>
+              </li>
+              <li>
+                <a href="#objects">Objects</a>
+              </li>
+              <li>
+                <a href="#object">Object</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </p>
+
+      <hr>
+
+      <h2>
+        <a name="about-graphql">About GraphQL</a>
+      </h2>
+
+      <p>
+        GraphQL is a data query language you'll use to request information from the M+ data store. Traditionally GraphQL allows two
+        types of operations,
+        <em>queries</em> and
+        <em>mutations</em> these can be thought of as
+        <em>read</em> and
+        <em>write</em> operations.
+      </p>
+      <p>
+        As well as one more operation called
+        <em>
+          <a href="#introspection">introspection</a>
+        </em>, which allows you to ask the GraphQL endpoint about itself.
+      </p>
+      <p>
+        Below you will find examples of various calls to can make to the GraphQL endpoint.
+      </p>
+
+
+      <h3>
+        <a name="comminicating-with-graphql">Communicating with GraphQL</a>
+      </h3>
+
+      <p>
+        The single endpoint for all GraphQL calls is...
+      </p>
+      <p>
+        <code>{{config.graphql.host}}/graphql</code>
+      </p>
+      <p>
+        GraphQL operations consist of multiline JSON, an example "Hello World" GraphQL query is show below:
+      </p>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.hello "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.hello ''}}}</pre>
+
+      <p>
+        To query GraphQL using cURL, make a
+        <code>POST</code> request with a JSON payload as
+        <code>--data-binary</code>. You must also include your API token as
+        <code>bearer</code> authorization.
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.hello '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+      <p>
+        Using Nodejs it may look like this, making sure to pass in your API token as a
+        <code>bearer</code> token as shown.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.hello '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="graphql-playground">GraphQL playground</a>
+      </h3>
+      <p>
+        Probably the easiest way to try out GraphQL queries is to use the playground which can be found here:
+        <a href="{{config.graphql.host}}/playground">{{config.graphql.host}}/playground</a>
+      </p>
+
+      <p>
+        You can see an
+        <a href='{{exploreQuery queries.objectsMedium "" config.graphql.host}}'>example query in the playground here</a>, you will need to press the "run" button to see the results of the query.
+      </p>
+
+      <hr>
+
+      <h2>
+        <a name="graphql-queries">About GraphQL</a>
+      </h2>
+
+      <p>
+        Below you'll find a list of the current queries you can make against the data store.
+      </p>
+
+      <h2>
+        <a name="introspection">Introspection</a>
+      </h2>
+
+      <p>
+        The
+        <em>introspection</em> operation is the only operation you can call using
+        <code>GET</code>. Introspection allows you to query the GraphQL schema for details about itself. Query
+        <code class="red">__schema</code> to list all types defined in the schema and get details about each:
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+
+      <pre class="query">{{{graphQLQuery queries.schema}}}</pre>
+
+      <p>
+        Query
+        <code class="red">__type</code> to get details about any type:
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.type "(name:\"Object\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+
+      <pre class="query">{{{graphQLQuery queries.type '(name: "Object")'}}}</pre>
+
+      <hr />
+
+      <h3>
+        <a name="objects">Objects</a>
+      </h3>
+
+      <p>
+        This query selects all of the objects and can be filtered by certain fields shown below. Note: filters are
+        <em>additive</em> rather than
+        <em>or</em>, filtering two fields will only return records that match both.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">page</code>,
+        <code class="red">per_page</code>,
+        <code class="red">sort_field</code>,
+        <code class="red">sort</code> &amp;
+        <code class="red">lang</code>
+      </p>
+
+      <p>
+        The only valid value for
+        <code class="red">sort_field</code> is
+        <code>id</code>, values for
+        <code class="red">sort</code> are
+        <code>asc</code> &amp;
+        <code>desc</code>.
+      </p>
+
+      <p>
+        The only valid values for
+        <code class="red">lang</code> are
+        <code>en</code>,
+        <code>zh-hant</code> &amp;
+        <code>zh-hans</code>. The default is
+        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
+        <code>en</code> version if there is one.
+      </p>
+
+      <p>
+        Here is the simplest call to get all object ids
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsMini "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsMini ''}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.objectsMini '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.objectsMini '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        Here we are asking for slightly more information, note how we can use the
+        <code>per_page</code> filter to limit the number of results.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsMedium "(page: 10, per_page: 4)" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsMedium '(page: 10, per_page: 4)'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.objectsMedium '(page: 10, per_page: 4)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.objectsMedium '(page: 10, per_page: 4)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="object">Object</a>
+      </h3>
+
+      <p>
+        You can get a single object by passing in the
+        <code class="red">id</code> parameter. Here we are showing
+        <em>all</em> the fields possible.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectLarge "(id: 119)" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectLarge '(id: 119)'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.objectLarge '(id: 119)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.objectLarge '(id: 119)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+
+    </div>
+  </div>
+
+  {{> tail}}
+</body>
+
+</html>

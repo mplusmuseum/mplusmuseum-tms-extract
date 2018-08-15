@@ -4,6 +4,8 @@ const fs = require('fs')
 const path = require('path')
 const rootDir = path.join(__dirname, '../../../data')
 const elasticsearch = require('elasticsearch')
+const Queries = require('../../classes/queries')
+const GraphQL = require('../../classes/graphQL')
 
 exports.index = async (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
@@ -73,6 +75,22 @@ exports.index = async (req, res) => {
     }
   }
   req.templateValues.elasticSearchJSON = elasticSearchJSON
+
+  //  Grab the query used to ask for an object
+  const queries = new Queries()
+  const searchFilter = `(id: ${id})`
+  const query = queries.get('objectLarge', searchFilter)
+
+  //  Now we need to actually run the query
+  const graphQL = new GraphQL()
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  req.templateValues.graphQLresults = results
+
+  req.templateValues.searchFilter = searchFilter
+  req.templateValues.queries = queries
 
   req.templateValues.id = id
 

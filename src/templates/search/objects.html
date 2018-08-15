@@ -65,6 +65,23 @@
       <pre class="query json">{{{jsonCode elasticSearchJSON}}}</pre>{{else}}
       <p>No elasticSearch configured, or no response.</p> {{/if}}
 
+      <hr>
+
+      <h2>GraphQL response</h2>
+
+      {{#if graphQLresults}}
+      <pre class="query json">{{{jsonCode graphQLresults}}}</pre>{{else}}
+      <p>No graphQL configured, or no response.</p> {{/if}}
+
+      <hr>
+
+      <h2>GraphQL query</h2>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectLarge searchFilter config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectLarge searchFilter}}}</pre>
+      <hr>
+
       <p>
         All queries executed in {{executionTime}}ms
       </p>
