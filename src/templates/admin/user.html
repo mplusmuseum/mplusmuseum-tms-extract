@@ -49,6 +49,12 @@
                 </td>
               </tr>
               <tr>
+                <td>Vendor</td>
+                <td>
+                  <input type="checkbox" name="vendor" {{#ifEqual selectedUser.user_metadata.roles.isVendor true}}checked{{/ifEqual}}>
+                </td>
+              </tr>
+              <tr>
                 <td>Admin</td>
                 <td>
                   <input type="checkbox" name="admin" {{#ifEqual selectedUser.user_metadata.roles.isAdmin true}}checked{{/ifEqual}}>

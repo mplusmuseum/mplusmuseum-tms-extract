@@ -31,6 +31,7 @@ exports.user = async (req, res) => {
       const roles = {
         isAdmin: 'admin' in req.body,
         isStaff: 'staff' in req.body,
+        isVendor: 'vendor' in req.body,
         isDeveloper: 'developer' in req.body
       }
       await userObj.setRoles(selectedUser.user_id, roles)

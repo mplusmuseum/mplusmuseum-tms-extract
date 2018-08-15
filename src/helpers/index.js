@@ -2,7 +2,7 @@ const moment = require('moment')
 const querystring = require('querystring')
 const Prism = require('prismjs')
 var loadLanguages = require('prismjs/components/index.js')
-loadLanguages(['bash', 'graphql'])
+loadLanguages(['bash', 'graphql', 'json', 'xml'])
 
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
@@ -335,6 +335,11 @@ exports.graphQLQuery = (query, filter) => {
   return Prism.highlight(rtn, Prism.languages.graphql, 'graphql')
 }
 
+const curlCode = (code) => {
+  return Prism.highlight(code, Prism.languages.bash, 'bash')
+}
+exports.curlCode = curlCode
+
 exports.curlQuery = (query, filter, graphQL, token) => {
   let newQuery = showQuery(query, filter)
   //  We are going to do an ugly thing here to remove the
@@ -355,6 +360,25 @@ ${newQuery}
 }\\"}" \\
 ${graphQL}/graphql`
   return Prism.highlight(rtn, Prism.languages.bash, 'bash')
+}
+
+const nodeCode = (code) => {
+  return Prism.highlight(code, Prism.languages.javascript, 'javascript')
+}
+exports.nodeCode = nodeCode
+
+exports.jsonCode = object => {
+  let jsonFormat = null
+  try {
+    jsonFormat = JSON.stringify(object, null, 4)
+  } catch (er) {
+    return object
+  }
+  return Prism.highlight(jsonFormat, Prism.languages.json, 'json')
+}
+
+exports.xmlCode = object => {
+  return Prism.highlight(object, Prism.languages.xml, 'xml')
 }
 
 exports.nodeQuery = (query, filter, graphQL, token) => {

@@ -8,10 +8,12 @@ const Config = require('../classes/config')
 // Break out all the seperate parts of the site
 /* eslint-disable import/no-unresolved */
 const admin = require('./admin')
+const api = require('./api')
 const config = require('./config')
 const developer = require('./developer')
 const item = require('./item')
 const main = require('./main')
+const search = require('./search')
 const stats = require('./stats')
 const uploadFile = require('./uploadFile')
 const user = require('./user')
@@ -139,8 +141,12 @@ router.get('/stats/logs', ensureLoggedIn, stats.logs)
 router.post('/stats', ensureLoggedIn, stats.index)
 router.get('/uploadFile', ensureLoggedIn, uploadFile.index)
 router.post('/uploadFile', ensureLoggedIn, uploadFile.getfile)
+router.get('/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
 router.get('/view/:item/:id', ensureLoggedIn, item.index)
+
+router.get('/api', ensureLoggedIn, api.index)
+router.post('/api/checkToken', api.checkToken)
 
 // ############################################################################
 //

@@ -22,14 +22,14 @@ const getUserSync = async id => {
   }
 
   const user = await request({
-      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
-      method: 'GET',
-      headers: {
+    url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+    method: 'GET',
+    headers: {
         'content-type': 'application/json',
         Authorization: `bearer ${auth0Token}`
       },
-      json: payload
-    })
+    json: payload
+  })
     .then(response => {
       return response
     })
@@ -66,14 +66,14 @@ const setApiToken = async id => {
   }
 
   const user = await request({
-      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
-      method: 'PATCH',
-      headers: {
+    url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+    method: 'PATCH',
+    headers: {
         'content-type': 'application/json',
         Authorization: `bearer ${auth0Token}`
       },
-      json: payload
-    })
+    json: payload
+  })
     .then(response => {
       return response
     })
@@ -88,6 +88,7 @@ const setApiToken = async id => {
  * {
  *    isAdmin: false,
  *    isStaff: false,
+ *    isVendor: false,
  *    isDeveloper: true
  * }
  * @param {string} id The id of a user
@@ -111,14 +112,14 @@ const setRoles = async (id, roles) => {
   }
 
   const user = await request({
-      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
-      method: 'PATCH',
-      headers: {
+    url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+    method: 'PATCH',
+    headers: {
         'content-type': 'application/json',
         Authorization: `bearer ${auth0Token}`
       },
-      json: payload
-    })
+    json: payload
+  })
     .then(response => {
       return response
     })
@@ -148,6 +149,7 @@ const getUser = async id => {
     const roles = {
       isAdmin: true,
       isStaff: true,
+      isVendor: true,
       isDeveloper: true
     }
     user = await setRoles(id, roles)
@@ -160,6 +162,7 @@ const getUser = async id => {
     const roles = {
       isAdmin: false,
       isStaff: false,
+      isVendor: false,
       isDeveloper: true
     }
     user = await setRoles(id, roles)
@@ -180,7 +183,7 @@ class User {
    * the details we want. The User object doesn't contain any values of the user
    * (yet) only methods that return json representations of the user.
    */
-  constructor() {}
+  constructor () {}
 
   /**
    * When we use auth0 to log a user in we get a JSON object back with _some_ of the user's
@@ -192,7 +195,7 @@ class User {
    * @returns {json} A better json representation of the user with the `user_metadata` field
    * that we want, that includes the user's roles and developer api token
    */
-  async get(auth0id) {
+  async get (auth0id) {
     //  Grab the id from the user object or a string
     let id = null
     if (typeof auth0id === 'object') {
@@ -212,7 +215,7 @@ class User {
    * @param {json} roles The roles we wish to set on a user as a json object
    * @returns {json} A json representation of a user
    */
-  async setRoles(id, roles) {
+  async setRoles (id, roles) {
     const user = await setRoles(id, roles)
     return user
   }
