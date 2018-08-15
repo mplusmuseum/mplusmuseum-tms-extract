@@ -326,7 +326,7 @@ exports.showQuery = showQuery
 
 exports.exploreQuery = (query, filter, graphQL) => {
   const newQuery = showQuery(query, filter)
-  const newUrl = `${graphQL}/api-explorer?query=${querystring.escape(newQuery)}`
+  const newUrl = `${graphQL}/playground?query=${querystring.escape(newQuery)}`
   return newUrl
 }
 
