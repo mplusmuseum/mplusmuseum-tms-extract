@@ -140,6 +140,7 @@ router.get('/stats/logs', ensureLoggedIn, stats.logs)
 router.post('/stats', ensureLoggedIn, stats.index)
 router.get('/uploadFile', ensureLoggedIn, uploadFile.index)
 router.post('/uploadFile', ensureLoggedIn, uploadFile.getfile)
+router.get('/wait', main.wait)
 router.get('/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
 router.get('/api', ensureLoggedIn, api.index)

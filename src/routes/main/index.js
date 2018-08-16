@@ -15,6 +15,12 @@ exports.status = (req, res) => {
   return res.redirect('/developer')
 }
 
+exports.wait = (req, res) => {
+  const design = decortation.pickLoggedOutDesign()
+  req.templateValues.design = design
+  return res.render('config/wait', req.templateValues)
+}
+
 /*
 exports.config = (request, response) => {
   const templateValues = {}
