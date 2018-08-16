@@ -1,7 +1,7 @@
 {{#if user}}
   {{#if (or user.roles.isAdmin user.roles.isStaff)}}
     <script type="text/javascript">
-      const intercomAppId = '{{INTERCOM_APP_ID}}';
+      const intercomAppId = '{{config.intercom.appId}}';
 
       const name = '{{user.name}}';
       // note: email might be empty even if the user is logged in

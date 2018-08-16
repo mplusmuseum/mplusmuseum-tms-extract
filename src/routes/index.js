@@ -58,6 +58,7 @@ router.use(function (req, res, next) {
   const configObj = new Config()
   req.config = configObj
   req.templateValues.config = req.config
+
   if (req.user === undefined) {
     req.user = null
   } else {

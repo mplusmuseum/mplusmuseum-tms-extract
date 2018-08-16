@@ -58,6 +58,14 @@ exports.index = (req, res) => {
       return res.redirect('/config')
     }
 
+    //  ADD/UPDATE INTERCOM
+    if (req.body.action === 'updateintercomappid') {
+      config.set('intercom', {
+        appId: req.body.intercomappid
+      })
+      return res.redirect('/config')
+    }
+
     //  ADD/UPDATE TMS
     /* NOTE: We have removed the eMuseum key and url here as we are not connecting directly to the TMS system */
     if (req.body.action === 'updatetms' && 'tmsstub' in req.body && req.body.tmsstub !== '' /* && 'tmsurl' in req.body && req.body.tmsurl !== '' && 'key' in req.body && req.body.key !== '' */) {

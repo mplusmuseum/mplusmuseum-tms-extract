@@ -384,7 +384,6 @@ exports.xmlCode = object => {
 exports.getDefaultTemplateData = () => {
   return {
     NODE_ENV: process.env.NODE_ENV,
-    INTERCOM_APP_ID: process.env.INTERCOM_APP_ID,
   };
 }
 
