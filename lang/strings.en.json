@@ -1,0 +1,12 @@
+{
+  "nav": {
+    "developer": "developer",
+    "config": "config",
+    "upload_files": "upload files",
+    "stats_and_search": "Stats &amp; Search",
+    "api": "API",
+    "admin": "admin",
+    "login": "login",
+    "logout": "logout"
+  }
+}
