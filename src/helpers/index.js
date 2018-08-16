@@ -381,6 +381,13 @@ exports.xmlCode = object => {
   return Prism.highlight(object, Prism.languages.xml, 'xml')
 }
 
+exports.getDefaultTemplateData = () => {
+  return {
+    NODE_ENV: process.env.NODE_ENV,
+    INTERCOM_APP_ID: process.env.INTERCOM_APP_ID,
+  };
+}
+
 exports.nodeQuery = (query, filter, graphQL, token) => {
   let newQuery = showQuery(query, filter)
   let querySplit = newQuery.split('\n')
