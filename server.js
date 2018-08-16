@@ -201,6 +201,9 @@ if (skipBuild === false) {
   })
 }
 
+//  Make sure the data directory exists
+if (!fs.existsSync(path.join(rootDir, 'data'))) fs.mkdirSync(path.join(rootDir, 'data'))
+
 // ########################################################################
 /*
  * STEP THREE
@@ -374,14 +377,11 @@ if (process.env.NODE_ENV !== 'development') {
 const pidFile = path.join(rootDir, '.pid')
 if (fs.existsSync(pidFile)) {
   const pid = fs.readFileSync(pidFile, 'utf-8')
-  console.log('old pid: ', pid)
   const isRunning = require('is-running')(pid)
   if (isRunning) {
     process.kill(pid)
   }
 }
-
-fs.writeFileSync(pidFile, process.pid, 'utf-8')
 
 let skipOpen = false
 if ('skipOpen' in argOptions && argOptions.skipOpen === true) {
@@ -429,6 +429,25 @@ if (process.env.NODE_ENV === 'development') {
   }
 }
 
+process.on('uncaughtException', err => {
+  if (err.errno === 'EADDRINUSE') {
+    console.log('')
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('')
+    console.log('                 DON\'T PANIC'.bold)
+    console.log('')
+    console.log('The server did not shut down properly last time'.warn)
+    console.log('  please try starting it up again, everything'.warn)
+    console.log('      sould be cleaned up now, thank you.'.warn)
+    console.log('')
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('')
+  }
+  process.exit()
+})
+
 http.createServer(app).listen(process.env.PORT)
 
 //  Now we kick off the regular tasks that do things periodically
@@ -456,6 +475,24 @@ elasticsearch.startUpserting()
 //  This starts off checking for images to upload to elastic search
 const auth0Users = require('./app/modules/auth0')
 auth0Users.startGettingAllUserTokens()
+
+console.log('')
+console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+console.log('')
+console.log('                 SERVER STARTED'.bold)
+console.log('')
+console.log('           Everything is up and running'.info)
+console.log('')
+console.log(`    The process id for the server is ${process.pid}, use`.info)
+console.log(`                 'kill -9 ${process.pid}'`.bold)
+console.log('         should you wish to force stop it'.info)
+console.log('')
+console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+console.log('')
+
+fs.writeFileSync(pidFile, process.pid, 'utf-8')
 
 //  Now we kick off the regular tasks that do things periodically
 //  kinda like cron jobs

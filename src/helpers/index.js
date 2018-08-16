@@ -2,7 +2,7 @@ const moment = require('moment')
 const querystring = require('querystring')
 const Prism = require('prismjs')
 var loadLanguages = require('prismjs/components/index.js')
-loadLanguages(['bash', 'graphql', 'json', 'xml'])
+loadLanguages(['bash', 'graphql', 'json'])
 
 exports.ifIndexDivisibleBy = (index, divisor, options) => {
   if ((index + 1) % divisor === 0 && index > 0) {
