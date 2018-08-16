@@ -74,7 +74,6 @@ const getAllUserTokens = async (page) => {
   const config = new Config()
   const auth0info = config.get('auth0')
   if (auth0info === null) {
-    console.log('auth0 is not set up')
     return
   }
 

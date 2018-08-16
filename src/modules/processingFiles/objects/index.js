@@ -756,6 +756,9 @@ exports.processFile = processFile
 const makePerfect = async () => {
   const config = new Config()
   const tmsses = config.get('tms')
+
+  if (tmsses === null) return
+
   let foundItemToUpload = false
   let processFilename = null
   let perfectFilename = null
