@@ -12,31 +12,27 @@
   <div class="wrapper">
     <div class="container admin-layout documentation">
 
-      <h1>Stats</h1>
+      <h1 class="capitalize">{{i18n.stats.stats}}</h1>
       <p>
-        This is where we keep a bunch of stats to keep an eye on how the server is running.
+        {{i18n.stats.intro}}
       </p>
       <p>
-        You can also view some logs over on the
-        <a href="/stats/logs">logs page</a>.
+        {{{i18n.stats.link_to_logs}}}
       </p>
 
       <hr> {{#if tms}}
-      <h2>TMS systems</h2>
+      <h2>{{i18n.stats.tms_system}}</h2>
       {{#each tms}}
       <h4 style="margin-bottom: 1rem">{{stub}}</h4>
       <table>
         <tr>
-          <td style="vertical-align: top">Total objects processed</td>
+          <td style="vertical-align: top">{{../i18n.stats.total_objects_processed}}</td>
           <td>{{prettyNumber objectsProcessed}}</td>
         </tr>
         <tr>
-          <td style="vertical-align: top">Object files waiting to be processed</td>
+          <td style="vertical-align: top">{{../i18n.stats.object_files_waiting}}</td>
           <td>{{prettyNumber objectsWaitingToBeProcessed}} (Finishes {{timeAgo timeToUpsertObjects}}, estimate) {{#if ../user.roles.isAdmin}}
-            <small>
-              <br /> *If you have a lot of files to upload, you can adjust this time in the
-              <a href="/config#elasticsearch">ElasticSearch section</a> of the config page.</small>
-            {{/if}}
+            {{{../i18n.stats.lot_of_files_to_upload}}} {{/if}}
           </td>
         </tr>
 
@@ -44,7 +40,7 @@
           <td colspan="2">&nbsp;</td>
         </tr>
         <tr>
-          <td>Results generated in</td>
+          <td>{{../i18n.stats.results_generated_in}}</td>
           <td>{{prettyNumber ms}}ms</td>
         </tr>
       </table>
@@ -54,13 +50,13 @@
         <form method="post">
           <table class="api">
             <tr>
-              <td style="width: 25%">Search object by id:</td>
+              <td style="width: 25%">{{../i18n.stats.search_object}}:</td>
               <td>
                 <input type="text" name="objectID">
               </td>
               <td>
                 <input type="hidden" name="tms" value="{{stub}}">
-                <button type="submit" value="search" name="action">Go</button>
+                <button class="capitalize" type="submit" value="search" name="action">{{../i18n.stats.go}}</button>
               </td>
             </tr>
           </table>

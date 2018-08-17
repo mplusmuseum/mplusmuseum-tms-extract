@@ -17,6 +17,16 @@
       <p>
         Here are your user settings
       </p>
+      <p>
+        <h2>Set Language</h2>
+        <ul>
+          {{#each langs}}
+          <li>
+            <a href="/settings/language/{{@this}}">{{@this}}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </p>
     </div>
   </div>
 

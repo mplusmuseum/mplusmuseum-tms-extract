@@ -2,22 +2,22 @@
   <div class="nav-wrapper">
     <a href="/" class="brand-logo left">M+</a>
     {{#if user}}
-    <ul>
+    <ul class="capitalize">
 
       {{#if user.roles.isDeveloper}}
       <li>
-        <a href="/developer">Developer</a>
+        <a href="/developer">{{i18n.nav.developer}}</a>
       </li>
       {{/if}} {{#if user.roles.isAdmin}}
       <li>
-        <a href="/config">Config</a>
+        <a href="/config">{{i18n.nav.config}}</a>
       </li>
       {{/if}} {{#if (or user.roles.isAdmin user.roles.isStaff)}}
       <li>
-        <a href="/uploadFile">Upload files</a>
+        <a href="/uploadFile">{{i18n.nav.upload_files}}</a>
       </li>
       <li>
-        <a href="/stats">Stats &amp; Search</a>
+        <a href="/stats">{{{i18n.nav.stats_and_search}}}</a>
       </li>
       <li>
         <a href="/api">API</a>
@@ -32,17 +32,17 @@
       </li>
       {{#if user.roles.isAdmin}}
       <li>
-        <a href="/admin">Admin</a>
+        <a href="/admin">{{i18n.nav.admin}}</a>
       </li>
       {{/if}}
       <li>
-        <a href="/logout">Logout</a>
+        <a href="/logout">{{i18n.nav.logout}}</a>
       </li>
     </ul>
     {{else}}
     <ul class="right">
       <li>
-        <a href="/login">Login</a>
+        <a href="/login">{{i18n.nav.login}}</a>
       </li>
     </ul>
     {{/if}}
