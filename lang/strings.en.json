@@ -19,6 +19,8 @@
     "lot_of_files_to_upload": "<small><br> *If you have a lot of files to upload, you can adjust this time in the <a href=\"/config#elasticsearch\">ElasticSearch section</a> of the config page.</small>",
     "results_generated_in": "Results generated in",
     "search_object": "Search object by id",
-    "go": "go"
+    "go": "go",
+    "publicAccess": "Public access files",
+    "remaining": "remaining"
   }
 }
