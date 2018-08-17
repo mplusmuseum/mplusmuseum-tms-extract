@@ -120,25 +120,42 @@ const knownFields = {
 }
 */
 
-/* areacategories */
-const parseAreaCategory = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.rank
-    delete item.type
-    delete item.areacat
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      rank: parseInt(item.rank, 10),
-      type: item.type,
-      areacat: item.areacat ? item.areacat.map(parseText) : null
-    }
-  })
-  return rtnArray
+const getSortnumber = objectNumber => {
+  //  We have a sort number, if the objectNumber is numeric then we can use
+  //  it for the sort number, if it's not then we just leave it null
+  let sortNumber = null
+  if (!isNaN(parseFloat(objectNumber))) {
+    sortNumber = parseFloat(objectNumber)
+  }
+  return sortNumber
+}
+
+const getClassifications = classifications => {
+  const classificationsObj = {}
+  if ('areacategory' in classifications) {
+    if (!Array.isArray(classifications.areacategory)) classifications.areacategory = [classifications.areacategory]
+    classifications.areacategory.forEach((area) => {
+      if ('type' in area) {
+        const areaLower = area.type.toLowerCase()
+        if (!(areaLower in classificationsObj)) {
+          classificationsObj[areaLower] = {}
+        }
+        if ('rank' in area) {
+          classificationsObj[areaLower].rank = parseInt(area.rank, 10)
+        }
+        if ('areacat' in area) {
+          if (!Array.isArray(area.areacat)) area.areacat = [area.areacat]
+          classificationsObj[areaLower].areacat = area.areacat.map((area) => {
+            return {
+              text: area._,
+              lang: area.lang
+            }
+          })
+        }
+      }
+    })
+  }
+  return classificationsObj
 }
 
 /* areacategory_concat */
@@ -496,6 +513,8 @@ const parseObject = o => {
     objectID: parseInt(o.id, 10),
     publicAccess: parseInt(o.PublicAccess, 10) === 1,
     objectNumber: o.objectnumber,
+    sortNumber: getSortnumber(o.objectnumber),
+    classification: getClassifications(o.areacategories),
     titles: parseObjectOrArray(o.titles, parseText),
     displayDate: o.dated,
     beginDate: parseFloat(o.datebegin),
@@ -795,8 +814,7 @@ const makePerfect = async () => {
   })
 
   if (foundItemToUpload && processFilename !== null) {
-    const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
-    const processFileJSON = JSON.parse(processFileRaw)
+    const processFileJSON = {}
     processFileJSON.artInt = await artisanalints.createArtisanalInt()
     const perfectFilePretty = JSON.stringify(processFileJSON, null, 4)
     fs.writeFileSync(perfectFilename, perfectFilePretty, 'utf-8')
