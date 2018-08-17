@@ -11,6 +11,7 @@
   + [Elastic Search](#elastic-search)
   + [TMS systems](#tms-systems)
   + [Cloudinary](#cloudinary)
+  + [Intercom](#Intercom)
 + [Admin tools](#admin-tools)
   + [Managing users](#managing-users)
   + [The config page](#the-config-page)
@@ -147,8 +148,7 @@ Setting the value too low will get the images uploaded faster but will "thrash" 
 
 ### Intercom
 
-You can optionally use [Intercom](https://www.intercom.com/) to communicate with...
-TO BE EXPANDED
+You can optionally use [Intercom](https://www.intercom.com/) to enable dashboard users to communicate to you via the Intercom chat widget. This is currently restricted to "admin" and "staff" users. After setting a valid Intercom App Id, the Intercom widget will display in the bottom right corner.
 
 
 # Admin tools
