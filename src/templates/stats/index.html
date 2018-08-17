@@ -22,6 +22,16 @@
 
       <hr> {{#if tms}}
       <h2>{{i18n.stats.tms_system}}</h2>
+
+      <h4 style="margin-bottom: 0.5em">{{i18n.stats.publicAccess}}</h4>
+      <div style="position: relative; width: 100%; height: 32px">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #f9f9f9; border: 1px solid #ddd; border-radius: 6px;">
+          <div style="position: absolute; top: 0; left: 0; width: {{publicAccess.truePercent}}%; height: 100%; background: #66ff66">
+          </div>
+          <div style="top: 2px; left: 6px; position: absolute; font-size: 80%">{{prettyNumber publicAccess.trueTotal}} ({{publicAccess.truePercent}}%)</div>
+          <div style="top: 2px; right: 6px; position: absolute; font-size: 80%">{{prettyNumber publicAccess.falseTotal}} {{i18n.stats.remaining}}</div>
+        </div>
+      </div>
       {{#each tms}}
       <h4 style="margin-bottom: 1rem">{{stub}}</h4>
       <table>
