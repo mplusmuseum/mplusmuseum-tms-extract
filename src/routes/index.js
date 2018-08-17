@@ -1,3 +1,6 @@
+const fs = require('fs')
+const path = require('path')
+const langDir = path.join(__dirname, '../../lang')
 const express = require('express')
 const passport = require('passport')
 const router = express.Router()
@@ -58,13 +61,16 @@ router.use(function (req, res, next) {
   req.config = configObj
   req.templateValues.config = req.config
   req.templateValues.NODE_ENV = process.env.NODE_ENV
+
+  const defaultLang = 'en'
+  let selectedLang = 'en'
+
   if (req.user === undefined) {
     req.user = null
   } else {
     //  Shortcut the roles
     if ('user_metadata' in req.user && 'roles' in req.user.user_metadata) {
       req.user.roles = req.user.user_metadata.roles
-      req.user.apitoken = req.user.user_metadata.apitoken
     } else {
       req.user.roles = {
         isAdmin: false,
@@ -72,8 +78,45 @@ router.use(function (req, res, next) {
         isStaff: false
       }
     }
+    if ('user_metadata' in req.user && 'apitoken' in req.user.user_metadata) {
+      req.user.apitoken = req.user.user_metadata.apitoken
+    } else {
+      req.user.apitoken = null
+    }
+    if ('user_metadata' in req.user && 'lang' in req.user.user_metadata) {
+      req.user.lang = req.user.user_metadata.lang
+    } else {
+      req.user.lang = 'en'
+    }
+    selectedLang = req.user.lang
   }
   req.templateValues.user = req.user
+
+  //  Read in the language files and overlay the selected langage on the
+  //  default one
+  //  TODO: Cache all this for about 5 minutes
+  //  TODO: break the cache if we update strings
+  const langs = fs.readdirSync(langDir).filter((lang) => {
+    const langSplit = lang.split('.')
+    if (langSplit.length !== 3) return false
+    if (langSplit[0] !== 'strings' || langSplit[2] !== 'json') return false
+    return true
+  }).map((lang) => {
+    const langSplit = lang.split('.')
+    return langSplit[1]
+  })
+  req.templateValues.langs = langs
+  const i18n = JSON.parse(fs.readFileSync(path.join(langDir, `strings.${defaultLang}.json`)))
+  if (selectedLang !== defaultLang) {
+    const selectedi18n = JSON.parse(fs.readFileSync(path.join(langDir, `strings.${selectedLang}.json`)))
+    Object.entries(selectedi18n).forEach((branch) => {
+      const key = branch[0]
+      const values = branch[1]
+      if (!(key in i18n)) i18n[key] = {}
+      Object.assign(i18n[key], values)
+    })
+  }
+  req.templateValues.i18n = i18n
 
   //  If there is no Auth0 setting in config then we _must_
   //  check to see if we are setting Auth0 settings and if

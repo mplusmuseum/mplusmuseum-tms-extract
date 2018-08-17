@@ -340,6 +340,7 @@ body {
     border-bottom: 1px solid #039be5;
     font-size: 0.8em;
     margin-bottom: 1rem;
+    .languages,
     .graphQL,
     .elasticsearch {
       float: right;
@@ -361,5 +362,17 @@ body {
         color: inherit;
       }
     }
+    .languages {
+      a {
+        color: blue
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    }
   }
+}
+
+.capitalize {
+  text-transform: capitalize
 }

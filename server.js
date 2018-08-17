@@ -525,12 +525,3 @@ if (process.env.NODE_ENV !== 'DEV') {
   checkFields()
 }
 */
-
-/*
-Object.entries(lang2).forEach((branch) => {
-  const key = branch[0]
-  const values = branch[1]
-  if (!(key in lang1)) lang1[key] = {}
-  Object.assign(lang1[key], values)
-})
-*/

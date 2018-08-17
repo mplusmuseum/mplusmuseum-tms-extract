@@ -8,5 +8,17 @@
     "admin": "admin",
     "login": "login",
     "logout": "logout"
+  },
+  "stats": {
+    "stats": "stats",
+    "intro": "This is where we keep a bunch of stats to keep an eye on how the server is running.",
+    "link_to_logs": "You can also view some logs over on the <a href=\"/stats/logs\">logs page</a>.",
+    "tms_system": "TMS systems",
+    "total_objects_processed": "Total objects processed",
+    "object_files_waiting": "Object files waiting to be processed",
+    "lot_of_files_to_upload": "<small><br> *If you have a lot of files to upload, you can adjust this time in the <a href=\"/config#elasticsearch\">ElasticSearch section</a> of the config page.</small>",
+    "results_generated_in": "Results generated in",
+    "search_object": "Search object by id",
+    "go": "go"
   }
 }
