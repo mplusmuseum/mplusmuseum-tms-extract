@@ -124,6 +124,7 @@ const checkItems = async () => {
           })
           files.forEach((file) => {
             if (foundItemToUpload === true) return
+
             //  Read in the perfect version of the file, because we want to see if the remote
             //  data has been set yet, or if it and the source is null, in either case we can upsert the
             //  file. Otherwise we are going to skip it.
@@ -131,10 +132,12 @@ const checkItems = async () => {
             if (!(fs.existsSync(perfectFilename))) return
             const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
             const perfectFile = JSON.parse(perfectFileRaw)
-            if ((perfectFile.artInt !== null && perfectFile.artInt !== null)) {
-              foundItemToUpload = true
-              upsertObject(type, tms.stub, file.split('.')[0])
-            }
+
+            //  If we don't have an artInt then we don't upload the file
+            if (!('artInt' in perfectFile) || perfectFile.artInt === null || perfectFile.artInt === '') return
+
+            foundItemToUpload = true
+            upsertObject(type, tms.stub, file.split('.')[0])
           })
         })
       }
