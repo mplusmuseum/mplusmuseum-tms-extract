@@ -3,6 +3,7 @@ const Users = require('../../classes/users')
 const Config = require('../../classes/config')
 const logging = require('../../modules/logging')
 const elasticsearch = require('elasticsearch')
+const myElasticsearch = require('../../modules/elasticsearch')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
@@ -79,5 +80,10 @@ exports.blowaway = async (req, res) => {
     ms: endTime - startTime
   })
 
+  return res.redirect('/admin')
+}
+
+exports.aggrigateObjects = async (req, res) => {
+  myElasticsearch.aggregateObjects(req.params.tms)
   return res.redirect('/admin')
 }
