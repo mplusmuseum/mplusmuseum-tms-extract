@@ -145,17 +145,29 @@ const getClassifications = classifications => {
         }
         if ('areacat' in area) {
           if (!Array.isArray(area.areacat)) area.areacat = [area.areacat]
-          classificationsObj[areaLower].areacat = area.areacat.map((area) => {
-            return {
-              text: area._,
-              lang: area.lang
-            }
+          classificationsObj[areaLower].areacat = {}
+          area.areacat.forEach((area) => {
+            classificationsObj[areaLower].areacat[area.lang] = area._
           })
         }
       }
     })
   }
   return classificationsObj
+}
+
+//  Extract all the languages out of the data object we have been passed
+const getTextByLanguage = (objThing, key) => {
+  //  Make sure the key actually exists
+  if (objThing === null || objThing === undefined || !(key in objThing)) return null
+  if (!Array.isArray(objThing[key])) objThing[key] = [objThing[key]]
+  const rtnObj = {}
+  objThing[key].forEach((textLang) => {
+    if ('lang' in textLang && '_' in textLang && textLang.lang !== null && textLang.lang !== '' && textLang._ !== null && textLang._ !== '') {
+      rtnObj[textLang.lang] = textLang._
+    }
+  })
+  return rtnObj
 }
 
 /* areacategory_concat */
@@ -515,13 +527,13 @@ const parseObject = o => {
     objectNumber: o.objectnumber,
     sortNumber: getSortnumber(o.objectnumber),
     classification: getClassifications(o.areacategories),
-    titles: parseObjectOrArray(o.titles, parseText),
+    title: getTextByLanguage(o.titles, 'title'),
     displayDate: o.dated,
     beginDate: parseFloat(o.datebegin),
     endDate: parseFloat(o.dateend),
-    dimensions: parseObjectOrArray(o.dimensions, parseText),
-    mediums: parseObjectOrArray(o.mediums, parseText),
-    creditLines: parseObjectOrArray(o.creditlines, parseText),
+    dimension: getTextByLanguage(o.dimensions, 'dimensions'),
+    medium: getTextByLanguage(o.mediums, 'medium'),
+    creditLine: getTextByLanguage(o.creditlines, 'creditline'),
     /*
     areacategories: parseObjectOrArray(o.areacategories, parseAreaCategory),
     areacategory_concat: parseObjectOrArray(
@@ -605,6 +617,7 @@ const processFile = async (tms, filename) => {
       }))
     objectsJSON = json.objects.object.map((object) => parseObject(object))
   } catch (er) {
+    console.log(er)
     tmsLogger.object(`Failed to parse that file tms ${tms}`, {
       action: 'error',
       stub: tms
