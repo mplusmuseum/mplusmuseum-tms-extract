@@ -49,9 +49,29 @@
               </li>
               <li>
                 <a href="#objects">Objects</a>
+                <ul>
+                  <li>
+                    <a href="#paginationandfilter">Pagination and filter example</a>
+                  </li>
+                  <li>
+                    <a href="#sorting">Sorting example</a>
+                  </li>
+                  <li>
+                    <a href="#fetchingbyids">Fetching by ids example</a>
+                  </li>
+                </ul>
               </li>
               <li>
                 <a href="#object">Object</a>
+              </li>
+              <li>
+                <a href="#areas">Areas</a>
+              </li>
+              <li>
+                <a href="#categories">Categories</a>
+              </li>
+              <li>
+                <a href="#mediums">Mediums</a>
               </li>
             </ul>
           </li>
@@ -186,16 +206,31 @@
         <code class="red">page</code>,
         <code class="red">per_page</code>,
         <code class="red">sort_field</code>,
-        <code class="red">sort</code> &amp;
+        <code class="red">sort</code>,
+        <code class="red">[ids]</code>,
+        <code class="red">classification.area</code>,
+        <code class="red">classification.category</code>,
+        <code class="red">medium</code>,
+        <code class="red">displayDate</code>,
+        <code class="red">beginDate</code>,
+        <code class="red">endDate</code> and
         <code class="red">lang</code>
       </p>
 
       <p>
-        The only valid value for
-        <code class="red">sort_field</code> is
-        <code>id</code>, values for
+        Valid values for the
+        <code class="red">sort_field</code> are
+        <code>id</code>,
+        <code>objectNumber</code>,
+        <code>sortNumber</code>,
+        <code>title</code>,
+        <code>displayDate</code>,
+        <code>beginDate</code>,
+        <code>endDate</code>,
+        <code>classification.area</code> and
+        <code>classification.category</code>, values for
         <code class="red">sort</code> are
-        <code>asc</code> &amp;
+        <code>asc</code> and
         <code>desc</code>.
       </p>
 
@@ -203,15 +238,15 @@
         The only valid values for
         <code class="red">lang</code> are
         <code>en</code>,
-        <code>zh-hant</code> &amp;
+        <code>zh-hant</code> and
         <code>zh-hans</code>. The default is
         <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
         <code>en</code> version if there is one.
       </p>
 
-      <p>
+      <h3>
         Here is the simplest call to get all object ids
-      </p>
+      </h3>
 
       <p class="runinexplore">
         <a href='{{exploreQuery queries.objectsMini "" config.graphql.host}}'>Run in the playground</a>
@@ -232,28 +267,88 @@
         <pre class="query node">{{{nodeQuery queries.objectsMini '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
+      <h3>
+        <a name="paginationandfilter">Pagination and filter</a>
+      </h3>
+
       <p>
         Here we are asking for slightly more information, note how we can use the
-        <code>per_page</code> filter to limit the number of results.
+        <code class="red">per_page</code> filter to limit the number of results.
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMedium "(page: 10, per_page: 4)" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsMedium "(page:3, per_page: 5, area: \"Moving Image\")" config.graphql.host}}'>Run in the playground</a>
       </p>
-      <pre class="query">{{{graphQLQuery queries.objectsMedium '(page: 10, per_page: 4)'}}}</pre>
+      <pre class="query">{{{graphQLQuery queries.objectsMedium '(page:3, per_page: 5, area: "Moving Image")'}}}</pre>
 
       <p>
         cURL
       </p>
       <p>
-        <pre class="query terminal">{{{curlQuery queries.objectsMedium '(page: 10, per_page: 4)' config.graphql.host user.apitoken}}}</pre>
+        <pre class="query terminal">{{{curlQuery queries.objectsMedium '(page:3, per_page: 5, area: \\\"Moving Image\\\")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
       <p>
         NodeJS.
       </p>
       <p>
-        <pre class="query node">{{{nodeQuery queries.objectsMedium '(page: 10, per_page: 4)' config.graphql.host user.apitoken}}}</pre>
+        <pre class="query node">{{{nodeQuery queries.objectsMedium '(page:3, per_page: 5, area: "Moving Image")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="sorting">Sorting</a>
+      </h3>
+
+      <p>
+        Here is an example of sorting by
+        <code>sortNumber</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsLarge "(sort_field: \"sortNumber\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsLarge '(sort_field: "sortNumber", sort: "asc")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.objectsLarge '(sort_field: \\\"sortNumber\\\", sort: \\\"asc\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.objectsLarge '(sort_field: "sortNumber", sort: "asc")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="fetchingbyids">Fetching by ids</a>
+      </h3>
+
+      <p>
+        You can also ask for specific objects by passing in an array of
+        <code class="red">ids</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsMedium "(ids:[1, 2, 3, 4])" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsMedium '(ids:[1, 2, 3, 4])'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.objectsMedium '(ids:[1, 2, 3, 4])' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.objectsMedium '(ids:[1, 2, 3, 4])' config.graphql.host user.apitoken}}}</pre>
       </p>
 
       <hr />
@@ -288,6 +383,198 @@
       </p>
 
 
+      <hr />
+
+      <h3>
+        <a name="areas">Areas</a>
+      </h3>
+
+      <p>
+        You can fetch all the valid areas which you can then use to filter objects by. For example running the query below will return
+        a handful of areas, which you would then use in an Object query with
+        <code>(area: "xxxxxxxx")</code> where "xxxxxxxx" is one of the areas returned by this query.
+      </p>
+
+      <p>
+        Valid filters are
+        <code class="red">per_page</code>,
+        <code class="red">lang</code>,
+        <code class="red">sort</code> and
+        <code class="red">sort_field</code>.
+      </p>
+
+      <p>
+        Valid values for the
+        <code class="red">sort_field</code> are
+        <code>title</code> and
+        <code>count</code>. Valid values for the
+        <code class="red">sort</code> are
+        <code>asc</code> and
+        <code>desc</code>.
+      </p>
+
+      <p>
+        The only valid values for
+        <code class="red">lang</code> are
+        <code>en</code>,
+        <code>zh-hant</code> and
+        <code>zh-hans</code>. The default is
+        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
+        <code>en</code> version if there is one.
+      </p>
+
+      <p>
+        The
+        <code class="red">per_page</code> filter will limit the number of results, for example
+        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Areas data set.
+      </p>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.areas "(lang: \"zh-hant\", sort_field: \"count\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.areas '(lang: "zh-hant", sort_field: "count", sort: "asc")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.areas '(lang: \\\"zh-hant\\\", sort_field: \\\"count\\\", sort: \\\"asc\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.areas '(lang: "zh-hant", sort_field: "count", sort: "asc")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="categories">Categories</a>
+      </h3>
+
+      <p>
+        You can fetch all the valid categories which you can then use to filter objects by. For example running the query below will
+        return a handful of categories, which you would then use in an Object query with
+        <code>(category: "xxxxxxxx")</code> where "xxxxxxxx" is one of the categories returned by this query.
+      </p>
+
+      <p>
+        Valid filters are
+        <code class="red">per_page</code>,
+        <code class="red">lang</code>,
+        <code class="red">sort</code> and
+        <code class="red">sort_field</code>.
+      </p>
+
+      <p>
+        Valid values for the
+        <code class="red">sort_field</code> are
+        <code>title</code> and
+        <code>count</code>. Valid values for the
+        <code class="red">sort</code> are
+        <code>asc</code> and
+        <code>desc</code>.
+      </p>
+
+      <p>
+        The only valid values for
+        <code class="red">lang</code> are
+        <code>en</code>,
+        <code>zh-hant</code> and
+        <code>zh-hans</code>. The default is
+        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
+        <code>en</code> version if there is one.
+      </p>
+
+      <p>
+        The
+        <code class="red">per_page</code> filter will limit the number of results, for example
+        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Categories data
+        set.
+      </p>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.categories "(lang: \"zh-hans\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.categories '(lang: "zh-hans", sort_field: "count", sort: "desc")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.categories '(lang: \\\"zh-hans\\\", sort_field: \\\"count\\\", sort: \\\"desc\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.categories '(lang: "zh-hans", sort_field: "count", sort: "desc")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="mediums">Mediums</a>
+      </h3>
+
+      <p>
+        You can fetch all the valid mediums which you can then use to filter objects by. For example running the query below will
+        return a handful of mediums, which you would then use in an Object query with
+        <code>(category: "xxxxxxxx")</code> where "xxxxxxxx" is one of the mediums returned by this query.
+      </p>
+
+      <p>
+        Valid filters are
+        <code class="red">per_page</code>,
+        <code class="red">lang</code>,
+        <code class="red">sort</code> and
+        <code class="red">sort_field</code>.
+      </p>
+
+      <p>
+        Valid values for the
+        <code class="red">sort_field</code> are
+        <code>title</code> and
+        <code>count</code>. Valid values for the
+        <code class="red">sort</code> are
+        <code>asc</code> and
+        <code>desc</code>.
+      </p>
+
+      <p>
+        The only valid values for
+        <code class="red">lang</code> are
+        <code>en</code>,
+        <code>zh-hant</code> and
+        <code>zh-hans</code>. The default is
+        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
+        <code>en</code> version if there is one.
+      </p>
+
+      <p>
+        The
+        <code class="red">per_page</code> filter will limit the number of results, for example
+        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Mediums data set.
+      </p>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.mediums "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.mediums ''}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.mediums '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.mediums '' config.graphql.host user.apitoken}}}</pre>
+      </p>
     </div>
   </div>
 
