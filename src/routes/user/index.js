@@ -17,18 +17,3 @@ exports.settings = (req, res) => {
   req.templateValues.langs = langs
   return res.render('user/settings', req.templateValues)
 }
-
-exports.setLanguage = async (req, res) => {
-  //  I kinda want to go back to the referring page at this point
-  //  incase we have the language thing in the footer
-  const userObj = await new User()
-  const selectedUser = await userObj.get(req.user.user_id)
-  if (selectedUser !== null) {
-    await userObj.setLang(selectedUser.user_id, req.params.lang)
-    req.session.passport.user = await new User().get(selectedUser.user_id)
-  }
-  if (req.headers.referer) {
-    return res.redirect(req.headers.referer)
-  }
-  return res.redirect('/settings')
-}
