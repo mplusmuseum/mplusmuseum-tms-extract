@@ -28,8 +28,12 @@ const getNames = names => {
     //  Make sure the language is in the namesObj
     if (!(name.lang in namesObj)) namesObj[name.lang] = {}
     namesObj[name.lang].id = name.id
-    namesObj[name.lang].alphasort = name.alphasort
-    namesObj[name.lang].displayname = name.displayname
+    if ('alphasort' in name && Object.prototype.toString.call(name.alphasort) === '[object String]') {
+      namesObj[name.lang].alphasort = name.alphasort
+    }
+    if ('displayname' in name && Object.prototype.toString.call(name.displayname) === '[object String]') {
+      namesObj[name.lang].displayname = name.displayname
+    }
   })
   return namesObj
 }
@@ -55,8 +59,6 @@ const getBios = bios => {
 // #########################################################################
 
 const parseConstituent = c => {
-  if (c.id === '608') console.log(c)
-
   const newConstituent = {
     constituentID: parseInt(c.id, 10),
     publicAccess: c.id === 1,
@@ -78,8 +80,6 @@ const parseConstituent = c => {
     const newDeath = parseInt(c.deathyear, 10)
     if (!isNaN(newDeath) && newDeath !== 0) newConstituent.deathyear = newDeath
   }
-
-  if ('names' in c && 'name' in c.names && c.names.name.length > 3) console.log(c.names.name.length)
 
   return newConstituent
 }

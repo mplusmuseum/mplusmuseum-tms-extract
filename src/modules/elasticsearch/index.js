@@ -74,15 +74,7 @@ const upsertItem = async (type, tms, id) => {
       tms: tms,
       ms: endTime - startTime
     })
-
     //  We are going to reset the timeout to update the aggrigations
-    /*
-    clearTimeout(global.update_aggrigations)
-    global.update_aggrigations = setTimeout(() => {
-      aggregateObjects(tms)
-      aggregateObjects(tms)
-    }, 60 * 1000 * 2) // Do it in two minutes time
-    */
   })
 }
 
