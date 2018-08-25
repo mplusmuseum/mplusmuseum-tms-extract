@@ -323,6 +323,43 @@
           </table>
         </form>
       </p>
+
+      <hr />
+
+      <h2>
+        <a name="elasticsearch">Intercom Chat Widget</a>
+      </h2>
+      <p>
+        You can optionally use <a href="https://www.intercom.com/">Intercom</a> to enable "admin" and "staff" dashboard users to communicate with you via the Intercom chat widget. You will need to create an Intercom account to get a valid Intercom App Id. Add that here and the widget will display in the bottom right corner for admin and staff users.
+      </p>
+
+      {{#if config.intercom.appId}}
+      <p>
+        Congratulations Intercom has been set up
+      </p>
+      <p>
+        You can reconfigure it below if needed.
+      </p>
+      {{/if}}
+      <p>
+        <form method="post">
+          <table>
+            <tr>
+              <td>Intercom App Id</td>
+              <td>
+                <input type="text" name="intercomappid" placeholder="Example: abcdwxyz"
+                  {{#if config.intercom.appId}}value="{{config.intercom.appId}}" {{/if}}>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <button type="submit" value="updateintercomappid" name="action">Update</button>
+              </td>
+            </tr>
+          </table>
+
+        </form>
+      </p>
     </div>
   </div>
 

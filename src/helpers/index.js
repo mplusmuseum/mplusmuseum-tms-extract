@@ -381,6 +381,12 @@ exports.xmlCode = object => {
   return Prism.highlight(object, Prism.languages.xml, 'xml')
 }
 
+exports.getDefaultTemplateData = () => {
+  return {
+    NODE_ENV: process.env.NODE_ENV,
+  };
+}
+
 exports.nodeQuery = (query, filter, graphQL, token) => {
   let newQuery = showQuery(query, filter)
   let querySplit = newQuery.split('\n')

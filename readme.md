@@ -11,6 +11,7 @@
   + [Elastic Search](#elastic-search)
   + [TMS systems](#tms-systems)
   + [Cloudinary](#cloudinary)
+  + [Intercom](#Intercom)
 + [Admin tools](#admin-tools)
   + [Managing users](#managing-users)
   + [The config page](#the-config-page)
@@ -60,7 +61,7 @@ The code has been written so that running `yarn start` will install all the node
 
 There are a couple of useful command line parameters you can use...
 
-`--skipOpen` will start the app _without_ trying to open a browser.  
+`--skipOpen` will start the app _without_ trying to open a browser.
 `--skipBuild` will start the app _without_ running a `yarn install` or rebuilding any of the node or css files.
 `--skipStart` will make it so the app and any code watching doesn't start. Use this when you just want to rebuild the code but not actually start anything.
 
@@ -144,6 +145,11 @@ The system extracts image information for each object from the TMS system. An ob
 See the notes about **Interval in ms** setting in the [Elastic Search](#elastic-search) section above for more details about how you can tune the value to balance rate of upload vs CPU/network processing time. Or see [Speeding up and slowing down data handling](#speeding-up-and-slowing-down-data-handling) for more help.
 
 Setting the value too low will get the images uploaded faster but will "thrash" the system. While in developement and inital deploy this may be fine, once everything is running smoothly the value should be set down to a more _relaxed_ value.
+
+### Intercom
+
+You can optionally use [Intercom](https://www.intercom.com/) to enable dashboard users to communicate to you via the Intercom chat widget. This is currently restricted to "admin" and "staff" users. After setting a valid Intercom App Id, the Intercom widget will display in the bottom right corner.
+
 
 # Admin tools
 
