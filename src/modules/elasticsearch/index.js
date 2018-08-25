@@ -5,6 +5,192 @@ const rootDir = path.join(__dirname, '../../../data')
 const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
+const aggregateObjects = async (tms) => {
+  const tmsLogger = logging.getTMSLogger()
+
+  //  Check to see that we have elasticsearch configured
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  if (elasticsearchConfig === null) {
+    return
+  }
+
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const startTime = new Date().getTime()
+
+  //  Here we are going to run through all the objects we have
+  //  prcessed grabbing all the filterable fields and aggrigating
+  //  them so we can chuck those numbers into the database
+  const processedDir = path.join(rootDir, 'objects', tms, 'processed')
+  if (!(fs.existsSync(processedDir))) return
+  const subFolders = fs.readdirSync(processedDir)
+
+  const areas = {}
+  const categories = {}
+  const mediums = {}
+
+  subFolders.forEach((subFolder) => {
+    const files = fs.readdirSync(path.join(processedDir, subFolder))
+    files.forEach((file) => {
+      const objectRAW = fs.readFileSync(path.join(processedDir, subFolder, file))
+      const objectJSON = JSON.parse(objectRAW)
+
+      //  Do the areas and categories
+      if ('classification' in objectJSON) {
+        //  areas first
+        if ('area' in objectJSON.classification && 'areacat' in objectJSON.classification.area) {
+          let areacats = objectJSON.classification.area.areacat
+          if (!Array.isArray(areacats)) areacats = [areacats] // May sure we are an array
+          areacats.forEach((areacat) => {
+            if (areacat !== null && 'text' in areacat && 'lang' in areacat) {
+              if (!(areacat.text in areas)) {
+                areas[areacat.text] = {
+                  lang: areacat.lang,
+                  count: 0
+                }
+              }
+              areas[areacat.text].count++
+            }
+          })
+        }
+
+        //  categories next
+        if ('category' in objectJSON.classification && 'areacat' in objectJSON.classification.category) {
+          let areacats = objectJSON.classification.category.areacat
+          if (!Array.isArray(areacats)) areacats = [areacats] // Make sure it's an array
+          areacats.forEach((areacat) => {
+            if (areacat !== null && 'text' in areacat && 'lang' in areacat) {
+              if (!(areacat.text in categories)) {
+                categories[areacat.text] = {
+                  lang: areacat.lang,
+                  count: 0
+                }
+              }
+              categories[areacat.text].count++
+            }
+          })
+        }
+      }
+
+      //   Do the mediums
+      if ('mediums' in objectJSON) {
+        let objMediums = objectJSON.mediums
+        if (!Array.isArray(objMediums)) objMediums = [objMediums] // Make sure it's an array
+        objMediums.forEach((medium) => {
+          if (medium !== null && 'text' in medium && 'lang' in medium) {
+            if (!(medium.text in mediums)) {
+              mediums[medium.text] = {
+                lang: medium.lang,
+                count: 0
+              }
+            }
+            mediums[medium.text].count++
+          }
+        })
+      }
+    })
+  })
+
+  //  This is going to hold all the bulk uploads we are going to do
+  const buildUploads = []
+
+  //  Feed in the areas
+  let bulkUpload = {
+    index: 'object_areas_mplus',
+    type: 'object_areas',
+    body: []
+  }
+  let counter = 0
+  Object.entries(areas).forEach((keyval) => {
+    bulkUpload.body.push({
+      index: {
+        _id: counter
+      }
+    })
+    bulkUpload.body.push({
+      id: counter,
+      title: keyval[0],
+      lang: keyval[1].lang,
+      count: keyval[1].count
+    })
+    counter += 1
+  })
+  buildUploads.push(bulkUpload)
+
+  //  Now the categories
+  bulkUpload = {
+    index: 'object_categories_mplus',
+    type: 'object_categories',
+    body: []
+  }
+  counter = 0
+  Object.entries(categories).forEach((keyval) => {
+    bulkUpload.body.push({
+      index: {
+        _id: counter
+      }
+    })
+    bulkUpload.body.push({
+      id: counter,
+      title: keyval[0],
+      lang: keyval[1].lang,
+      count: keyval[1].count
+    })
+    counter += 1
+  })
+  buildUploads.push(bulkUpload)
+
+  //  Finally the mediums
+  bulkUpload = {
+    index: 'object_mediums_mplus',
+    type: 'object_mediums',
+    body: []
+  }
+  counter = 0
+  Object.entries(mediums).forEach((keyval) => {
+    bulkUpload.body.push({
+      index: {
+        _id: counter
+      }
+    })
+    bulkUpload.body.push({
+      id: counter,
+      title: keyval[0],
+      lang: keyval[1].lang,
+      count: keyval[1].count
+    })
+    counter += 1
+  })
+  buildUploads.push(bulkUpload)
+
+  //  Now we can actually bulk upload them into the database
+  buildUploads.forEach(async (bulkThis) => {
+    const exists = await esclient.indices.exists({
+      index: bulkThis.index
+    })
+    if (exists !== true) {
+      await esclient.indices.create({
+        index: bulkThis.index
+      })
+    }
+    esclient.bulk({
+      index: bulkThis.index,
+      type: bulkThis.type,
+      body: bulkThis.body
+    }).then(() => {
+      tmsLogger.object(`Upserting aggrigation data for object ${bulkThis.index} for ${tms}`, {
+        action: 'upsert_aggrigation',
+        index: bulkThis.index,
+        tms: tms,
+        ms: new Date().getTime() - startTime
+      })
+    })
+  })
+}
+exports.aggregateObjects = aggregateObjects
+
 const upsertObject = async (type, tms, id) => {
   const tmsLogger = logging.getTMSLogger()
 
@@ -74,6 +260,12 @@ const upsertObject = async (type, tms, id) => {
       tms: tms,
       ms: endTime - startTime
     })
+
+    //  We are going to reset the timeout to update the aggrigations
+    clearTimeout(global.update_aggrigations)
+    global.update_aggrigations = setTimeout(() => {
+      aggregateObjects(tms)
+    }, 60 * 1000 * 2) // Do it in two minutes time
   })
 }
 
@@ -124,6 +316,7 @@ const checkItems = async () => {
           })
           files.forEach((file) => {
             if (foundItemToUpload === true) return
+
             //  Read in the perfect version of the file, because we want to see if the remote
             //  data has been set yet, or if it and the source is null, in either case we can upsert the
             //  file. Otherwise we are going to skip it.
@@ -131,10 +324,12 @@ const checkItems = async () => {
             if (!(fs.existsSync(perfectFilename))) return
             const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
             const perfectFile = JSON.parse(perfectFileRaw)
-            if ((perfectFile.artInt !== null && perfectFile.artInt !== null)) {
-              foundItemToUpload = true
-              upsertObject(type, tms.stub, file.split('.')[0])
-            }
+
+            //  If we don't have an artInt then we don't upload the file
+            if (!('artInt' in perfectFile) || perfectFile.artInt === null || perfectFile.artInt === '') return
+
+            foundItemToUpload = true
+            upsertObject(type, tms.stub, file.split('.')[0])
           })
         })
       }

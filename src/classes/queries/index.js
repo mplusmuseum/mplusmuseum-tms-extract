@@ -3,7 +3,7 @@ class Queries {
   /**
    * Create a collection of queries
    */
-  constructor () {
+  constructor() {
     this.schema = `query {
   __schema {
     types {
@@ -64,15 +64,14 @@ class Queries {
     this.objectMedium = `query {
   object[[]] {
     id
-    publicAccess
     objectNumber
     title
     displayDate
-    beginDate
-    endDate
-    dimensions
-    creditLine
     medium
+    classification {
+      area
+      category
+    }
   }
 }`
 
@@ -81,13 +80,18 @@ class Queries {
     id
     publicAccess
     objectNumber
+    sortNumber
     title
     displayDate
     beginDate
     endDate
-    dimensions
+    dimension
     creditLine
     medium
+    classification {
+      area
+      category
+    }
   }
 }`
 
@@ -100,15 +104,14 @@ class Queries {
     this.objectsMedium = `query {
   objects[[]] {
     id
-    publicAccess
     objectNumber
     title
     displayDate
-    beginDate
-    endDate
-    dimensions
-    creditLine
     medium
+    classification {
+      area
+      category
+    }
   }
 }`
 
@@ -117,13 +120,39 @@ class Queries {
     id
     publicAccess
     objectNumber
+    sortNumber
     title
     displayDate
     beginDate
     endDate
-    dimensions
+    dimension
     creditLine
     medium
+    classification {
+      area
+      category
+    }
+  }
+}`
+
+    this.areas = `query {
+  areas[[]] {
+    title
+    count
+  }
+}`
+
+    this.categories = `query {
+  categories[[]] {
+    title
+    count
+  }
+}`
+
+    this.mediums = `query {
+  mediums[[]] {
+    title
+    count
   }
 }`
   }
@@ -134,7 +163,7 @@ class Queries {
    * @param {string} filter The filter we want to apply to the query i.e. '(limit: 20)'
    * @returns {string|null} A representation of the query ready to be used if found, or null if not.
    */
-  get (query, filter) {
+  get(query, filter) {
     if (!(query in this)) return null
     return this[query].replace('[[]]', filter)
   }

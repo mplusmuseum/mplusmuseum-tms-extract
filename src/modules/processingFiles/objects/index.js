@@ -120,25 +120,54 @@ const knownFields = {
 }
 */
 
-/* areacategories */
-const parseAreaCategory = entry => {
-  if (entry === null || entry === undefined) return null
-  let newEntry = entry
-  if (Array.isArray(newEntry) === false) newEntry = [newEntry]
-  const rtnArray = newEntry.map(item => {
-    /* A curios way to check we have all the fields
-    delete item.rank
-    delete item.type
-    delete item.areacat
-    if (Object.entries(item).length > 0) console.log(item)
-    */
-    return {
-      rank: parseInt(item.rank, 10),
-      type: item.type,
-      areacat: item.areacat ? item.areacat.map(parseText) : null
+const getSortnumber = objectNumber => {
+  //  We have a sort number, if the objectNumber is numeric then we can use
+  //  it for the sort number, if it's not then we just leave it null
+  let sortNumber = null
+  if (!isNaN(parseFloat(objectNumber))) {
+    sortNumber = parseFloat(objectNumber)
+  }
+  return sortNumber
+}
+
+const getClassifications = classifications => {
+  const classificationsObj = {}
+  if ('areacategory' in classifications) {
+    if (!Array.isArray(classifications.areacategory)) classifications.areacategory = [classifications.areacategory]
+    classifications.areacategory.forEach((area) => {
+      if ('type' in area) {
+        const areaLower = area.type.toLowerCase()
+        if (!(areaLower in classificationsObj)) {
+          classificationsObj[areaLower] = {}
+        }
+        if ('rank' in area) {
+          classificationsObj[areaLower].rank = parseInt(area.rank, 10)
+        }
+        if ('areacat' in area) {
+          if (!Array.isArray(area.areacat)) area.areacat = [area.areacat]
+          classificationsObj[areaLower].areacat = {}
+          area.areacat.forEach((area) => {
+            classificationsObj[areaLower].areacat[area.lang] = area._
+          })
+        }
+      }
+    })
+  }
+  return classificationsObj
+}
+
+//  Extract all the languages out of the data object we have been passed
+const getTextByLanguage = (objThing, key) => {
+  //  Make sure the key actually exists
+  if (objThing === null || objThing === undefined || !(key in objThing)) return null
+  if (!Array.isArray(objThing[key])) objThing[key] = [objThing[key]]
+  const rtnObj = {}
+  objThing[key].forEach((textLang) => {
+    if ('lang' in textLang && '_' in textLang && textLang.lang !== null && textLang.lang !== '' && textLang._ !== null && textLang._ !== '') {
+      rtnObj[textLang.lang] = textLang._
     }
   })
-  return rtnArray
+  return rtnObj
 }
 
 /* areacategory_concat */
@@ -496,13 +525,15 @@ const parseObject = o => {
     objectID: parseInt(o.id, 10),
     publicAccess: parseInt(o.PublicAccess, 10) === 1,
     objectNumber: o.objectnumber,
-    titles: parseObjectOrArray(o.titles, parseText),
+    sortNumber: getSortnumber(o.objectnumber),
+    classification: getClassifications(o.areacategories),
+    title: getTextByLanguage(o.titles, 'title'),
     displayDate: o.dated,
     beginDate: parseFloat(o.datebegin),
     endDate: parseFloat(o.dateend),
-    dimensions: parseObjectOrArray(o.dimensions, parseText),
-    mediums: parseObjectOrArray(o.mediums, parseText),
-    creditLines: parseObjectOrArray(o.creditlines, parseText),
+    dimension: getTextByLanguage(o.dimensions, 'dimensions'),
+    medium: getTextByLanguage(o.mediums, 'medium'),
+    creditLine: getTextByLanguage(o.creditlines, 'creditline'),
     /*
     areacategories: parseObjectOrArray(o.areacategories, parseAreaCategory),
     areacategory_concat: parseObjectOrArray(
@@ -586,6 +617,7 @@ const processFile = async (tms, filename) => {
       }))
     objectsJSON = json.objects.object.map((object) => parseObject(object))
   } catch (er) {
+    console.log(er)
     tmsLogger.object(`Failed to parse that file tms ${tms}`, {
       action: 'error',
       stub: tms
@@ -795,8 +827,7 @@ const makePerfect = async () => {
   })
 
   if (foundItemToUpload && processFilename !== null) {
-    const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
-    const processFileJSON = JSON.parse(processFileRaw)
+    const processFileJSON = {}
     processFileJSON.artInt = await artisanalints.createArtisanalInt()
     const perfectFilePretty = JSON.stringify(processFileJSON, null, 4)
     fs.writeFileSync(perfectFilename, perfectFilePretty, 'utf-8')

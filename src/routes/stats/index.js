@@ -2,8 +2,9 @@ const Config = require('../../classes/config')
 const fs = require('fs')
 const path = require('path')
 const LineByLineReader = require('line-by-line')
+const elasticsearch = require('elasticsearch')
 
-exports.index = (req, res) => {
+exports.index = async (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
     return res.redirect('/')
   }
@@ -75,6 +76,65 @@ exports.index = (req, res) => {
     })
   }
   req.templateValues.tms = newTMS
+
+  //  THIS IS BAD
+  //  I'm now going to check all the mplus_objects. I should really be doing
+  //  this inside the TMS loop, as we may have more than one thing. But for
+  //  the moment I'm just going to do it here
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  let publicAccessTrue = null
+  let publicAccessFalse = null
+
+  if (elasticsearchConfig !== null) {
+    const esclient = new elasticsearch.Client(elasticsearchConfig)
+    const index = `objects_mplus`
+
+    //  Get all the public access files
+    try {
+      const record = await esclient.count({
+        index,
+        body: {
+          query: {
+            term: {
+              publicAccess: true
+            }
+          }
+        }
+      })
+      publicAccessTrue = parseInt(record.count, 10)
+    } catch (err) {
+      publicAccessTrue = null
+    }
+
+    //  Get all the non public access files
+    try {
+      const record = await esclient.count({
+        index,
+        body: {
+          query: {
+            term: {
+              publicAccess: false
+            }
+          }
+        }
+      })
+      publicAccessFalse = parseInt(record.count, 10)
+    } catch (err) {
+      publicAccessFalse = null
+    }
+  }
+
+  if (publicAccessTrue !== null && publicAccessFalse !== null) {
+    req.templateValues.publicAccess = {
+      trueTotal: publicAccessTrue,
+      falseTotal: publicAccessFalse,
+      total: publicAccessTrue + publicAccessFalse,
+      truePercent: Math.ceil(publicAccessTrue / (publicAccessTrue + publicAccessFalse) * 100),
+      falsePercent: Math.floor(publicAccessFalse / (publicAccessTrue + publicAccessFalse) * 100)
+    }
+  }
   return res.render('stats/index', req.templateValues)
 }
 
