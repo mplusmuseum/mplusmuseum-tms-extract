@@ -60,13 +60,12 @@
         </table>
       </form>
 
-      {{!---
       <form method="post" enctype="multipart/form-data">
         <table class="api">
           <tr>
-            <td style="width: 40%">Authors file:</td>
+            <td style="width: 40%">Authors (Constituent) file:</td>
             <td>
-              <input type="file" name="authorsFile">
+              <input type="file" name="constituentFile">
             </td>
           </tr>
           <tr>
@@ -84,13 +83,14 @@
           <tr>
             <td>
               <br />
-              <button type="submit" value="updateAuthorsFile" name="action">Upload</button>
+              <button type="submit" value="updateConstituentFile" name="action">Upload</button>
             </td>
             <td>&nbsp;</td>
           </tr>
         </table>
       </form>
-      ---}} {{else}} {{#if user.role.isAdmin}}
+
+      {{else}} {{#if user.role.isAdmin}}
       <p>
         Before you can upload an objects file, you need to register a TMS system that the file has supplemental information for.
         You can do that on the

@@ -108,7 +108,7 @@ router.use(function (req, res, next) {
   const urlSplit = urlClean.split('/')
   if (urlSplit[0] === '') urlSplit.shift()
   if (!nonLangUrls.includes(urlSplit[0])) {
-    console.log(urlSplit)
+    // console.log(urlSplit)
     //  Check to see if the first entry isn't a language,
     //  if it's not pop the selectedLang into the url
     //  and try again
@@ -250,7 +250,8 @@ router.post('/:lang/stats', ensureLoggedIn, stats.index)
 router.get('/:lang/uploadFile', ensureLoggedIn, uploadFile.index)
 router.post('/:lang/uploadFile', ensureLoggedIn, uploadFile.getfile)
 router.get('/:lang/wait', main.wait)
-router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
+router.get('/:lang/search/constituents/:tms/:id', ensureLoggedIn, search.constituents.index)
+router.get('/:lang/search/constituents/:tms/:id', ensureLoggedIn, search.constituents.index)
 
 router.get('/api', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)

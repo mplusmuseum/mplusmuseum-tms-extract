@@ -2,6 +2,7 @@ const Config = require('../../classes/config')
 const formidable = require('formidable')
 const logging = require('../../modules/logging')
 const processObjects = require('../../modules/processingFiles/objects')
+const processConstituents = require('../../modules/processingFiles/constituents')
 
 exports.index = (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
@@ -55,6 +56,7 @@ exports.getfile = async (req, res) => {
     }
 
     const tms = fields.tms
+
     if ('objectFile' in files) {
       //  TODO: Wrap this in a promise!!
       new Promise((resolve, reject) => {
@@ -65,6 +67,21 @@ exports.getfile = async (req, res) => {
         req.templateValues.newObjects = results.newObjects
         req.templateValues.modifiedObjects = results.modifiedObjects
         req.templateValues.totalObjects = results.totalObjects
+        req.templateValues.ms = results.ms
+        return res.render('uploadFile/results', req.templateValues)
+      })
+    }
+
+    if ('constituentFile' in files) {
+      //  TODO: Wrap this in a promise!!
+      new Promise((resolve, reject) => {
+        resolve(processConstituents.processFile(tms, files.constituentFile.path))
+      }).then((results) => {
+        req.templateValues.fields = results.fields
+        req.templateValues.type = results.type
+        req.templateValues.newConstituents = results.newConstituents
+        req.templateValues.modifiedConstituents = results.modifiedConstituents
+        req.templateValues.totalConstituents = results.totalConstituents
         req.templateValues.ms = results.ms
         return res.render('uploadFile/results', req.templateValues)
       })
