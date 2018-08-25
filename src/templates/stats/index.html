@@ -46,9 +46,24 @@
           </td>
         </tr>
 
+        <td>
+          <td colspan="2">&nbsp;</td>
+        </td>
+
+        <tr>
+          <td style="vertical-align: top">{{../i18n.stats.total_constituents_processed}}</td>
+          <td>{{prettyNumber constituentsProcessed}}</td>
+        </tr>
+        <tr>
+          <td style="vertical-align: top">{{../i18n.stats.constituent_files_waiting}}</td>
+          <td>{{prettyNumber constituentsWaitingToBeProcessed}} (Finishes {{timeAgo timeToUpsertConstituents}}, estimate)
+          </td>
+        </tr>
+
         <tr>
           <td colspan="2">&nbsp;</td>
         </tr>
+
         <tr>
           <td>{{../i18n.stats.results_generated_in}}</td>
           <td>{{prettyNumber ms}}ms</td>
@@ -63,6 +78,23 @@
               <td style="width: 25%">{{../i18n.stats.search_object}}:</td>
               <td>
                 <input type="text" name="objectID">
+              </td>
+              <td>
+                <input type="hidden" name="tms" value="{{stub}}">
+                <button class="capitalize" type="submit" value="search" name="action">{{../i18n.stats.go}}</button>
+              </td>
+            </tr>
+          </table>
+        </form>
+      </p>
+
+      <p>
+        <form method="post">
+          <table class="api">
+            <tr>
+              <td style="width: 25%">{{../i18n.stats.search_constituent}}:</td>
+              <td>
+                <input type="text" name="constituentID">
               </td>
               <td>
                 <input type="hidden" name="tms" value="{{stub}}">
