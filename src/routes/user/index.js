@@ -1,7 +1,6 @@
 const fs = require('fs')
 const path = require('path')
 const langDir = path.join(__dirname, '../../../lang')
-const User = require('../../classes/user')
 
 exports.settings = (req, res) => {
   //  Grab the languages

@@ -7,7 +7,7 @@ const router = express.Router()
 const User = require('../classes/user')
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
 const Config = require('../classes/config')
-const getDefaultTemplateData = require('../helpers').getDefaultTemplateData;
+const getDefaultTemplateData = require('../helpers').getDefaultTemplateData
 
 // Break out all the seperate parts of the site
 /* eslint-disable import/no-unresolved */
@@ -57,14 +57,13 @@ router.use(function (req, res, next) {
 //
 // ############################################################################
 router.use(function (req, res, next) {
-  req.templateValues = getDefaultTemplateData();
+  req.templateValues = getDefaultTemplateData()
   const configObj = new Config()
   req.config = configObj
   req.templateValues.config = req.config
 
   const defaultLang = 'en'
   let selectedLang = 'en'
-
 
   if (req.user === undefined) {
     req.user = null
