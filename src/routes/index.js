@@ -108,7 +108,7 @@ router.use(function (req, res, next) {
   const urlSplit = urlClean.split('/')
   if (urlSplit[0] === '') urlSplit.shift()
   if (!nonLangUrls.includes(urlSplit[0])) {
-    console.log(urlSplit)
+    // console.log(urlSplit)
     //  Check to see if the first entry isn't a language,
     //  if it's not pop the selectedLang into the url
     //  and try again
