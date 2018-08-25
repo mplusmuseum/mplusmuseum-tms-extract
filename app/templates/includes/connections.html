@@ -13,6 +13,6 @@
   <div class="languages">
     Language: {{#each langs}} {{#ifEqual ../user.lang @this}}
     <strong>{{../this}}</strong>{{else}}
-    <a href="/settings/language/{{../this}}">{{../this}}</a> {{/ifEqual}} {{/each}}
+    <a href="/{{../this}}{{../../remainingUrl}}">{{../this}}</a> {{/ifEqual}} {{/each}}
   </div>
 </div>

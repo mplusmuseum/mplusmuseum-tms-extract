@@ -75,6 +75,7 @@ router.use(function (req, res, next) {
       req.user.roles = {
         isAdmin: false,
         isDeveloper: false,
+        isVendor: false,
         isStaff: false
       }
     }
@@ -83,14 +84,7 @@ router.use(function (req, res, next) {
     } else {
       req.user.apitoken = null
     }
-    if ('user_metadata' in req.user && 'lang' in req.user.user_metadata) {
-      req.user.lang = req.user.user_metadata.lang
-    } else {
-      req.user.lang = 'en'
-    }
-    selectedLang = req.user.lang
   }
-  req.templateValues.user = req.user
 
   //  Read in the language files and overlay the selected langage on the
   //  default one
@@ -106,6 +100,32 @@ router.use(function (req, res, next) {
     return langSplit[1]
   })
   req.templateValues.langs = langs
+
+  //  If we are *not* on a login, logout or callback url then
+  //  we need to check for langage stuff
+  const nonLangUrls = ['login', 'logout', 'callback', 'images']
+  const urlClean = req.url.split('?')[0]
+  const urlSplit = urlClean.split('/')
+  if (urlSplit[0] === '') urlSplit.shift()
+  if (!nonLangUrls.includes(urlSplit[0])) {
+    console.log(urlSplit)
+    //  Check to see if the first entry isn't a language,
+    //  if it's not pop the selectedLang into the url
+    //  and try again
+    if (!(langs.includes(urlSplit[0]))) {
+      return res.redirect(`/${defaultLang}${req.url}`)
+    } else {
+      selectedLang = urlSplit[0]
+    }
+
+    //  Now we can work out the *rest* of the URL _without_ the
+    //  langage part
+    urlSplit.shift()
+    req.templateValues.remainingUrl = `/${urlSplit.join('/')}`
+  }
+  if (req.user !== null) req.user.lang = selectedLang
+  req.templateValues.user = req.user
+
   const i18n = JSON.parse(fs.readFileSync(path.join(langDir, `strings.${defaultLang}.json`)))
   if (selectedLang !== defaultLang) {
     const selectedi18n = JSON.parse(fs.readFileSync(path.join(langDir, `strings.${selectedLang}.json`)))
@@ -164,33 +184,6 @@ router.use(function (req, res, next) {
   next()
 })
 
-router.get('/', main.status)
-router.post('/', main.status)
-router.get('/config', ensureLoggedIn, config.index)
-router.post('/config', ensureLoggedIn, config.index)
-router.get('/settings', ensureLoggedIn, user.settings)
-router.get('/settings/language/:lang', ensureLoggedIn, user.setLanguage)
-router.get('/admin', ensureLoggedIn, admin.index)
-router.post('/admin/blow/away/index/:index', ensureLoggedIn, admin.blowaway)
-router.post('/admin/aggregate/:tms', ensureLoggedIn, admin.aggrigateObjects)
-router.get('/admin/users', ensureLoggedIn, admin.users)
-router.get('/admin/user/:id', ensureLoggedIn, admin.user)
-router.post('/admin/user/:id', ensureLoggedIn, admin.user)
-router.get('/developer', ensureLoggedIn, developer.index)
-router.get('/developer/graphql', ensureLoggedIn, developer.graphql)
-router.get('/developer/graphql/status', ensureLoggedIn, developer.status.graphql)
-router.get('/developer/elasticsearch/status', ensureLoggedIn, developer.status.elasticsearch)
-router.get('/stats', ensureLoggedIn, stats.index)
-router.get('/stats/logs', ensureLoggedIn, stats.logs)
-router.post('/stats', ensureLoggedIn, stats.index)
-router.get('/uploadFile', ensureLoggedIn, uploadFile.index)
-router.post('/uploadFile', ensureLoggedIn, uploadFile.getfile)
-router.get('/wait', main.wait)
-router.get('/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
-
-router.get('/api', ensureLoggedIn, api.index)
-router.post('/api/checkToken', api.checkToken)
-
 // ############################################################################
 //
 //  Log in and log out tools
@@ -228,11 +221,38 @@ if (configObj.get('auth0') !== null) {
       failureRedirect: '/'
     }),
     async function (req, res) {
+      console.log('IN CALLBACK')
       //  Update the user with extra information
       req.session.passport.user = await new User().get(req.user)
       res.redirect(req.session.returnTo || '/')
     }
   )
 }
+
+router.get('/:lang', main.status)
+router.post('/:lang', main.status)
+router.get('/:lang/config', ensureLoggedIn, config.index)
+router.post('/:lang/config', ensureLoggedIn, config.index)
+router.get('/:lang/settings', ensureLoggedIn, user.settings)
+router.get('/:lang/admin', ensureLoggedIn, admin.index)
+router.post('/:lang/admin/blow/away/index/:index', ensureLoggedIn, admin.blowaway)
+router.post('/:lang/admin/aggregate/:tms', ensureLoggedIn, admin.aggrigateObjects)
+router.get('/:lang/admin/users', ensureLoggedIn, admin.users)
+router.get('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
+router.post('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
+router.get('/:lang/developer', ensureLoggedIn, developer.index)
+router.get('/:lang/developer/graphql', ensureLoggedIn, developer.graphql)
+router.get('/:lang/developer/graphql/status', ensureLoggedIn, developer.status.graphql)
+router.get('/:lang/developer/elasticsearch/status', ensureLoggedIn, developer.status.elasticsearch)
+router.get('/:lang/stats', ensureLoggedIn, stats.index)
+router.get('/:lang/stats/logs', ensureLoggedIn, stats.logs)
+router.post('/:lang/stats', ensureLoggedIn, stats.index)
+router.get('/:lang/uploadFile', ensureLoggedIn, uploadFile.index)
+router.post('/:lang/uploadFile', ensureLoggedIn, uploadFile.getfile)
+router.get('/:lang/wait', main.wait)
+router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
+
+router.get('/api', ensureLoggedIn, api.index)
+router.post('/api/checkToken', api.checkToken)
 
 module.exports = router
