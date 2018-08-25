@@ -5,12 +5,7 @@ const rootDir = path.join(__dirname, '../../../data')
 const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
-const aggregateObjects = async (tms) => {
-  return 'done'
-}
-exports.aggregateObjects = aggregateObjects
-
-const upsertObject = async (type, tms, id) => {
+const upsertItem = async (type, tms, id) => {
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have elasticsearch configured
@@ -73,7 +68,7 @@ const upsertObject = async (type, tms, id) => {
 
     fs.renameSync(processFilename, processedFilename)
     const endTime = new Date().getTime()
-    tmsLogger.object(`Upserted item for object ${id} for ${tms}`, {
+    tmsLogger.object(`Upserted item for ${type} ${id} for ${tms}`, {
       action: `upserted_${type}`,
       id: id,
       tms: tms,
@@ -81,10 +76,13 @@ const upsertObject = async (type, tms, id) => {
     })
 
     //  We are going to reset the timeout to update the aggrigations
+    /*
     clearTimeout(global.update_aggrigations)
     global.update_aggrigations = setTimeout(() => {
       aggregateObjects(tms)
+      aggregateObjects(tms)
     }, 60 * 1000 * 2) // Do it in two minutes time
+    */
   })
 }
 
@@ -110,7 +108,7 @@ const checkItems = async () => {
     return
   }
 
-  const types = ['objects']
+  const types = ['objects', 'constituents']
   const tmsses = config.get('tms')
 
   //  Now we need to look through all the folders in the data/[something]/[tms]perfect/[number]
@@ -148,7 +146,7 @@ const checkItems = async () => {
             if (!('artInt' in perfectFile) || perfectFile.artInt === null || perfectFile.artInt === '') return
 
             foundItemToUpload = true
-            upsertObject(type, tms.stub, file.split('.')[0])
+            upsertItem(type, tms.stub, file.split('.')[0])
           })
         })
       }

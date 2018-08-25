@@ -63,39 +63,39 @@
         You should be able to track the progress of new uploaded via the
         <a href="/stats">Stats</a> page.
       </p>
-      {{/if}} {{/ifEqual}} {{#ifEqual type 'authors'}}
-      <h2>Authors XML</h2>
+      {{/if}} {{/ifEqual}} {{#ifEqual type 'constituents'}}
+      <h2>Constituents XML</h2>
       {{#if ../error}}
       <p>
-        You have just tried to upload an authors file, it failed with the following error...
+        You have just tried to upload an constituents file, it failed with the following error...
       </p>
       <p>
         {{../../error.msg}}
       </p>
       {{else}}
       <p>
-        You have just uploaded an authors file...
+        You have just uploaded an constituents file...
       </p>
 
       <p>
         <table>
           <tr>
-            <td style="width: 20%">Total authors</td>
-            <td>{{../../totalAuthors}}</td>
+            <td style="width: 20%">Total constituents</td>
+            <td>{{../../totalConstituents}}</td>
           </tr>
           <tr>
-            <td>New exhibitions</td>
-            <td>{{../../newAuthors}}</td>
+            <td>New constituents</td>
+            <td>{{../../newConstituents}}</td>
           </tr>
           <tr>
-            <td>Modified exhibitions</td>
-            <td>{{../../modifiedAuthors}}</td>
+            <td>Modified constituents</td>
+            <td>{{../../modifiedConstituents}}</td>
           </tr>
         </table>
       </p>
       {{#if ../../fields}}
       <p>
-        These are the fields contained in all the authors...
+        These are the fields contained in all the constituents...
       </p>
       <p>
         <table>
