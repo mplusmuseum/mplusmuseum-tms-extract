@@ -73,6 +73,29 @@
               <li>
                 <a href="#mediums">Mediums</a>
               </li>
+              <li>
+                <a href="#constituents">Constituents</a>
+                <ul>
+                  <li>
+                    <a href="#constituents-paginationandfilter">Pagination and filter example</a>
+                  </li>
+                  <li>
+                    <a href="#constituents-sorting">Sorting example</a>
+                  </li>
+                  <li>
+                    <a href="#constituents-fetchingbyids">Fetching by ids example</a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a href="#constituent">Constituent</a>
+              </li>
+              <li>
+                <a href="#nesting">Nesting objects in constituents and constituents in objects</a>
+              </li>
+              <li>
+                <a href="#objects-connected-constituent">Finding objects connected to a constituent</a>
+              </li>
             </ul>
           </li>
         </ul>
@@ -382,7 +405,6 @@
         <pre class="query node">{{{nodeQuery queries.objectLarge '(id: 119)' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-
       <hr />
 
       <h3>
@@ -575,6 +597,257 @@
       <p>
         <pre class="query node">{{{nodeQuery queries.mediums '' config.graphql.host user.apitoken}}}</pre>
       </p>
+
+      <hr />
+
+      <h3>
+        <a name="constituents">Constituents</a>
+      </h3>
+
+      <p>
+        Constituents are people and institutions connected to an object, for example they may be the artists or the seller or buyer,
+        they may be the curator or the institution the displays the object.
+      </p>
+      <p>
+        This query selects all of the constituents and can be filtered by certain fields shown below. Note: filters are
+        <em>additive</em> rather than
+        <em>or</em>, filtering two fields will only return records that match both.
+      </p>
+
+      <p>
+        Valid filters are:
+        <code class="red">page</code>,
+        <code class="red">per_page</code>,
+        <code class="red">sort_field</code>,
+        <code class="red">sort</code>,
+        <code class="red">[ids]</code>,
+        <code class="red">gender</code>,
+        <code class="red">beginDate</code>,
+        <code class="red">endDate</code>,
+        <code class="red">nationality</code> and
+        <code class="red">lang</code>
+      </p>
+
+      <p>
+        Valid values for the
+        <code class="red">sort_field</code> are
+        <code>id</code>,
+        <code>name</code>,
+        <code>sortNumber</code>,
+        <code>alphaSortName</code>,
+        <code>gender</code>,
+        <code>beginDate</code>,
+        <code>endDate</code> and
+        <code>nationality</code>, values for
+        <code class="red">sort</code> are
+        <code>asc</code> and
+        <code>desc</code>.
+      </p>
+
+      <p>
+        The only valid values for
+        <code class="red">lang</code> are
+        <code>en</code>,
+        <code>zh-hant</code> and
+        <code>zh-hans</code>. The default is
+        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
+        <code>en</code> version if there is one.
+      </p>
+
+      <h3>
+        Here is the simplest call to get all constituent ids
+      </h3>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituents "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituents ''}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.constituents '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.constituents '' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="constituents-paginationandfilter">Pagination and filter</a>
+      </h3>
+
+      <p>
+        Here we are asking for slightly more information, note how we can use the
+        <code class="red">per_page</code> filter to limit the number of results.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituents "(page:3, per_page: 5, gender: \"Female\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituents '(page:3, per_page: 5, gender: "Female")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.constituents '(page:3, per_page: 5, gender: \\\"Female\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.constituents '(page:3, per_page: 5, gender: "Female")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="constituents-sorting">Sorting</a>
+      </h3>
+
+      <p>
+        Here is an example of sorting by
+        <code>alphaSortName</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituents "(sort_field: \"alphaSortName\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituents '(sort_field: "alphaSortName", sort: "asc")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.constituents '(sort_field: \\\"alphaSortName\\\", sort: \\\"asc\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.constituents '(sort_field: "alphaSortName", sort: "asc")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <h3>
+        <a name="constituents-fetchingbyids">Fetching by ids</a>
+      </h3>
+
+      <p>
+        You can also ask for specific constituents by passing in an array of
+        <code class="red">ids</code>.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituents "(ids:[238, 382, 459, 608], lang: \"zh-hant\")" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituents '(ids:[238, 382, 459, 608], lang: "zh-hant")'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.constituents '(ids:[238, 382, 459, 608], lang: \\\"zh-hant\\\")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.constituents '(ids:[238, 382, 459, 608], lang: "zh-hant")' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="constituent">Constituent</a>
+      </h3>
+
+      <p>
+        You can get a single constituent by passing in the
+        <code class="red">id</code> parameter. Here we are showing
+        <em>all</em> the fields possible.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituent "(id: 1458)" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituent '(id: 1458)'}}}</pre>
+
+      <p>
+        cURL
+      </p>
+      <p>
+        <pre class="query terminal">{{{curlQuery queries.constituent '(id: 1458)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <p>
+        NodeJS.
+      </p>
+      <p>
+        <pre class="query node">{{{nodeQuery queries.constituent '(id: 1458)' config.graphql.host user.apitoken}}}</pre>
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="nesting">Nesting objects in constituents and constituents in objects</a>
+      </h3>
+
+      <p>
+        When you are searching for objects you can nest a limited version of constituents in the results. If you are requesting
+        <strong>Objects</strong> you can get the constituents with the following query.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsConstituent "" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsConstituent ''}}}</pre>
+
+      <p>
+        If you are asking for a single Object then you can get a bit more information about the constituents, see the example below.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectConstituent "(id: 119)" config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectConstituent '(id: 119)'}}}</pre>
+
+      <p>
+        You cannot keep nesting objects and constituents beyond the first two levels, because they would just keep including each
+        other forever.
+      </p>
+
+      <p>
+        You can also next constituents inside objects, but again with limited information returned and only down two levels.
+      </p>
+
+      <hr />
+
+      <h3>
+        <a name="objects-connected-constituent">Finding objects connected to a constituent</a>
+      </h3>
+
+      <p>
+        There are two ways to find objects connected to a constituent. If we wanted to find all the objects created by an artist
+        we can run a query to find that artists and request the objects connected to the within the query, as shown below.
+      </p>
+
+      [example goes here]
+
+      <p>
+        You can also do a search on objects using the constituent ID as a filter. The advantage of the second way allows you to filter
+        the results with other filters. The below query shows all the objects curated by a user with a certain medium type.
+      </p>
+
+      [example goes here]
+
+      <hr />
+
     </div>
   </div>
 
