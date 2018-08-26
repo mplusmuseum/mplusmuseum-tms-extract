@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Dashboard - GraphQL Documentation</title>
+  <title>Dashboard - {{i18n.documentation.documentation}}</title>
   {{> head}}
   <link href="/css/prism.css" rel="stylesheet" />
 </head>
@@ -13,88 +13,85 @@
   <div class="wrapper">
     <div class="container admin-layout documentation">
 
-      <h1>GraphQL Documention</h1>
+      <h1>{{i18n.documentation.documentation}}</h1>
       <p>
-        Here you can find out all about how to make GraphQL calls. Remember you will need your developer key which you can always
-        find on the main
-        <a href="/developer">Developers Help</a> page, but it's also here:
+        {{{i18n.documentation.intro}}}
         <code>{{user.apitoken}}</code>
       </p>
 
       <p class="note">
-        <strong>NOTE:</strong> This documentation is very new and evolving but should be enough to get you up and running, we will
-        be expanding it in the near future.
+        {{{i18n.documentation.note}}}
       </p>
       <hr>
 
-      <h1>Table of Contents</h1>
+      <h1>{{i18n.documentation.TOC}}</h1>
       <p>
         <ul class="toc">
           <li>
-            <a href="#about-graphql">About GraphQL</a>
+            <a href="#about-graphql">{{i18n.documentation.about-graphql}}</a>
             <ul>
               <li>
-                <a href="#comminicating-with-graphql">Communicating with GraphQL</a>
+                <a href="#communicating-with-graphql">{{i18n.documentation.communicating-with-graphql}}</a>
               </li>
               <li>
-                <a href="#graphql-playground">GraphQL playground</a>
+                <a href="#graphql-playground">{{i18n.documentation.graphql-playground}}</a>
               </li>
             </ul>
           </li>
           <li>
-            <a href="#graphql-queries">GraphQL Queries</a>
+            <a href="#graphql-queries">{{i18n.documentation.graphql-queries}}</a>
             <ul>
               <li>
-                <a href="#introspection">Introspection</a>
+                <a href="#introspection">{{i18n.documentation.introspection}}</a>
               </li>
               <li>
-                <a href="#objects">Objects</a>
+                <a href="#objects">{{i18n.documentation.objects}}</a>
                 <ul>
                   <li>
-                    <a href="#paginationandfilter">Pagination and filter example</a>
+                    <a href="#paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
                   </li>
                   <li>
-                    <a href="#sorting">Sorting example</a>
+                    <a href="#sorting">{{i18n.documentation.sorting}}</a>
                   </li>
                   <li>
-                    <a href="#fetchingbyids">Fetching by ids example</a>
+                    <a href="#fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
                   </li>
                 </ul>
               </li>
               <li>
-                <a href="#object">Object</a>
+                <a href="#object">{{i18n.documentation.object}}</a>
               </li>
               <li>
-                <a href="#areas">Areas</a>
+                <a href="#areas">{{i18n.documentation.areas}}</a>
               </li>
               <li>
-                <a href="#categories">Categories</a>
+                <a href="#categories">{{i18n.documentation.categories}}</a>
               </li>
               <li>
-                <a href="#mediums">Mediums</a>
+                <a href="#mediums">{{i18n.documentation.mediums}}</a>
               </li>
               <li>
-                <a href="#constituents">Constituents</a>
+                <a href="#constituents">{{i18n.documentation.constituents}}</a>
                 <ul>
                   <li>
-                    <a href="#constituents-paginationandfilter">Pagination and filter example</a>
+                    <a href="#constituents-paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
                   </li>
                   <li>
-                    <a href="#constituents-sorting">Sorting example</a>
+                    <a href="#constituents-sorting">{{i18n.documentation.sorting}}</a>
                   </li>
                   <li>
-                    <a href="#constituents-fetchingbyids">Fetching by ids example</a>
+                    <a href="#constituents-fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
                   </li>
                 </ul>
               </li>
               <li>
-                <a href="#constituent">Constituent</a>
+                <a href="#constituent">{{i18n.documentation.constituent}}</a>
               </li>
               <li>
-                <a href="#nesting">Nesting objects in constituents and constituents in objects</a>
+                <a href="#nesting">{{i18n.documentation.nesting}}</a>
               </li>
               <li>
-                <a href="#objects-connected-constituent">Finding objects connected to a constituent</a>
+                <a href="#objects-connected-constituent">{{i18n.documentation.objects-connected-constituent}}</a>
               </li>
             </ul>
           </li>
@@ -104,110 +101,94 @@
       <hr>
 
       <h2>
-        <a name="about-graphql">About GraphQL</a>
+        <a name="about-graphql">{{i18n.documentation.about-graphql}}</a>
       </h2>
 
       <p>
-        GraphQL is a data query language you'll use to request information from the M+ data store. Traditionally GraphQL allows two
-        types of operations,
-        <em>queries</em> and
-        <em>mutations</em> these can be thought of as
-        <em>read</em> and
-        <em>write</em> operations.
+        {{{i18n.documentation.graphql-about-1}}}
       </p>
       <p>
-        As well as one more operation called
-        <em>
-          <a href="#introspection">introspection</a>
-        </em>, which allows you to ask the GraphQL endpoint about itself.
+        {{{i18n.documentation.graphql-about-2}}}
       </p>
       <p>
-        Below you will find examples of various calls to can make to the GraphQL endpoint.
+        {{i18n.documentation.graphql-about-3}}
       </p>
 
 
       <h3>
-        <a name="comminicating-with-graphql">Communicating with GraphQL</a>
+        <a name="communicating-with-graphql">{{i18n.documentation.communicating-with-graphql}}</a>
       </h3>
 
       <p>
-        The single endpoint for all GraphQL calls is...
+        {{{i18n.documentation.graphql-communicating-1}}}
       </p>
       <p>
         <code>{{config.graphql.host}}/graphql</code>
       </p>
       <p>
-        GraphQL operations consist of multiline JSON, an example "Hello World" GraphQL query is show below:
+        {{{i18n.documentation.graphql-communicating-2}}}
       </p>
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.hello "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.hello "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.hello ''}}}</pre>
 
       <p>
-        To query GraphQL using cURL, make a
-        <code>POST</code> request with a JSON payload as
-        <code>--data-binary</code>. You must also include your API token as
-        <code>bearer</code> authorization.
+        {{{i18n.documentation.graphql-communicating-3}}}
       </p>
       <p>
         <pre class="query terminal">{{{curlQuery queries.hello '' config.graphql.host user.apitoken}}}</pre>
       </p>
       <p>
-        Using Nodejs it may look like this, making sure to pass in your API token as a
-        <code>bearer</code> token as shown.
+        {{{i18n.documentation.graphql-communicating-4}}}
       </p>
       <p>
         <pre class="query node">{{{nodeQuery queries.hello '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
       <h3>
-        <a name="graphql-playground">GraphQL playground</a>
+        <a name="graphql-playground">{{i18n.documentation.graphql-playground}}</a>
       </h3>
       <p>
-        Probably the easiest way to try out GraphQL queries is to use the playground which can be found here:
+        {{{i18n.documentation.graphql-communicating-5}}}
         <a href="{{config.graphql.host}}/playground">{{config.graphql.host}}/playground</a>
       </p>
 
       <p>
-        You can see an
-        <a href='{{exploreQuery queries.objectsMedium "" config.graphql.host}}'>example query in the playground here</a>, you will need to press the "run" button to see the results of the query.
+        {{{i18n.documentation.graphql-communicating-6}}}
+        <a href='{{exploreQuery queries.objectsMedium "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <hr>
 
       <h2>
-        <a name="graphql-queries">About GraphQL</a>
+        <a name="graphql-queries">{{i18n.documentation.graphql-queries}}</a>
       </h2>
 
       <p>
-        Below you'll find a list of the current queries you can make against the data store.
+        {{{i18n.documentation.graphql-communicating-7}}}
       </p>
 
       <h2>
-        <a name="introspection">Introspection</a>
+        <a name="introspection">{{i18n.documentation.introspection}}</a>
       </h2>
 
       <p>
-        The
-        <em>introspection</em> operation is the only operation you can call using
-        <code>GET</code>. Introspection allows you to query the GraphQL schema for details about itself. Query
-        <code class="red">__schema</code> to list all types defined in the schema and get details about each:
+        {{{i18n.documentation.graphql-introspection-1}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <pre class="query">{{{graphQLQuery queries.schema}}}</pre>
 
       <p>
-        Query
-        <code class="red">__type</code> to get details about any type:
+        {{{i18n.documentation.graphql-introspection-2}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.type "(name:\"Object\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.type "(name:\"Object\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <pre class="query">{{{graphQLQuery queries.type '(name: "Object")'}}}</pre>
@@ -215,64 +196,30 @@
       <hr />
 
       <h3>
-        <a name="objects">Objects</a>
+        <a name="objects">{{i18n.documentation.objects}}</a>
       </h3>
 
       <p>
-        This query selects all of the objects and can be filtered by certain fields shown below. Note: filters are
-        <em>additive</em> rather than
-        <em>or</em>, filtering two fields will only return records that match both.
+        {{{i18n.documentation.graphql-objects-1}}}
+      </p>
+
+      <p>{{{i18n.documentation.graphql-objects-2}}}
       </p>
 
       <p>
-        Valid filters are:
-        <code class="red">page</code>,
-        <code class="red">per_page</code>,
-        <code class="red">sort_field</code>,
-        <code class="red">sort</code>,
-        <code class="red">[ids]</code>,
-        <code class="red">classification.area</code>,
-        <code class="red">classification.category</code>,
-        <code class="red">medium</code>,
-        <code class="red">displayDate</code>,
-        <code class="red">beginDate</code>,
-        <code class="red">endDate</code> and
-        <code class="red">lang</code>
+        {{{i18n.documentation.graphql-objects-3}}}
       </p>
 
       <p>
-        Valid values for the
-        <code class="red">sort_field</code> are
-        <code>id</code>,
-        <code>objectNumber</code>,
-        <code>sortNumber</code>,
-        <code>title</code>,
-        <code>displayDate</code>,
-        <code>beginDate</code>,
-        <code>endDate</code>,
-        <code>classification.area</code> and
-        <code>classification.category</code>, values for
-        <code class="red">sort</code> are
-        <code>asc</code> and
-        <code>desc</code>.
-      </p>
-
-      <p>
-        The only valid values for
-        <code class="red">lang</code> are
-        <code>en</code>,
-        <code>zh-hant</code> and
-        <code>zh-hans</code>. The default is
-        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
-        <code>en</code> version if there is one.
+        {{{i18n.documentation.valid-lang}}}
       </p>
 
       <h3>
-        Here is the simplest call to get all object ids
+        {{{i18n.documentation.graphql-objects-5}}}
       </h3>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMini "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsMini "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMini ''}}}</pre>
 
@@ -291,16 +238,15 @@
       </p>
 
       <h3>
-        <a name="paginationandfilter">Pagination and filter</a>
+        <a name="paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
       </h3>
 
       <p>
-        Here we are asking for slightly more information, note how we can use the
-        <code class="red">per_page</code> filter to limit the number of results.
+        {{{i18n.documentation.object-pagination}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMedium "(page:3, per_page: 5, area: \"Moving Image\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsMedium "(page:3, per_page: 5, area: \"Moving Image\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMedium '(page:3, per_page: 5, area: "Moving Image")'}}}</pre>
 
@@ -319,16 +265,15 @@
       </p>
 
       <h3>
-        <a name="sorting">Sorting</a>
+        <a name="sorting">{{i18n.documentation.sorting}}</a>
       </h3>
 
       <p>
-        Here is an example of sorting by
-        <code>sortNumber</code>.
+        {{{i18n.documentation.object-sort-example}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsLarge "(sort_field: \"sortNumber\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsLarge "(sort_field: \"sortNumber\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsLarge '(sort_field: "sortNumber", sort: "asc")'}}}</pre>
 
@@ -347,16 +292,15 @@
       </p>
 
       <h3>
-        <a name="fetchingbyids">Fetching by ids</a>
+        <a name="fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
       </h3>
 
       <p>
-        You can also ask for specific objects by passing in an array of
-        <code class="red">ids</code>.
+        {{{i18n.documentation.object-by-ids-example}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMedium "(ids:[1, 2, 3, 4])" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsMedium "(ids:[1, 2, 3, 4])" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMedium '(ids:[1, 2, 3, 4])'}}}</pre>
 
@@ -377,17 +321,15 @@
       <hr />
 
       <h3>
-        <a name="object">Object</a>
+        <a name="object">{{i18n.documentation.object}}</a>
       </h3>
 
       <p>
-        You can get a single object by passing in the
-        <code class="red">id</code> parameter. Here we are showing
-        <em>all</em> the fields possible.
+        {{{i18n.documentation.object-1}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectLarge "(id: 119)" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectLarge "(id: 119)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectLarge '(id: 119)'}}}</pre>
 
@@ -408,50 +350,32 @@
       <hr />
 
       <h3>
-        <a name="areas">Areas</a>
+        <a name="areas">{{i18n.documentation.areas}}</a>
       </h3>
 
       <p>
-        You can fetch all the valid areas which you can then use to filter objects by. For example running the query below will return
-        a handful of areas, which you would then use in an Object query with
-        <code>(area: "xxxxxxxx")</code> where "xxxxxxxx" is one of the areas returned by this query.
+        {{{i18n.documentation.areas-1}}}
       </p>
 
       <p>
-        Valid filters are
-        <code class="red">per_page</code>,
-        <code class="red">lang</code>,
-        <code class="red">sort</code> and
-        <code class="red">sort_field</code>.
+        {{{i18n.documentation.aggs-filters}}}
       </p>
 
       <p>
-        Valid values for the
-        <code class="red">sort_field</code> are
-        <code>title</code> and
-        <code>count</code>. Valid values for the
-        <code class="red">sort</code> are
-        <code>asc</code> and
-        <code>desc</code>.
+        {{{i18n.documentation.aggs-sort}}}
+
       </p>
 
       <p>
-        The only valid values for
-        <code class="red">lang</code> are
-        <code>en</code>,
-        <code>zh-hant</code> and
-        <code>zh-hans</code>. The default is
-        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
-        <code>en</code> version if there is one.
+        {{{i18n.documentation.valid-lang}}}
       </p>
 
       <p>
-        The
-        <code class="red">per_page</code> filter will limit the number of results, for example
-        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Areas data set.
+        {{{i18n.documentation.aggs-per-page}}}
       </p>
+
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.areas "(lang: \"zh-hant\", sort_field: \"count\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.areas "(lang: \"zh-hant\", sort_field: \"count\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.areas '(lang: "zh-hant", sort_field: "count", sort: "asc")'}}}</pre>
 
@@ -472,51 +396,31 @@
       <hr />
 
       <h3>
-        <a name="categories">Categories</a>
+        <a name="categories">{{i18n.documentation.categories}}</a>
       </h3>
 
       <p>
-        You can fetch all the valid categories which you can then use to filter objects by. For example running the query below will
-        return a handful of categories, which you would then use in an Object query with
-        <code>(category: "xxxxxxxx")</code> where "xxxxxxxx" is one of the categories returned by this query.
+        {{{i18n.documentation.category-1}}}
       </p>
 
       <p>
-        Valid filters are
-        <code class="red">per_page</code>,
-        <code class="red">lang</code>,
-        <code class="red">sort</code> and
-        <code class="red">sort_field</code>.
+        {{{i18n.documentation.aggs-filters}}}
       </p>
 
       <p>
-        Valid values for the
-        <code class="red">sort_field</code> are
-        <code>title</code> and
-        <code>count</code>. Valid values for the
-        <code class="red">sort</code> are
-        <code>asc</code> and
-        <code>desc</code>.
+        {{{i18n.documentation.aggs-sort}}}
       </p>
 
       <p>
-        The only valid values for
-        <code class="red">lang</code> are
-        <code>en</code>,
-        <code>zh-hant</code> and
-        <code>zh-hans</code>. The default is
-        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
-        <code>en</code> version if there is one.
+        {{{i18n.documentation.aggs-lang}}}
       </p>
 
       <p>
-        The
-        <code class="red">per_page</code> filter will limit the number of results, for example
-        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Categories data
-        set.
+        {{{i18n.documentation.aggs-per-page}}}
       </p>
+
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.categories "(lang: \"zh-hans\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.categories "(lang: \"zh-hans\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.categories '(lang: "zh-hans", sort_field: "count", sort: "desc")'}}}</pre>
 
@@ -537,50 +441,31 @@
       <hr />
 
       <h3>
-        <a name="mediums">Mediums</a>
+        <a name="mediums">{{i18n.documentation.mediums}}</a>
       </h3>
 
       <p>
-        You can fetch all the valid mediums which you can then use to filter objects by. For example running the query below will
-        return a handful of mediums, which you would then use in an Object query with
-        <code>(category: "xxxxxxxx")</code> where "xxxxxxxx" is one of the mediums returned by this query.
+        {{{i18n.documentation.medium-1}}}
       </p>
 
       <p>
-        Valid filters are
-        <code class="red">per_page</code>,
-        <code class="red">lang</code>,
-        <code class="red">sort</code> and
-        <code class="red">sort_field</code>.
+        {{{i18n.documentation.aggs-filters}}}
       </p>
 
       <p>
-        Valid values for the
-        <code class="red">sort_field</code> are
-        <code>title</code> and
-        <code>count</code>. Valid values for the
-        <code class="red">sort</code> are
-        <code>asc</code> and
-        <code>desc</code>.
+        {{{i18n.documentation.aggs-sort}}}
       </p>
 
       <p>
-        The only valid values for
-        <code class="red">lang</code> are
-        <code>en</code>,
-        <code>zh-hant</code> and
-        <code>zh-hans</code>. The default is
-        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
-        <code>en</code> version if there is one.
+        {{{i18n.documentation.aggs-lang}}}
       </p>
 
       <p>
-        The
-        <code class="red">per_page</code> filter will limit the number of results, for example
-        <code>(per_page: 10)</code> will return just 10 records. Unlike Objects you cannot paginate through the Mediums data set.
+        {{{i18n.documentation.aggs-per-page}}}
       </p>
+
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.mediums "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.mediums "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.mediums ''}}}</pre>
 
@@ -601,65 +486,34 @@
       <hr />
 
       <h3>
-        <a name="constituents">Constituents</a>
+        <a name="constituents">{{i18n.documentation.constituents}}</a>
       </h3>
 
       <p>
-        Constituents are people and institutions connected to an object, for example they may be the artists or the seller or buyer,
-        they may be the curator or the institution the displays the object.
+        {{{i18n.documentation.constituents-1}}}
       </p>
       <p>
-        This query selects all of the constituents and can be filtered by certain fields shown below. Note: filters are
-        <em>additive</em> rather than
-        <em>or</em>, filtering two fields will only return records that match both.
+        {{{i18n.documentation.constituents-2}}}
       </p>
 
       <p>
-        Valid filters are:
-        <code class="red">page</code>,
-        <code class="red">per_page</code>,
-        <code class="red">sort_field</code>,
-        <code class="red">sort</code>,
-        <code class="red">[ids]</code>,
-        <code class="red">gender</code>,
-        <code class="red">beginDate</code>,
-        <code class="red">endDate</code>,
-        <code class="red">nationality</code> and
-        <code class="red">lang</code>
+        {{{i18n.documentation.constituents-filters}}}
       </p>
 
       <p>
-        Valid values for the
-        <code class="red">sort_field</code> are
-        <code>id</code>,
-        <code>name</code>,
-        <code>sortNumber</code>,
-        <code>alphaSortName</code>,
-        <code>gender</code>,
-        <code>beginDate</code>,
-        <code>endDate</code> and
-        <code>nationality</code>, values for
-        <code class="red">sort</code> are
-        <code>asc</code> and
-        <code>desc</code>.
+        {{{i18n.documentation.constituents-sorts}}}
       </p>
 
       <p>
-        The only valid values for
-        <code class="red">lang</code> are
-        <code>en</code>,
-        <code>zh-hant</code> and
-        <code>zh-hans</code>. The default is
-        <code>en</code>, if a record doesn't have values that match the selected language then it'll return the
-        <code>en</code> version if there is one.
+        {{{i18n.documentation.aggs-lang}}}
       </p>
 
       <h3>
-        Here is the simplest call to get all constituent ids
+        {{{i18n.documentation.constituents-call-for-ids}}}
       </h3>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.constituents "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents ''}}}</pre>
 
@@ -678,16 +532,15 @@
       </p>
 
       <h3>
-        <a name="constituents-paginationandfilter">Pagination and filter</a>
+        <a name="constituents-paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
       </h3>
 
       <p>
-        Here we are asking for slightly more information, note how we can use the
-        <code class="red">per_page</code> filter to limit the number of results.
+        {{{i18n.documentation.constituents-more-info}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(page:3, per_page: 5, gender: \"Female\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.constituents "(page:3, per_page: 5, gender: \"Female\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(page:3, per_page: 5, gender: "Female")'}}}</pre>
 
@@ -706,16 +559,15 @@
       </p>
 
       <h3>
-        <a name="constituents-sorting">Sorting</a>
+        <a name="constituents-sorting">{{i18n.documentation.sorting}}</a>
       </h3>
 
       <p>
-        Here is an example of sorting by
-        <code>alphaSortName</code>.
+        {{{i18n.documentation.constituents-sorting}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(sort_field: \"alphaSortName\", sort: \"asc\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.constituents "(sort_field: \"alphaSortName\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(sort_field: "alphaSortName", sort: "asc")'}}}</pre>
 
@@ -734,16 +586,15 @@
       </p>
 
       <h3>
-        <a name="constituents-fetchingbyids">Fetching by ids</a>
+        <a name="constituents-fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
       </h3>
 
       <p>
-        You can also ask for specific constituents by passing in an array of
-        <code class="red">ids</code>.
+        {{{i18n.documentation.constituents-by-ids-example}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(ids:[238, 382, 459, 608], lang: \"zh-hant\")" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.constituents "(ids:[238, 382, 459, 608], lang: \"zh-hant\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(ids:[238, 382, 459, 608], lang: "zh-hant")'}}}</pre>
 
@@ -764,17 +615,15 @@
       <hr />
 
       <h3>
-        <a name="constituent">Constituent</a>
+        <a name="constituent">{{i18n.documentation.constituent}}</a>
       </h3>
 
       <p>
-        You can get a single constituent by passing in the
-        <code class="red">id</code> parameter. Here we are showing
-        <em>all</em> the fields possible.
+        {{{i18n.documentation.constituent-1}}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituent "(id: 1458)" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.constituent "(id: 1458)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituent '(id: 1458)'}}}</pre>
 
@@ -795,53 +644,49 @@
       <hr />
 
       <h3>
-        <a name="nesting">Nesting objects in constituents and constituents in objects</a>
+        <a name="nesting">{{i18n.documentation.nesting}}</a>
       </h3>
 
       <p>
-        When you are searching for objects you can nest a limited version of constituents in the results. If you are requesting
-        <strong>Objects</strong> you can get the constituents with the following query.
+        {{i18n.documentation.nesting-1}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsConstituent "" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectsConstituent "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsConstituent ''}}}</pre>
 
       <p>
-        If you are asking for a single Object then you can get a bit more information about the constituents, see the example below.
+        {{i18n.documentation.nesting-2}}
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectConstituent "(id: 119)" config.graphql.host}}'>Run in the playground</a>
+        <a href='{{exploreQuery queries.objectConstituent "(id: 119)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectConstituent '(id: 119)'}}}</pre>
 
       <p>
-        You cannot keep nesting objects and constituents beyond the first two levels, because they would just keep including each
-        other forever.
+        {{i18n.documentation.nesting-3}}
       </p>
 
       <p>
-        You can also next constituents inside objects, but again with limited information returned and only down two levels.
+        {{i18n.documentation.nesting-4}}
       </p>
 
       <hr />
 
       <h3>
-        <a name="objects-connected-constituent">Finding objects connected to a constituent</a>
+        <a name="objects-connected-constituent">{{i18n.documentation.objects-connected-constituent}}</a>
       </h3>
 
       <p>
-        There are two ways to find objects connected to a constituent. If we wanted to find all the objects created by an artist
-        we can run a query to find that artists and request the objects connected to the within the query, as shown below.
+        {{i18n.documentation.connected-1}}
       </p>
 
       [example goes here]
 
       <p>
-        You can also do a search on objects using the constituent ID as a filter. The advantage of the second way allows you to filter
-        the results with other filters. The below query shows all the objects curated by a user with a certain medium type.
+        {{i18n.documentation.connected-2}}
       </p>
 
       [example goes here]
