@@ -22,7 +22,7 @@ These are all the cool parse functions to get the data into the right format
 const getConsituents = authors => {
   const consituentsObj = {
     ids: [],
-    idToRoleRank: {}
+    idsToRoleRank: {}
   }
   if (authors === null || authors === undefined) return null
   if (!('author' in authors)) return null
@@ -30,16 +30,16 @@ const getConsituents = authors => {
 
   if (!Array.isArray(authors.author)) authors.author = [authors.author]
   authors.author.forEach((author) => {
-    //  Populate the ids and idToRoleRank with the author IDs
+    //  Populate the ids and idsToRoleRank with the author IDs
     if ('author' in author) {
       const authorId = parseInt(author.author, 10)
       if (!consituentsObj.ids.includes(authorId)) consituentsObj.ids.push(authorId)
-      if (!(authorId in consituentsObj.idToRoleRank)) consituentsObj.idToRoleRank[authorId] = {}
+      if (!(authorId in consituentsObj.idsToRoleRank)) consituentsObj.idsToRoleRank[authorId] = {}
 
       //  Now do the ranks
       if ('rank' in author) {
         const rank = parseInt(author.rank, 10)
-        consituentsObj.idToRoleRank[authorId].rank = rank
+        consituentsObj.idsToRoleRank[authorId].rank = rank
       }
 
       //  And do the same for the role
@@ -48,13 +48,14 @@ const getConsituents = authors => {
         if ('role' in roles) {
           const role = roles.role
           if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '') {
-            consituentsObj.idToRoleRank[authorId].role = {}
-            consituentsObj.idToRoleRank[authorId].role[role.lang] = role._
+            consituentsObj.idsToRoleRank[authorId].role = {}
+            consituentsObj.idsToRoleRank[authorId].role[role.lang] = role._
           }
         }
       }
     }
   })
+  consituentsObj.idsToRoleRank = [consituentsObj.idsToRoleRank]
   return consituentsObj
 }
 
