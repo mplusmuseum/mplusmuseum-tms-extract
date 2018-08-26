@@ -19,6 +19,45 @@ These are all the cool parse functions to get the data into the right format
 */
 // #########################################################################
 
+const getConsituents = authors => {
+  const consituentsObj = {
+    ids: [],
+    idToRoleRank: {}
+  }
+  if (authors === null || authors === undefined) return null
+  if (!('author' in authors)) return null
+  if (authors.author === null) return null
+
+  if (!Array.isArray(authors.author)) authors.author = [authors.author]
+  authors.author.forEach((author) => {
+    //  Populate the ids and idToRoleRank with the author IDs
+    if ('author' in author) {
+      const authorId = parseInt(author.author, 10)
+      if (!consituentsObj.ids.includes(authorId)) consituentsObj.ids.push(authorId)
+      if (!(authorId in consituentsObj.idToRoleRank)) consituentsObj.idToRoleRank[authorId] = {}
+
+      //  Now do the ranks
+      if ('rank' in author) {
+        const rank = parseInt(author.rank, 10)
+        consituentsObj.idToRoleRank[authorId].rank = rank
+      }
+
+      //  And do the same for the role
+      if ('roles' in author) {
+        const roles = author.roles
+        if ('role' in roles) {
+          const role = roles.role
+          if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '') {
+            consituentsObj.idToRoleRank[authorId].role = {}
+            consituentsObj.idToRoleRank[authorId].role[role.lang] = role._
+          }
+        }
+      }
+    }
+  })
+  return consituentsObj
+}
+
 const getSortnumber = objectNumber => {
   //  We have a sort number, if the objectNumber is numeric then we can use
   //  it for the sort number, if it's not then we just leave it null
@@ -81,6 +120,7 @@ const parseObject = o => {
     objectNumber: o.objectnumber,
     sortNumber: getSortnumber(o.objectnumber),
     classification: getClassifications(o.areacategories),
+    consituents: getConsituents(o.authors),
     title: getTextByLanguage(o.titles, 'title'),
     displayDate: o.dated,
     beginDate: parseFloat(o.datebegin),
