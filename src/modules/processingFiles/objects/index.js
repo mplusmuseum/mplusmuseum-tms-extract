@@ -55,7 +55,7 @@ const getConsituents = authors => {
       }
     }
   })
-  consituentsObj.idsToRoleRank = [consituentsObj.idsToRoleRank]
+  consituentsObj.idsToRoleRank = JSON.stringify(consituentsObj.idsToRoleRank)
   return consituentsObj
 }
 
