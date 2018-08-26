@@ -95,6 +95,42 @@ class Queries {
   }
 }`
 
+    this.objectConstituent = `query {
+  object[[]] {
+    id
+    objectNumber
+    title
+    displayDate
+    medium
+    classification {
+      area
+      category
+    }
+    constituents {
+      id
+      name
+      alphaSortName
+      displayBio
+      gender
+      beginDate
+      nationality
+      rank
+      roles
+      objects {
+        id
+        objectNumber
+        title
+        displayDate
+        medium
+        classification {
+          area
+          category
+        }
+      }
+    }
+  }
+}`
+
     this.objectsMini = `query {
   objects[[]] {
     id
@@ -131,6 +167,100 @@ class Queries {
     classification {
       area
       category
+    }
+  }
+}`
+
+    this.objectsConstituent = `query {
+  objects[[]] {
+    id
+    objectNumber
+    title
+    displayDate
+    medium
+    classification {
+      area
+      category
+    }
+    constituents {
+      id
+      name
+      alphaSortName
+      displayBio
+      gender
+      beginDate
+      nationality
+    }
+  }
+}`
+
+    this.objectConstituent = `query {
+  objects[[]] {
+    id
+    objectNumber
+    title
+    displayDate
+    medium
+    classification {
+      area
+      category
+    }
+    constituents {
+      id
+      name
+      alphaSortName
+      displayBio
+      gender
+      beginDate
+      nationality
+      roles
+      rank
+      objects {
+        id
+        title
+        displayDate
+        medium
+        classification {
+          area
+          category
+        }
+      }
+    }
+  }
+}`
+
+    this.constituents = `query {
+  constituents[[]] {
+    id
+    name
+    alphaSortName
+    displayBio
+    gender
+    beginDate
+    nationality
+  }
+}`
+    this.constituent = `query {
+  constituent[[]] {
+    id
+    name
+    alphaSortName
+    displayBio
+    gender
+    beginDate
+    nationality
+    rank
+    roles
+    objects {
+      id
+      objectNumber
+      title
+      displayDate
+      medium
+      classification {
+        area
+        category
+      }
     }
   }
 }`
