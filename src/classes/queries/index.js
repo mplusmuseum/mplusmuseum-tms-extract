@@ -115,7 +115,7 @@ class Queries {
       beginDate
       nationality
       rank
-      roles
+      role
       objects {
         id
         objectNumber
@@ -190,41 +190,8 @@ class Queries {
       gender
       beginDate
       nationality
-    }
-  }
-}`
-
-    this.objectConstituent = `query {
-  objects[[]] {
-    id
-    objectNumber
-    title
-    displayDate
-    medium
-    classification {
-      area
-      category
-    }
-    constituents {
-      id
-      name
-      alphaSortName
-      displayBio
-      gender
-      beginDate
-      nationality
-      roles
+      role
       rank
-      objects {
-        id
-        title
-        displayDate
-        medium
-        classification {
-          area
-          category
-        }
-      }
     }
   }
 }`
@@ -249,7 +216,6 @@ class Queries {
     gender
     beginDate
     nationality
-    rank
     roles
     objects {
       id
