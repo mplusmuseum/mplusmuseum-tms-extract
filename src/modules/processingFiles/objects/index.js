@@ -22,40 +22,61 @@ These are all the cool parse functions to get the data into the right format
 const getConsituents = authors => {
   const consituentsObj = {
     ids: [],
-    idsToRoleRank: {}
+    idsToRoleRank: []
   }
   if (authors === null || authors === undefined) return null
   if (!('author' in authors)) return null
   if (authors.author === null) return null
 
   if (!Array.isArray(authors.author)) authors.author = [authors.author]
+
+  //  We are going to make an array of id/rank/role objects so we can match them
+  //  up again on the other side
   authors.author.forEach((author) => {
-    //  Populate the ids and idsToRoleRank with the author IDs
+    const newAuthorObj = {}
+
+    //  We pretty much need an author for anything to work
     if ('author' in author) {
       const authorId = parseInt(author.author, 10)
       if (!consituentsObj.ids.includes(authorId)) consituentsObj.ids.push(authorId)
-      if (!(authorId in consituentsObj.idsToRoleRank)) consituentsObj.idsToRoleRank[authorId] = {}
+      newAuthorObj.id = authorId
 
       //  Now do the ranks
       if ('rank' in author) {
         const rank = parseInt(author.rank, 10)
-        consituentsObj.idsToRoleRank[authorId].rank = rank
+        newAuthorObj.rank = rank
       }
 
-      //  And do the same for the role
+      //  Incase we have roles in other languages we need to build up
       if ('roles' in author) {
-        const roles = author.roles
-        if ('role' in roles) {
-          const role = roles.role
-          if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '') {
-            consituentsObj.idsToRoleRank[authorId].role = {}
-            consituentsObj.idsToRoleRank[authorId].role[role.lang] = role._
+        let roles = author.roles
+        //  If we don't have an array of roles, turn it into one
+        if (!Array.isArray(roles)) roles = [roles]
+        //  Loop through the roles
+        roles.forEach((roleParent) => {
+          //  This is where we are going to put all the language versions of the role
+          newAuthorObj.roles = {}
+          //  If we have a role node...
+          if ('role' in roleParent) {
+            const role = roleParent.role
+            //  And in the role node we have the lang and the text
+            if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '') {
+              //  Set the role against the language in the object
+              newAuthorObj.roles[role.lang] = role._
+            }
           }
-        }
+        })
       }
+      //  Add the object to the array of id/rank/roles
+      consituentsObj.idsToRoleRank.push(newAuthorObj)
     }
   })
+  //  To stop theElasticSearch trying to make a large number of fields
+  //  based on this nested data, we're going to store it as a string.
+  //  We don't need to ever search on it, we just need to be able to
+  //  unpack it again on the other side.
   consituentsObj.idsToRoleRank = JSON.stringify(consituentsObj.idsToRoleRank)
+
   return consituentsObj
 }
 
