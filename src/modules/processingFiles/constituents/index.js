@@ -51,7 +51,7 @@ const getGenders = gender => {
   }
   if (gender === 'Female') {
     genderObj['zh-hant'] = '女性'
-    genderObj['zh-hans'] = '男性'
+    genderObj['zh-hans'] = '女性'
   }
   if (gender === 'Neutral') {
     genderObj['zh-hant'] = '中性'
