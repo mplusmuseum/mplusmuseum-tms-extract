@@ -20,7 +20,7 @@
         <a href="/stats">{{{i18n.nav.stats_and_search}}}</a>
       </li>
       <li>
-        <a href="/api">API</a>
+        <a href="/developer/terms">API Terms</a>
       </li>
       {{/if}}
     </ul>
@@ -40,6 +40,11 @@
       </li>
     </ul>
     {{else}}
+    <ul class="capitalize">
+      <li>
+        <a href="/developer/terms">API Terms</a>
+      </li>
+    </ul>
     <ul class="right">
       <li>
         <a href="/login">{{i18n.nav.login}}</a>
@@ -48,4 +53,4 @@
     {{/if}}
   </div>
 </nav>
-{{#if user}} {{> connections}} {{/if}}
+{{> connections}}

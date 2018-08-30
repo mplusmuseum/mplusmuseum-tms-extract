@@ -9,6 +9,10 @@ exports.graphql = (req, res) => {
   return res.render('developer/graphql', req.templateValues)
 }
 
+exports.terms = (req, res) => {
+  return res.render('developer/terms', req.templateValues)
+}
+
 exports.status = {
   graphql: (req, res) => {
     req.templateValues.graphqlping = global.graphqlping

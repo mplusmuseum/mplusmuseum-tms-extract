@@ -14,7 +14,8 @@
 
       <h1>Developer Help</h1>
       <p>
-        Hello and welcome to the developer portal for the M+ api, below you will find your API key and the details you need to start
+        Hello and welcome to the developer portal for the M+ api, below you will find your API key and the details you
+        need to start
         making calls to our GraphQL server.
         <form>
           <table class="api">
@@ -33,6 +34,9 @@
       <p>
         <ul>
           <li>
+            <a href="/developer/terms">GraphQL API Terms of use</a>
+          </li>
+          <li>
             <a href="/developer/graphql">GraphQL Documentation</a>
           </li>
           <li>
@@ -48,7 +52,8 @@
       {{else}}
       <p>
         GraphQL has not been configured yet. {{#if user.roles.isAdmin}}You can
-        <a href="/config">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up now.{{/if}}
+        <a href="/config">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up
+        now.{{/if}}
       </p>
       {{/if}}
     </div>
