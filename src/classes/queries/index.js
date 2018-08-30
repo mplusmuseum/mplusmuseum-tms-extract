@@ -3,7 +3,7 @@ class Queries {
   /**
    * Create a collection of queries
    */
-  constructor () {
+  constructor() {
     this.schema = `query {
   __schema {
     types {
@@ -223,7 +223,8 @@ class Queries {
     displayBio
     gender
     beginDate
-    nationality
+    nationality\
+    type
   }
 }`
     this.constituent = `query {
@@ -236,6 +237,7 @@ class Queries {
     beginDate
     nationality
     roles
+    type
     objects {
       id
       objectNumber
@@ -282,6 +284,7 @@ class Queries {
     beginDate
     endDate
     nationality
+    type
   }
 }`
   }
@@ -292,7 +295,7 @@ class Queries {
    * @param {string} filter The filter we want to apply to the query i.e. '(limit: 20)'
    * @returns {string|null} A representation of the query ready to be used if found, or null if not.
    */
-  get (query, filter) {
+  get(query, filter) {
     if (!(query in this)) return null
     return this[query].replace('[[]]', filter)
   }
