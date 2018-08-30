@@ -1,5 +1,6 @@
 <div class="connections">
 
+  {{#if user}}
   <div class="graphQL">
     GraphQL: {{#if config.graphql.host}}
     <a href="/developer/graphql/status">{{{graphQLStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
@@ -10,6 +11,7 @@
     <a href="/developer/elasticsearch/status">{{{elasticsearchStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
     <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
   </div>
+  {{/if}}
   <div class="languages">
     Language: {{#each langs}} {{#ifEqual ../user.lang @this}}
     <strong>{{../this}}</strong>{{else}}
