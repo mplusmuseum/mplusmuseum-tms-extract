@@ -196,6 +196,25 @@ class Queries {
   }
 }`
 
+    this.objectsConstituentMini = `query {
+  objects[[]] {
+    id
+    objectNumber
+    title
+    displayDate
+    medium
+    classification {
+      area
+      category
+    }
+    constituents {
+      name
+      role
+      rank
+    }
+  }
+}`
+
     this.constituents = `query {
   constituents[[]] {
     id
@@ -257,7 +276,6 @@ class Queries {
     id
     publicAccess
     name
-    type
     alphaSortName
     displayBio
     gender

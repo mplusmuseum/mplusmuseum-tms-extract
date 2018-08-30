@@ -683,13 +683,19 @@
         {{i18n.documentation.connected-1}}
       </p>
 
-      [example goes here]
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.constituent "(id: 1458)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.constituent '(id: 1458)'}}}</pre>
 
       <p>
         {{i18n.documentation.connected-2}}
       </p>
 
-      [example goes here]
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsConstituentMini "(constituent: 1458)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsConstituentMini '(constituent: 1458)'}}}</pre>
 
       <hr />
 
