@@ -38,6 +38,36 @@ const getNames = names => {
   return namesObj
 }
 
+const getGenders = gender => {
+  console.log(gender)
+  const genderObj = {
+    'en': gender,
+    'zh-hant': '',
+    'zh-hans': ''
+  }
+  if (gender === 'Male') {
+    genderObj['zh-hant'] = '男性'
+    genderObj['zh-hans'] = '男性'
+  }
+  if (gender === 'Female') {
+    genderObj['zh-hant'] = '女性'
+    genderObj['zh-hans'] = '男性'
+  }
+  if (gender === 'Neutral') {
+    genderObj['zh-hant'] = '中性'
+    genderObj['zh-hans'] = '中性'
+  }
+  if (gender === 'unknown') {
+    genderObj['zh-hant'] = '不詳'
+    genderObj['zh-hans'] = '不詳'
+  }
+  if (gender === null || gender === undefined) {
+    genderObj['zh-hant'] = null
+    genderObj['zh-hans'] = null
+  }
+  return genderObj
+}
+
 const getBios = bios => {
   const biosObj = {}
   //  Make sure we have valid bios
@@ -64,8 +94,9 @@ const parseConstituent = c => {
     publicAccess: parseInt(c.PublicAccess, 10) === 1,
     name: getNames(c.names),
     type: 'type' in c ? c.type : null,
-    gender: 'Gender' in c ? c.Gender : null,
+    gender: getGenders(c.Gender),
     displayBio: getBios(c.bios),
+    nationality: 'Nationality' in c ? c.Nationality : null,
     beginDate: null,
     deathyear: null,
     id: parseInt(c.id, 10)
