@@ -61,7 +61,7 @@ const getBios = bios => {
 const parseConstituent = c => {
   const newConstituent = {
     constituentID: parseInt(c.id, 10),
-    publicAccess: c.id === 1,
+    publicAccess: parseInt(c.PublicAccess, 10) === 1,
     name: getNames(c.names),
     type: 'type' in c ? c.type : null,
     gender: 'Gender' in c ? c.Gender : null,
@@ -70,6 +70,7 @@ const parseConstituent = c => {
     deathyear: null,
     id: parseInt(c.id, 10)
   }
+
   //  Make sure the birth year is actually numeric and not 0
   if ('birthyear_yearformed' in c) {
     const newBirth = parseInt(c.birthyear_yearformed, 10)
