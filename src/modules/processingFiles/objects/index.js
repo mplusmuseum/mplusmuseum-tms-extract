@@ -60,7 +60,7 @@ const getConsituents = authors => {
           if ('role' in roleParent) {
             const role = roleParent.role
             //  And in the role node we have the lang and the text
-            if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '') {
+            if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '' && role.lang !== 'zh-hans') {
               //  Set the role against the language in the object
               newAuthorObj.roles[role.lang] = role._
             }
@@ -107,7 +107,9 @@ const getClassifications = classifications => {
           if (!Array.isArray(area.areacat)) area.areacat = [area.areacat]
           classificationsObj[areaLower].areacat = {}
           area.areacat.forEach((area) => {
-            classificationsObj[areaLower].areacat[area.lang] = area._
+            if (area.lang !== 'zh-hans') {
+              classificationsObj[areaLower].areacat[area.lang] = area._
+            }
           })
         }
       }
@@ -123,7 +125,7 @@ const getTextByLanguage = (objThing, key) => {
   if (!Array.isArray(objThing[key])) objThing[key] = [objThing[key]]
   const rtnObj = {}
   objThing[key].forEach((textLang) => {
-    if ('lang' in textLang && '_' in textLang && textLang.lang !== null && textLang.lang !== '' && textLang._ !== null && textLang._ !== '') {
+    if ('lang' in textLang && '_' in textLang && textLang.lang !== null && textLang.lang !== '' && textLang._ !== null && textLang._ !== '' && textLang._ !== 'zh-hans') {
       rtnObj[textLang.lang] = textLang._
     }
   })
