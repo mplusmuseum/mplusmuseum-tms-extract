@@ -420,22 +420,22 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.categories "(lang: \"zh-hans\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.categories "(lang: \"zh-hant\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
-      <pre class="query">{{{graphQLQuery queries.categories '(lang: "zh-hans", sort_field: "count", sort: "desc")'}}}</pre>
+      <pre class="query">{{{graphQLQuery queries.categories '(lang: "zh-hant", sort_field: "count", sort: "desc")'}}}</pre>
 
       <p>
         {{i18n.documentation.curl}}
       </p>
       <p>
-        <pre class="query terminal">{{{curlQuery queries.categories '(lang: \\\"zh-hans\\\", sort_field: \\\"count\\\", sort: \\\"desc\\\")' config.graphql.host user.apitoken}}}</pre>
+        <pre class="query terminal">{{{curlQuery queries.categories '(lang: \\\"zh-hant\\\", sort_field: \\\"count\\\", sort: \\\"desc\\\")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
       <p>
         {{i18n.documentation.nodejs}}
       </p>
       <p>
-        <pre class="query node">{{{nodeQuery queries.categories '(lang: "zh-hans", sort_field: "count", sort: "desc")' config.graphql.host user.apitoken}}}</pre>
+        <pre class="query node">{{{nodeQuery queries.categories '(lang: "zh-hant", sort_field: "count", sort: "desc")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
       <hr />

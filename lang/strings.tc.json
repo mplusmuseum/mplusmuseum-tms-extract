@@ -66,7 +66,7 @@
     "graphql-objects-1": "這項查詢會選擇所有物件，並能夠透過以下字段進行篩選。備註：篩選屬累加性質而非任擇其一，篩選兩個字段的話，只會回傳同時吻合兩者的數據。",
     "graphql-objects-2": "有效的篩選為：<code class=\"red\">page</code>（頁數）、<code class=\"red\">per_page</code>（每頁結果）、<code class=\"red\">sort_field</code>（字段排序）、<code class=\"red\">sort</code>（排序）、<code class=\"red\">[ids]</code>、<code class=\"red\">classification.area</code>（範圍分類）、<code class=\"red\">classification.category</code>（類別分類）、<code class=\"red\">medium</code>（媒介）、<code class=\"red\">displayDate</code>（展示日期）、<code class=\"red\">beginDate</code>（開始日期）、<code class=\"red\">endDate</code>（結束日期）和 <code class=\"red\">lang</code>（語言）",
     "graphql-objects-3": "<code class=\"red\">sort_field</code>（字段排序）的有效值為 <code>id</code>、<code>objectNumber</code>（物件號碼）、<code>sortNumber</code>（排序號碼）、<code>title</code>（標題）、<code>displayDate</code>（展示日期）、<code>beginDate</code>（開始日期）、<code>endDate</code>（結束日期）、<code>classification.area</code>（範圍分類）和<code>classification.category</code>（類別分類）。<code class=\"red\">sort</code>（排序）的有效值為 <code>asc</code>（遞增）和 <code>desc</code>（遞減）",
-    "valid-lang": "<code class=\"red\">lang</code>（語言）的有效值只有 <code>en</code>（英文）、<code>zh-hant</code>（繁體中文）和<code>zh-hans</code>（簡體中文）。預設語言為 <code>en</code>，如果資料庫沒有符合所選語言的有效值，便會回傳 <code>en</code>版本（如有）。",
+    "valid-lang": "<code class=\"red\">lang</code>（語言）的有效值只有 <code>en</code>（英文）和 <code>zh-hant</code>（繁體中文）。預設語言為 <code>en</code>，如果資料庫沒有符合所選語言的有效值，便會回傳 <code>en</code>版本（如有）。",
     "graphql-objects-5": "以下是調用所有物件最簡單的方法",
     "object-pagination": "以下我們稍為增加查詢資訊量，請留意我們如何以<code class=\"red\">per_page</code>（每頁結果）篩選器，以限制每頁查詢結果的數目。",
     "object-sort-example": "以下是使用 <code>sortNumber</code>（排序號碼）進行排序的例子",

@@ -25,45 +25,40 @@ const getNames = names => {
   if (names === undefined || names === null || !('name' in names)) return namesObj
   if (!Array.isArray(names.name)) names.name = [names.name]
   names.name.forEach((name) => {
-    //  Make sure the language is in the namesObj
-    if (!(name.lang in namesObj)) namesObj[name.lang] = {}
-    namesObj[name.lang].id = name.id
-    if ('alphasort' in name && Object.prototype.toString.call(name.alphasort) === '[object String]') {
-      namesObj[name.lang].alphasort = name.alphasort
-    }
-    if ('displayname' in name && Object.prototype.toString.call(name.displayname) === '[object String]') {
-      namesObj[name.lang].displayname = name.displayname
+    if ('lang' in name && name.lang !== 'zh-hans') {
+      //  Make sure the language is in the namesObj
+      if (!(name.lang in namesObj)) namesObj[name.lang] = {}
+      namesObj[name.lang].id = name.id
+      if ('alphasort' in name && Object.prototype.toString.call(name.alphasort) === '[object String]') {
+        namesObj[name.lang].alphasort = name.alphasort
+      }
+      if ('displayname' in name && Object.prototype.toString.call(name.displayname) === '[object String]') {
+        namesObj[name.lang].displayname = name.displayname
+      }
     }
   })
   return namesObj
 }
 
 const getGenders = gender => {
-  console.log(gender)
   const genderObj = {
     'en': gender,
-    'zh-hant': '',
-    'zh-hans': ''
+    'zh-hant': ''
   }
   if (gender === 'Male') {
     genderObj['zh-hant'] = '男性'
-    genderObj['zh-hans'] = '男性'
   }
   if (gender === 'Female') {
     genderObj['zh-hant'] = '女性'
-    genderObj['zh-hans'] = '女性'
   }
   if (gender === 'Neutral') {
     genderObj['zh-hant'] = '中性'
-    genderObj['zh-hans'] = '中性'
   }
   if (gender === 'unknown') {
     genderObj['zh-hant'] = '不詳'
-    genderObj['zh-hans'] = '不詳'
   }
   if (gender === null || gender === undefined) {
     genderObj['zh-hant'] = null
-    genderObj['zh-hans'] = null
   }
   return genderObj
 }
@@ -75,7 +70,7 @@ const getBios = bios => {
   if (!Array.isArray(bios.bio)) bios.bio = [bios.bio]
   bios.bio.forEach((bio) => {
     //  Make sure the language is in the namesObj
-    if ('_' in bio && bio._ !== '' && bio._ !== null && bio._ !== undefined && 'lang' in bio && bio.lang !== '' && bio.lang !== null && bio.lang !== undefined) {
+    if ('_' in bio && bio._ !== '' && bio._ !== null && bio._ !== undefined && 'lang' in bio && bio.lang !== '' && bio.lang !== null && bio.lang !== undefined && bio.lang !== 'zh-hans') {
       if (!(bio.lang in biosObj)) biosObj[bio.lang] = bio._
     }
   })
