@@ -1,0 +1,26 @@
+body {
+  &.cover {
+    background: no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+  }
+
+  .capitalise {
+    text-transform: capitalize
+  }
+
+  .sub-nav {
+    width: 100%;
+    max-width: 100%;
+
+    .tabs {
+      margin: 2px 12px;
+    }
+  }
+
+  .is-spaced {
+    margin-bottom: 1.5rem
+  }
+}

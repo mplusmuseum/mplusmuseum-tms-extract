@@ -179,6 +179,15 @@ if (skipBuild === false) {
     '--copy-files'
   ])
 
+  // Copy naked webfonts files
+  spawnSync('npx', [
+    'babel',
+    'src/public/webfonts',
+    '--out-dir',
+    'app/public/webfonts',
+    '--copy-files'
+  ])
+
   //  Compile node files
   spawnSync('npx', ['babel', 'src', '--out-dir', 'app'])
 
