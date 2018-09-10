@@ -3,23 +3,38 @@
 <head>
   <title>Dashboard - GraphQL Status</title>
   {{> head}}
-  <meta http-equiv="refresh" content="60;url=/"></meta>
+  <meta http-equiv="refresh" content="60;url=/" />
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          ElasticSearch Status
+        </h1>
+        <h2 class="subtitle is-3">
+          Worried about the ElasticSearch server being down, here's the place to check
+        </h2>
+      </div>
+    </div>
+  </section>
 
-      <h1>ElasticSearch Status</h1>
+  <section class="section">
+    <div class="container">
+
+      <h1 class="title">
+        <a name="status" class="hidename">ElasticSearch Status</a>
+      </h1>
       {{#if config.elasticsearch}}
       <p>
         This is the current status of the ElasticSearch server, we attempt to ping it once per minute.
       </p>
       <p>
-        <table>
+        <table class="table is-striped is-fullwidth">
           <thead>
             <tr>
               <th>Milliseconds</th>
@@ -46,12 +61,13 @@
       {{/if}} {{else}}
       <p>
         ElasticSearch has not been configured yet. {{#if user.roles.isAdmin}}You can
-        <a href="/config#elasticsearch">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up new{{/if}}
+        <a href="/config#elasticsearch">configure that now</a> if you wish.{{else}}You should ask the admin user to set
+        that up new{{/if}}
       </p>
       {{/if}}
 
     </div>
-  </div>
+  </section>
 
   {{> tail}}
 </body>

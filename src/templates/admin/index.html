@@ -5,49 +5,71 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
-
-      <h1>Admin</h1>
-      <p>
-        <ul>
-          <li>
-            <a href="/admin/users">Users</a>
-          </li>
-        </ul>
-
-        <h3>Danger-ish</h3>
-
-        <ul>
-          <li>
-            <form method="POST" action="/admin/aggregate/mplus">
-              <button type="submit" style="font-size: 1.5rem; padding: 6px; background: yellow; cursor: pointer;">Re-aggregate object fields</button>
-            </form>
-          </li>
-        </ul>
-
-        <h3>DANGER!</h3>
-
-        <ul>
-          <li>
-            <form method="POST" action="/admin/blow/away/index/objects">
-              <button type="submit" style="font-size: 1.5rem; padding: 6px; background: red; cursor: pointer;">Blow away index for objects</button>
-            </form>
-          </li>
-          <li>
-            <form method="POST" action="/admin/blow/away/index/authors">
-              <button type="submit" style="font-size: 1.5rem; padding: 6px; background: red; cursor: pointer;">Blow away index for authors</button>
-            </form>
-          </li>
-        </ul>
-
-      </p>
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Admin
+        </h1>
+        <h2 class="subtitle is-3">
+          Where we can break things
+        </h2>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+      <ul>
+        <li>
+          <a href="/admin/users">Users</a>
+        </li>
+      </ul>
+
+      <hr />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <h2 class="title">Danger-ish</h2>
+
+      <ul>
+        <li>
+          <form method="POST" action="/admin/aggregate/mplus">
+            <button class="button is-warning" type="submit">Re-aggregate object fields</button>
+          </form>
+        </li>
+      </ul>
+      <hr />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <h2 class="title">DANGER!</h2>
+
+      <ul>
+        <li>
+          <form method="POST" action="/admin/blow/away/index/objects">
+            <button class="button is-danger" type="submit">Blow away index for objects</button>
+          </form>
+        </li>
+        <li>
+          <form method="POST" action="/admin/blow/away/index/authors">
+            <button class="button is-danger" type="submit">Blow away index for authors</button>
+          </form>
+        </li>
+      </ul>
+
+    </div>
+  </section>
 
   {{> tail}}
 </body>

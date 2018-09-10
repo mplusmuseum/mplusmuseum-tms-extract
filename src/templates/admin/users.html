@@ -5,25 +5,34 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
-
-      <h1>Admin / Users</h1>
-      <p>
-        <ul>
-          {{#each users}}
-          <li>
-            <a href="/admin/user/{{user_id}}">{{nickname}}</a>
-          </li>
-          {{/each}}
-        </ul>
-      </p>
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Users
+        </h1>
+        <h2 class="subtitle is-3">
+          These are the registered users
+        </h2>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+      <ul>
+        {{#each users}}
+        <li>
+          <a href="/admin/user/{{user_id}}">{{nickname}}</a>
+        </li>
+        {{/each}}
+      </ul>
+    </div>
+  </section>
 
   {{> tail}}
 </body>

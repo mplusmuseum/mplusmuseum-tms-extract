@@ -6,32 +6,45 @@
   <link href="/css/prism.css" rel="stylesheet" />
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
 
-      <h1>Search - Constituent - {{id}}</h1>
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Constituent - {{id}}
+        </h1>
+        <h2 class="subtitle is-3">
+          All the information we know about this constituent
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+
       {{#if config.spelunker}}
       <p>
         <a href="{{config.spelunker.host}}/constituents/{{id}}">View Constituent {{id}} on the spelunker</a>
       </p>
       {{/if}}
-      <h2>Local JSON data</h2>
+      <h1 class="title">Local JSON data</h1>
 
-      <h4>To process</h4>
+      <h2 class="title is-4">To process</h2>
       {{#if processJSON}}
       <pre class="query json">{{{jsonCode processJSON}}}</pre>{{else}}
       <p>There is no file to process.</p> {{/if}}
 
-      <h4>Processed file</h4>
+      <h2 class="title is-4">Processed file</h2>
       {{#if processedJSON}}
       <pre class="query json">{{{jsonCode processedJSON}}}</pre>{{else}}
       <p>There is no processed file.</p> {{/if}}
 
-      <h4>TMS &amp; extra information</h4>
+      <h2 class="title is-4">TMS &amp; extra information</h2>
       {{#if perfectJSON}}
       <pre class="query json">{{{jsonCode perfectJSON}}}</pre> {{#if config.cloudinary}} {{#if perfectJSON.remote}}
       <div class="image_viewer">
@@ -52,14 +65,14 @@
       {{/if}} {{/if}} {{else}}
       <p>There is no TMS or extra information.</p> {{/if}}
 
-      <h4>Original XML file</h4>
+      <h2 class="title is-4">Original XML file</h2>
       {{#if xmlXML}}
       <pre class="query xml">{{{xmlCode xmlXML}}}</pre>{{else}}
       <p>There is no original XML file.</p> {{/if}}
 
       <hr>
 
-      <h2>ElasticSearch results</h2>
+      <h1 class="title">ElasticSearch results</h1>
 
       {{#if elasticSearchJSON}}
       <pre class="query json">{{{jsonCode elasticSearchJSON}}}</pre>{{else}}
@@ -67,7 +80,7 @@
 
       <hr>
 
-      <h2>GraphQL response</h2>
+      <h1 class="title">GraphQL response</h1>
 
       {{#if graphQLresults}}
       <pre class="query json">{{{jsonCode graphQLresults}}}</pre>{{else}}
@@ -75,7 +88,7 @@
 
       <hr>
 
-      <h2>GraphQL query</h2>
+      <h1 class="title">GraphQL query</h1>
       <p class="runinexplore">
         <a href='{{exploreQuery queries.constituentLarge searchFilter config.graphql.host}}'>Run in the playground</a>
       </p>
@@ -87,9 +100,9 @@
       </p>
 
     </div>
-  </div>
+    </div>
 
-  {{> tail}}
+    {{> tail}}
 </body>
 
 </html>

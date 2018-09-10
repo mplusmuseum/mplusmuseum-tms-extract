@@ -5,74 +5,163 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
-
-      <h1>
-        <a href="/admin">Admin</a> /
-        <a href="/admin/users">Users</a> / {{selectedUser.nickname}}</h1>
-      <p>
-        <form method="POST">
-          <table class="admin">
-            <tbody>
-              <tr>
-                <td>ID</td>
-                <td>{{selectedUser.user_id}}</td>
-              </tr>
-              <tr>
-                <td>Created</td>
-                <td>{{timePretty selectedUser.created_at}}</td>
-              </tr>
-              <tr>
-                <td>Last Login</td>
-                <td>{{timePretty selectedUser.last_login}}</td>
-              </tr>
-              <tr>
-                <td>Login counts</td>
-                <td>{{selectedUser.logins_count}}</td>
-              </tr>
-              <tr>
-                <td>Developer</td>
-                <td>
-                  <input type="checkbox" name="developer" {{#ifEqual selectedUser.user_metadata.roles.isDeveloper true}}checked{{/ifEqual}}
-                  />
-                </td>
-              </tr>
-              <tr>
-                <td>Staff</td>
-                <td>
-                  <input type="checkbox" name="staff" {{#ifEqual selectedUser.user_metadata.roles.isStaff true}}checked{{/ifEqual}}>
-                </td>
-              </tr>
-              <tr>
-                <td>Vendor</td>
-                <td>
-                  <input type="checkbox" name="vendor" {{#ifEqual selectedUser.user_metadata.roles.isVendor true}}checked{{/ifEqual}}>
-                </td>
-              </tr>
-              <tr>
-                <td>Admin</td>
-                <td>
-                  <input type="checkbox" name="admin" {{#ifEqual selectedUser.user_metadata.roles.isAdmin true}}checked{{/ifEqual}}>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <button type="hidden" name="action" value="update">Update</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-        </form>
-
-      </p>
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          User: {{selectedUser.nickname}}
+        </h1>
+        <h2 class="subtitle is-3">
+          Update this user's settings
+        </h2>
+      </div>
     </div>
-  </div>
+  </section>
+
+
+  <section class="section">
+    <div class="container documentation">
+      <form method="POST">
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">ID</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input is-static" type="email" value="{{selectedUser.user_id}}" readonly>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Created</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input is-static" type="email" value="{{timePretty selectedUser.created_at}}" readonly>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Last Login</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input is-static" type="email" value="{{timePretty selectedUser.last_login}}" readonly>
+
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Login counts</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input is-static" type="email" value="{{selectedUser.logins_count}}" readonly>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Developer</label>
+          </div>
+          <div class="field-body">
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <input class="checkbox" type="checkbox" name="developer"
+                    {{#ifEqual selectedUser.user_metadata.roles.isDeveloper true}} checked{{/ifEqual}} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Staff</label>
+          </div>
+          <div class="field-body">
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <input class="checkbox" type="checkbox" name="staff"
+                    {{#ifEqual selectedUser.user_metadata.roles.isStaff true}} checked{{/ifEqual}} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Vendor</label>
+          </div>
+          <div class="field-body">
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <input class="checkbox" type="checkbox" name="vendor"
+                    {{#ifEqual selectedUser.user_metadata.roles.isVendor true}} checked{{/ifEqual}} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Admin</label>
+          </div>
+          <div class="field-body">
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <input class="checkbox" type="checkbox" name="admin"
+                    {{#ifEqual selectedUser.user_metadata.roles.isAdmin true}} checked{{/ifEqual}} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item">&nbsp;</div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <p class="control">
+                <button class="button is-primary" type="hidden" name="action" value="update">Update</button>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </section>
 
   {{> tail}}
 </body>

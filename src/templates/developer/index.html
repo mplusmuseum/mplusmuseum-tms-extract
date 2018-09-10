@@ -5,31 +5,53 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Developer Help
+        </h1>
+        <h2 class="subtitle is-3">
+          Various bits of information to help developers :)
+        </h2>
+      </div>
+    </div>
+  </section>
 
-      <h1>Developer Help</h1>
+  <section class="section">
+    <div class="container">
+      <h1 class="title">
+        <a name="handshake" class="hidename">API token</a>
+      </h1>
       <p>
-        Hello and welcome to the developer portal for the M+ api, below you will find your API key and the details you
+        Hello and welcome to the developer portal for the M+ api, below you will find your API key and the details
+        you
         need to start
         making calls to our GraphQL server.
-        <form>
-          <table class="api">
-            <tr>
-              <td>API token:</td>
-              <td class="token">{{user.apitoken}}</td>
-            </tr>
-          </table>
-        </form>
       </p>
+      <p>
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">API token
+            </p>
+          </header>
+          <div class="card-content has-text-centered is-size-3 has-text-weight-semibold">{{user.apitoken}}</div>
+        </div>
+      </p>
+      <hr />
+    </div>
+  </section>
 
-      <hr>
+  <section class="section">
+    <div class="container">
 
-      <h2>GraphQL</h2>
+      <h1 class="title">
+        <a name="graphql" class="hidename">GraphQL</a>
+      </h1>
       {{#if config.graphql}}
       <p>
         <ul>
@@ -57,7 +79,7 @@
       </p>
       {{/if}}
     </div>
-  </div>
+  </section>
 
   {{> tail}}
 </body>
