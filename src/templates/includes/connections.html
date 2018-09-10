@@ -1,20 +1,43 @@
-<div class="connections">
+<div class="container sub-nav">
+  <div class="level has-background-white-bis">
 
-  {{#if user}}
-  <div class="graphQL">
-    GraphQL: {{#if config.graphql.host}}
-    <a href="/developer/graphql/status">{{{graphQLStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
-    <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
-  </div>
-  <div class="elasticsearch">
-    Elastic Search: {{#if config.elasticsearch.host}}
-    <a href="/developer/elasticsearch/status">{{{elasticsearchStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
-    <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
-  </div>
-  {{/if}}
-  <div class="languages">
-    Language: {{#each langs}} {{#ifEqual ../user.lang @this}}
-    <strong>{{../this}}</strong>{{else}}
-    <a href="/{{../this}}{{../../remainingUrl}}">{{../this}}</a> {{/ifEqual}} {{/each}}
+    <div class="level-left">
+      &nbsp;
+    </div>
+    <div class="level-right">
+      {{#if user}}
+      <div class="level-item">
+        GraphQL: {{#if config.graphql.host}}
+        <a href="/developer/graphql/status">{{{graphQLStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
+        <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
+      </div>
+      <div class="level-item">
+        Elastic Search: {{#if config.elasticsearch.host}}
+        <a href="/developer/elasticsearch/status">{{{elasticsearchStatus}}}</a> {{else}} {{#if user.roles.isAdmin}}
+        <a href="/config">Not configured</a>{{else}}Not configured{{/if}} {{/if}}
+      </div>
+      {{/if}}
+      <div class="level-item">
+        <div class="tabs is-toggle is-small">
+          <ul class="">
+            {{#each langs}}
+            {{#ifEqual ../user.lang @this}}
+            <li class="is-active">
+              <a>
+                <span>{{../this}}</span>
+              </a>
+            </li>
+            {{else}}
+            <li>
+              <a href="/{{../this}}{{../../remainingUrl}}">
+                <span>{{../this}}</span>
+              </a>
+            </li>
+            {{/ifEqual}}
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

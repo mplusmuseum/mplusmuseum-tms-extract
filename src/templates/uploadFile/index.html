@@ -5,21 +5,35 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Upload file
+        </h1>
+        <h2 class="subtitle is-3">
+          Here we upload the various files the system needs
+        </h2>
+      </div>
+    </div>
+  </section>
 
-      <h1>Upload File</h1>
+  <section class="section">
+    <div class="container documentation">
 
-      <h2>Object File</h2>
+      <h1 class="title">XML File</h1>
       {{#if config.tms}}
       <p>
-        If you have a JSON/XML file jam packed full of objects, then you can upload it here. Each time you upload a file it will
-        be rescanned for new and modified records. Please note when you 1st upload a file it can take a while for all objects
-        to appear in the GraphQL. After the initial batch of objects have been uploaded to the GraphQL system smaller updates
+        If you have a JSON/XML file jam packed full of objects, then you can upload it here. Each time you upload a
+        file it will
+        be rescanned for new and modified records. Please note when you 1st upload a file it can take a while for all
+        objects
+        to appear in the GraphQL. After the initial batch of objects have been uploaded to the GraphQL system smaller
+        updates
         should happen a lot quicker.
       </p>
       <p>
@@ -31,80 +45,106 @@
       </p>
 
       <form method="post" enctype="multipart/form-data">
-        <table class="api">
-          <tr>
-            <td style="width: 40%">Objects file:</td>
-            <td>
-              <input type="file" name="objectFile">
-            </td>
-          </tr>
-          <tr>
-            <td>Select TMS system</td>
-            <td>
-              <ul class="tmsSelect">
-                {{#each config.tms}}
-                <li>
-                  <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}}checked{{/ifEqual}}>{{stub}}
-                </li>
-                {{/each}}
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <br />
-              <button type="submit" value="updateObjectFile" name="action">Upload</button>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-        </table>
+        <h2 class="title is-5">Objects file:</h2>
+        <div class="file is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" name="objectFile">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Select TMS system</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <ul class="tmsSelect">
+                  {{#each config.tms}}
+                  <li>
+                    <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}} checked{{/ifEqual}}>{{stub}}
+                      </li> {{/each}} </ul> </p> </div> </div> </div> <div class="level">
+                    <div class="level-left">
+                      <div class="level-item">&nbsp;</div>
+                    </div>
+                    <div class="level-right">
+                      <div class="level-item">
+                        <p class="control">
+                          <button class="button is-primary" type="submit" value="updateObjectFile" name="action">Upload</button>
+                        </p>
+                      </div>
+                    </div>
+            </div>
       </form>
 
       <form method="post" enctype="multipart/form-data">
-        <table class="api">
-          <tr>
-            <td style="width: 40%">Authors (Constituent) file:</td>
-            <td>
-              <input type="file" name="constituentFile">
-            </td>
-          </tr>
-          <tr>
-            <td>Select TMS system</td>
-            <td>
-              <ul class="tmsSelect">
-                {{#each config.tms}}
-                <li>
-                  <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}}checked{{/ifEqual}}>{{stub}}
-                </li>
-                {{/each}}
-              </ul>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <br />
-              <button type="submit" value="updateConstituentFile" name="action">Upload</button>
-            </td>
-            <td>&nbsp;</td>
-          </tr>
-        </table>
+        <h2 class="title is-5">Authors (Constituent) file:</h2>
+        <div class="file is-boxed">
+          <label class="file-label">
+            <input class="file-input" type="file" name="constituentFile">
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">
+                Choose a file…
+              </span>
+            </span>
+          </label>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Select TMS system</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <ul class="tmsSelect">
+                  {{#each config.tms}}
+                  <li>
+                    <input type="radio" name="tms" value="{{stub}}" {{#ifEqual @index 0}} checked{{/ifEqual}}>{{stub}}
+                      </li> {{/each}} </ul> </p> </div> </div> </div> <div class="level">
+                    <div class="level-left">
+                      <div class="level-item">&nbsp;</div>
+                    </div>
+                    <div class="level-right">
+                      <div class="level-item">
+                        <p class="control">
+                          <button class="button is-primary" type="submit" value="updateConstituentFile" name="action">Upload</button>
+                        </p>
+                      </div>
+                    </div>
+            </div>
       </form>
+
+
 
       {{else}} {{#if user.role.isAdmin}}
       <p>
-        Before you can upload an objects file, you need to register a TMS system that the file has supplemental information for.
+        Before you can upload an objects file, you need to register a TMS system that the file has supplemental
+        information for.
         You can do that on the
         <a href="/config">Config</a> page.
       </p>
       {{else}}
       <p>
-        Before you can upload an objects file, a TMS system needs to be registered that this file will be referenced against. Please
+        Before you can upload an objects file, a TMS system needs to be registered that this file will be referenced
+        against. Please
         ask an Admin user to do this for you.
       </p>
       {{/if}} {{/if}}
 
     </div>
-  </div>
+  </section>
 
   {{> tail}}
 </body>

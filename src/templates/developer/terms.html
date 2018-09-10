@@ -5,17 +5,27 @@
   {{> head}}
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          API Terms
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
 
       {{{i18n.apiterms.body}}}
 
     </div>
-  </div>
+  </section>
 
   {{> tail}}
 </body>

@@ -1,56 +1,72 @@
-<nav class="header">
-  <div class="nav-wrapper">
-    <a href="/" class="brand-logo left">M+</a>
-    {{#if user}}
-    <ul class="capitalize">
-
-      {{#if user.roles.isDeveloper}}
-      <li>
-        <a href="/developer">{{i18n.nav.developer}}</a>
-      </li>
-      {{/if}} {{#if user.roles.isAdmin}}
-      <li>
-        <a href="/config">{{i18n.nav.config}}</a>
-      </li>
-      {{/if}} {{#if (or user.roles.isAdmin user.roles.isStaff)}}
-      <li>
-        <a href="/uploadFile">{{i18n.nav.upload_files}}</a>
-      </li>
-      <li>
-        <a href="/stats">{{{i18n.nav.stats_and_search}}}</a>
-      </li>
-      <li>
-        <a href="/developer/terms">API Terms</a>
-      </li>
-      {{/if}}
-    </ul>
-
-    <ul class="right">
-      <li>
-        <a href="/settings">
-          <img class="avatar" src="{{user.picture}}" />{{user.nickname}}</a>
-      </li>
-      {{#if user.roles.isAdmin}}
-      <li>
-        <a href="/admin">{{i18n.nav.admin}}</a>
-      </li>
-      {{/if}}
-      <li>
-        <a href="/logout">{{i18n.nav.logout}}</a>
-      </li>
-    </ul>
-    {{else}}
-    <ul class="capitalize">
-      <li>
-        <a href="/developer/terms">API Terms</a>
-      </li>
-    </ul>
-    <ul class="right">
-      <li>
-        <a href="/login">{{i18n.nav.login}}</a>
-      </li>
-    </ul>
+<nav id="navbar" class="navbar has-background-light" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    {{#if loggedIn}}
+    <a class="navbar-item" href="/">
+      M+
+    </a>
     {{/if}}
+    <div class="navbar-burger burger" onclick="document.querySelector('.navbar-menu').classList.toggle('is-active');">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="navbar-menu">
+    <div class="navbar-start capitalise">
+      {{#if user}}
+      {{#if user.roles.isDeveloper}}
+      <a class="navbar-item" href="/developer">
+        {{i18n.nav.developer}}
+      </a>
+      {{/if}}
+
+      {{#if user.roles.isAdmin}}
+      <a class="navbar-item" href="/config">
+        {{i18n.nav.config}}
+      </a>
+      {{/if}}
+
+      {{#if (or user.roles.isAdmin user.roles.isStaff)}}
+      <a class="navbar-item" href="/uploadFile">
+        {{i18n.nav.upload_files}}
+      </a>
+      <a class="navbar-item" href="/stats">
+        {{{i18n.nav.stats_and_search}}}
+      </a>
+      <a class="navbar-item" href="/stats/logs">
+        {{{i18n.nav.logs}}}
+      </a>
+      {{/if}}
+      {{/if}}
+      <a class="navbar-item" href="/developer/terms">
+        {{i18n.nav.apiterms}}
+      </a>
+    </div>
+
+
+    <div class="navbar-end">
+      {{#if user}}
+      <a class="navbar-item" href="/settings">
+        <figure class="image is-32x32">
+          <img class="avatar" src="{{user.picture}}" />
+        </figure>&nbsp;{{user.nickname}}
+      </a>
+      </a>
+      {{#if user.roles.isAdmin}}
+      <a class="navbar-item capitalise" href="/admin">
+        {{i18n.nav.admin}}
+      </a>
+      {{/if}}
+      <a class="navbar-item capitalise" href="/logout">
+        {{i18n.nav.logout}}
+      </a>
+      {{else}}
+      <a class="navbar-item capitalise" href="/login">
+        {{i18n.nav.login}}
+      </a>
+      {{/if}}
+    </div>
   </div>
 </nav>
 {{> connections}}

@@ -6,25 +6,40 @@
   <link href="/css/prism.css" rel="stylesheet" />
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          {{i18n.documentation.documentation}}
+        </h1>
+      </div>
+    </div>
+  </section>
 
-      <h1>{{i18n.documentation.documentation}}</h1>
+  <section class="section">
+    <div class="container documentation">
+
       <p>
-        {{{i18n.documentation.intro}}}
-        <code>{{user.apitoken}}</code>
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">API token
+            </p>
+          </header>
+          <div class="card-content has-text-centered is-size-3 has-text-weight-semibold">{{user.apitoken}}</div>
+        </div>
       </p>
+
 
       <p class="note">
         {{{i18n.documentation.note}}}
       </p>
       <hr>
 
-      <h1>{{i18n.documentation.TOC}}</h1>
+      <h1 class="title">{{i18n.documentation.TOC}}</h1>
       <p>
         <ul class="toc">
           <li>
@@ -100,8 +115,8 @@
 
       <hr>
 
-      <h2>
-        <a name="about-graphql">{{i18n.documentation.about-graphql}}</a>
+      <h2 class="title is-3">
+        <a class="hidename" name="about-graphql">{{i18n.documentation.about-graphql}}</a>
       </h2>
 
       <p>
@@ -115,8 +130,8 @@
       </p>
 
 
-      <h3>
-        <a name="communicating-with-graphql">{{i18n.documentation.communicating-with-graphql}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="communicating-with-graphql">{{i18n.documentation.communicating-with-graphql}}</a>
       </h3>
 
       <p>
@@ -146,8 +161,8 @@
         <pre class="query node">{{{nodeQuery queries.hello '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="graphql-playground">{{i18n.documentation.graphql-playground}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="graphql-playground">{{i18n.documentation.graphql-playground}}</a>
       </h3>
       <p>
         {{{i18n.documentation.graphql-communicating-5}}}
@@ -161,16 +176,16 @@
 
       <hr>
 
-      <h2>
-        <a name="graphql-queries">{{i18n.documentation.graphql-queries}}</a>
+      <h2 class="title is-3">
+        <a class="hidename" name="graphql-queries">{{i18n.documentation.graphql-queries}}</a>
       </h2>
 
       <p>
         {{{i18n.documentation.graphql-communicating-7}}}
       </p>
 
-      <h2>
-        <a name="introspection">{{i18n.documentation.introspection}}</a>
+      <h2 class="title is-3">
+        <a class="hidename" name="introspection">{{i18n.documentation.introspection}}</a>
       </h2>
 
       <p>
@@ -195,8 +210,8 @@
 
       <hr />
 
-      <h3>
-        <a name="objects">{{i18n.documentation.objects}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="objects">{{i18n.documentation.objects}}</a>
       </h3>
 
       <p>
@@ -214,7 +229,7 @@
         {{{i18n.documentation.valid-lang}}}
       </p>
 
-      <h3>
+      <h3 class="title is-4">
         {{{i18n.documentation.graphql-objects-5}}}
       </h3>
 
@@ -237,8 +252,8 @@
         <pre class="query node">{{{nodeQuery queries.objectsMini '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
       </h3>
 
       <p>
@@ -264,8 +279,8 @@
         <pre class="query node">{{{nodeQuery queries.objectsMedium '(page:0, per_page: 5, area: "Moving Image")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="sorting">{{i18n.documentation.sorting}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="sorting">{{i18n.documentation.sorting}}</a>
       </h3>
 
       <p>
@@ -291,8 +306,8 @@
         <pre class="query node">{{{nodeQuery queries.objectsLarge '(sort_field: "sortNumber", sort: "asc")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
       </h3>
 
       <p>
@@ -320,8 +335,8 @@
 
       <hr />
 
-      <h3>
-        <a name="object">{{i18n.documentation.object}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="object">{{i18n.documentation.object}}</a>
       </h3>
 
       <p>
@@ -349,8 +364,8 @@
 
       <hr />
 
-      <h3>
-        <a name="areas">{{i18n.documentation.areas}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="areas">{{i18n.documentation.areas}}</a>
       </h3>
 
       <p>
@@ -395,8 +410,8 @@
 
       <hr />
 
-      <h3>
-        <a name="categories">{{i18n.documentation.categories}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="categories">{{i18n.documentation.categories}}</a>
       </h3>
 
       <p>
@@ -440,8 +455,8 @@
 
       <hr />
 
-      <h3>
-        <a name="mediums">{{i18n.documentation.mediums}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="mediums">{{i18n.documentation.mediums}}</a>
       </h3>
 
       <p>
@@ -485,8 +500,8 @@
 
       <hr />
 
-      <h3>
-        <a name="constituents">{{i18n.documentation.constituents}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="constituents">{{i18n.documentation.constituents}}</a>
       </h3>
 
       <p>
@@ -508,7 +523,7 @@
         {{{i18n.documentation.aggs-lang}}}
       </p>
 
-      <h3>
+      <h3 class="title is-4">
         {{{i18n.documentation.constituents-call-for-ids}}}
       </h3>
 
@@ -531,8 +546,8 @@
         <pre class="query node">{{{nodeQuery queries.constituents '' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="constituents-paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="constituents-paginationandfilter">{{i18n.documentation.paginationandfilter}}</a>
       </h3>
 
       <p>
@@ -558,8 +573,8 @@
         <pre class="query node">{{{nodeQuery queries.constituents '(page:3, per_page: 5, gender: "Female")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="constituents-sorting">{{i18n.documentation.sorting}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="constituents-sorting">{{i18n.documentation.sorting}}</a>
       </h3>
 
       <p>
@@ -585,8 +600,8 @@
         <pre class="query node">{{{nodeQuery queries.constituents '(sort_field: "alphaSortName", sort: "asc")' config.graphql.host user.apitoken}}}</pre>
       </p>
 
-      <h3>
-        <a name="constituents-fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="constituents-fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
       </h3>
 
       <p>
@@ -614,8 +629,8 @@
 
       <hr />
 
-      <h3>
-        <a name="constituent">{{i18n.documentation.constituent}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="constituent">{{i18n.documentation.constituent}}</a>
       </h3>
 
       <p>
@@ -643,8 +658,8 @@
 
       <hr />
 
-      <h3>
-        <a name="nesting">{{i18n.documentation.nesting}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="nesting">{{i18n.documentation.nesting}}</a>
       </h3>
 
       <p>
@@ -675,8 +690,8 @@
 
       <hr />
 
-      <h3>
-        <a name="objects-connected-constituent">{{i18n.documentation.objects-connected-constituent}}</a>
+      <h3 class="title is-4">
+        <a class="hidename" name="objects-connected-constituent">{{i18n.documentation.objects-connected-constituent}}</a>
       </h3>
 
       <p>
@@ -700,7 +715,7 @@
       <hr />
 
     </div>
-  </div>
+  </section>
 
   {{> tail}}
 </body>
