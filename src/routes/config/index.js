@@ -79,15 +79,14 @@ exports.index = (req, res) => {
       let foundMatch = false
       tms.forEach((thisTMS) => {
         if (thisTMS.stub === req.body.tmsstub) {
-          // thisTMS.url = req.body.tmsurl
-          // thisTMS.key = req.body.key
+          thisTMS.filepath = req.body.filepath
           foundMatch = true
         }
       })
       if (foundMatch === false) {
         tms.push({
-          stub: req.body.tmsstub // ,
-          // url: req.body.tmsurl,
+          stub: req.body.tmsstub,
+          filepath: req.body.filepath
           // key: req.body.key
         })
       }

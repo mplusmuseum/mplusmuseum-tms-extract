@@ -245,13 +245,35 @@
       <p>
         <h2 class="title is-5">TMS: <strong>{{stub}}</strong></h2>
       </p>
-      <p>
-        <form method="post">
-          <input type="hidden" name="tmsstub" value="{{stub}}">
-          <button class="button is-primary" type="submit" value="updatetms" name="action">Update</button>
-          <button class="button  is-danger" type="submit" value="deletetms" name="action">Remove</button>
-        </form>
-      </p>{{/each}} {{else}} {{/if}}
+      <form method="post">
+        <input type="hidden" name="tmsstub" value="{{stub}}">
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">XML file location</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input" type="text" name="filepath" placeholder="Full local path to filename, including the filename"
+                  value="{{filepath}}">
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item">&nbsp;</div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <p class="control">
+                <button class="button is-primary" type="submit" value="updatetms" name="action">Update</button>
+                <button class="button  is-danger" type="submit" value="deletetms" name="action">Remove</button>
+              </p>
+            </div>
+          </div>
+        </div>
+      </form>{{/each}} {{else}} {{/if}}
       <p>
         Please use the form below to register a new TMS system.
       </p>
@@ -264,6 +286,19 @@
             <div class="field">
               <p class="control">
                 <input class="input" type="text" name="tmsstub" placeholder="i.e. a stub like 'mplus', for use in urls"
+                  value="">
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">XML file location</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input class="input" type="text" name="filepath" placeholder="Full local path to filename, including the filename"
                   value="">
               </p>
             </div>
