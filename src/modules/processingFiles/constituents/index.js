@@ -88,7 +88,7 @@ const processJsonFile = async (tms, parentNode, childNode) => {
   const startTime = new Date().getTime()
   const tmsLogger = logging.getTMSLogger()
 
-  const filename = path.join(rootDir, 'imports', parentNode, tms, 'files.json')
+  const filename = path.join(rootDir, 'imports', parentNode, tms, 'items.json')
   if (!fs.existsSync(filename)) {
     console.log('Cant find file: ', filename)
   }
@@ -263,8 +263,8 @@ const makePerfect = async () => {
 
   tmsses.forEach((tms) => {
     if (foundItemToUpload === true) return
-    const tmsProcessDir = path.join(rootDir, 'constituents', tms.stub, 'process')
-    const tmsPerfectDir = path.join(rootDir, 'constituents', tms.stub, 'perfect')
+    const tmsProcessDir = path.join(rootDir, 'imports', 'Constituents', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'imports', 'Constituents', tms.stub, 'perfect')
     if (fs.existsSync(tmsProcessDir)) {
       if (foundItemToUpload === true) return
       const subFolders = fs.readdirSync(tmsProcessDir)

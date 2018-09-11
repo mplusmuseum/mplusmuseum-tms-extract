@@ -11,213 +11,66 @@ These are all the cool parse functions to get the data into the right format
 */
 // #########################################################################
 
-const getConstituents = constituents => {
-  const constituentsObj = {
-    ids: [],
-    idsToRoleRank: []
+const getVenues = venues => {
+  if (venues === null || venues === undefined) return null
+  if (typeof (venues) === 'string') {
+    venues = [{
+      _: venues
+    }]
   }
-  if (constituents === null || constituents === undefined) return null
-  if (!Array.isArray(constituents)) constituents = [constituents]
-
-  //  We are going to make an array of id/rank/role objects so we can match them
-  //  up again on the other side
-  constituents.forEach((constituent) => {
-    const newConstituentObj = {}
-
-    const constituentId = parseInt(constituent.ConstituentID, 10)
-    if (!constituentsObj.ids.includes(constituentId)) constituentsObj.ids.push(constituentId)
-
-    newConstituentObj.id = constituentId
-    if ('Displayorder' in constituent) {
-      const rank = parseInt(constituent.Displayorder, 10)
-      newConstituentObj.rank = rank
+  if (!Array.isArray(venues)) venues = [venues]
+  const venuesObj = {
+    titles: {
+      'en': [],
+      'zh-hant': []
+    },
+    venues: {
+      'en': [],
+      'zh-hant': []
     }
-    if ('Role' in constituent) {
-      newConstituentObj.roles = {
-        en: constituent.Role
-      }
-    }
-    //  Add the object to the array of id/rank/roles
-    constituentsObj.idsToRoleRank.push(newConstituentObj)
-  })
-  //  To stop theElasticSearch trying to make a large number of fields
-  //  based on this nested data, we're going to store it as a string.
-  //  We don't need to ever search on it, we just need to be able to
-  //  unpack it again on the other side.
-  constituentsObj.idsToRoleRank = JSON.stringify(constituentsObj.idsToRoleRank)
-
-  return constituentsObj
-}
-
-const getSortnumber = objectNumber => {
-  //  We have a sort number, if the objectNumber is numeric then we can use
-  //  it for the sort number, if it's not then we just leave it null
-  /*
-  let sortNumber = null
-  if (!isNaN(parseFloat(objectNumber))) {
-    sortNumber = parseFloat(objectNumber)
   }
-  return sortNumber
-  */
-  return objectNumber
-}
-
-const getClassifications = classifications => {
-  const classificationsObj = {}
-  if (!Array.isArray(classifications)) {
-    classifications = [classifications]
-  }
-  classifications.forEach((cat) => {
-    //  Get the area or category
-    if ('Classification' in cat) {
-      const catSplit = cat.Classification.split('-')[0]
-
-      //  If we have an area then put it there
-      if (catSplit === 'Area') {
-        classificationsObj.area = {
-          rank: parseInt(cat.Displayorder, 10),
-          areacat: {}
-        }
-        //  Add the languages if we have them
-        if ('Classification' in cat) {
-          classificationsObj.area.areacat['en'] = cat.Classification.replace('Area-', '')
-        }
-        if ('ClassificationTC' in cat) {
-          classificationsObj.area.areacat['zh-hant'] = cat.ClassificationTC
-        }
+  venues.forEach((venue) => {
+    if ('_' in venue) {
+      const venueObj = {
+        title: venue._
       }
-      //  If we have an category then put it there
-      if (catSplit === 'Category') {
-        classificationsObj.category = {
-          rank: parseInt(cat.Displayorder, 10),
-          areacat: {}
-        }
-        //  Add the languages if we have them
-        if ('Classification' in cat) {
-          classificationsObj.category.areacat['en'] = cat.Classification.replace('Category-', '')
-        }
-        if ('ClassificationTC' in cat) {
-          classificationsObj.category.areacat['zh-hant'] = cat.ClassificationTC
-        }
+      if ('VenueBeginDate' in venue) {
+        venueObj.beginDate = new Date(venue.VenueBeginDate)
+        venueObj.beginDateStr = venue.VenueBeginDate
       }
+      if ('VenueEndDate' in venue) {
+        venueObj.endDate = new Date(venue.VenueEndDate)
+        venueObj.endDateStr = venue.VenueEndDate
+      }
+      venuesObj.titles['en'].push(venue._)
+      venuesObj.venues['en'].push(venueObj)
     }
   })
-  return classificationsObj
-}
-
-//  Turn the list of ids into an actual array
-const getExhibitionIds = ids => {
-  if (ids === undefined || ids === null) return null
-  if (!Array.isArray(ids)) ids = [ids]
-  return ids.map((id) => {
-    //  Sometimes we are a string, sometimes an object
-    if (typeof (id) === 'string') return parseInt(id, 10)
-    if (typeof (id) === 'object' && '_' in id) return parseInt(id._, 10)
-    return null
-  }).filter(Boolean)
-}
-
-//  Turn the list of ids into an actual array
-const getExhibitionSections = ids => {
-  if (ids === undefined || ids === null) return null
-  if (!Array.isArray(ids)) ids = [ids]
-  return JSON.stringify(ids.map((id) => {
-    //  Sometimes we are a string, sometimes an object
-    if (typeof (id) === 'object' && '_' in id && 'Section' in id) {
-      const returnObj = {}
-      returnObj[parseInt(id._, 10)] = id.Section
-      return returnObj
-    }
-    return null
-  }).filter(Boolean))
-}
-
-//  Grab the label text
-const getExhibitionLabelText = labelText => {
-  if (labelText === undefined || labelText === null) return null
-  if (!Array.isArray(labelText)) labelText = [labelText]
-  const labelObj = {
-    purposes: [],
-    labels: []
-  }
-  labelObj.purposes = labelText.map((label) => {
-    if (typeof (label) === 'object' && 'Purpose' in label) return label.Purpose
-    return null
-  }).filter(Boolean)
-  labelObj.labels = labelText.map((label) => {
-    if (typeof (label) === 'string') {
-      return {
-        'purpose': null,
-        'text': label
-      }
-    }
-    if (typeof (label) === 'object' && '_' in label && 'Purpose' in label) {
-      return {
-        'purpose': label.Purpose,
-        'text': label._
-      }
-    }
-    return null
-  }).filter(Boolean)
-  return labelObj
-}
-
-const forceIDArray = ids => {
-  if (ids === undefined || ids === null) return null
-  if (!Array.isArray(ids)) ids = [ids]
-  ids = ids.map((id) => {
-    return parseInt(id, 10)
-  })
-  return ids
+  return venuesObj
 }
 
 // #########################################################################
 /*
- * The actual object parsing
+ * The actual constituent parsing
  */
 // #########################################################################
+
 const parseItem = item => {
   const newItem = {
-    objectID: parseInt(item.ObjectID, 10),
-    publicAccess: parseInt(item.PublicAccess, 10) === 1,
-    onView: parseInt(item.OnView, 10) === 1,
-    objectNumber: item.ObjectNumber,
-    sortNumber: getSortnumber(item.SortNumber),
-    classification: getClassifications(item.AreaCat),
-    consituents: getConstituents(item.ObjectRelatedConstituents),
-    exhibition: {
-      ids: getExhibitionIds(item.RelatedExhibitionID),
-      sections: getExhibitionSections(item.RelatedExhibitionID),
-      exhibitionLabelText: {}
-    },
-    relatedEventIds: forceIDArray(item.RelatedEventID),
-    relatedConceptIds: forceIDArray(item.RelatedConceptID),
-    allORC: item.AllORC,
+    exhibitionID: parseInt(item.ExhibitionID, 10),
+    type: 'ExhibitionType' in item ? item.ExhibitionType : null,
     title: {},
-    objectStatus: {},
-    displayDate: {},
-    beginDate: parseFloat(item.DateBegin),
-    endDate: parseFloat(item.Dateend),
-    dimension: {},
-    medium: {},
-    creditLine: {},
-    id: parseInt(item.ObjectID, 10)
+    venues: getVenues(item.Venue),
+    beginDate: 'ExhibitionBeginDate' in item ? new Date(item.ExhibitionBeginDate) : null,
+    beginDateStr: 'ExhibitionBeginDate' in item ? item.ExhibitionBeginDate : null,
+    endDate: 'ExhibitonEndDate' in item ? new Date(item.ExhibitonEndDate) : null,
+    endDateStr: 'ExhibitonEndDate' in item ? item.ExhibitonEndDate : null,
+    id: parseInt(item.ExhibitionID, 10)
   }
-  //  Now drop in all the languages
-  if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
-  if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
-  if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
-  if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
-  if ('Dated' in item) newItem.displayDate['en'] = item.Dated
-  if ('DateTC' in item) newItem.displayDate['zh-hant'] = item.DateTC
-  if ('Dimensions' in item) newItem.dimension['en'] = item.Dimensions
-  if ('DimensionTC' in item) newItem.dimension['zh-hant'] = item.DimensionTC
-  if ('Medium' in item) newItem.medium['en'] = item.Medium
-  if ('MediumTC' in item) newItem.medium['zh-hant'] = item.MediumTC
-  if ('CreditLine' in item) newItem.creditLine['en'] = item.CreditLine
-  if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
-  if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
-  if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
+
+  if ('ExhTitle' in item) newItem.title['en'] = item.ExhTitle
+  if ('ExhTitleTC' in item) newItem.title['zh-hant'] = item.ExhTitleTC
+
   return newItem
 }
 
@@ -406,8 +259,8 @@ const makePerfect = async () => {
 
   tmsses.forEach((tms) => {
     if (foundItemToUpload === true) return
-    const tmsProcessDir = path.join(rootDir, 'imports', 'Objects', tms.stub, 'process')
-    const tmsPerfectDir = path.join(rootDir, 'imports', 'Objects', tms.stub, 'perfect')
+    const tmsProcessDir = path.join(rootDir, 'imports', 'Exhibitions', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'imports', 'Exhibitions', tms.stub, 'perfect')
     if (fs.existsSync(tmsProcessDir)) {
       if (foundItemToUpload === true) return
       const subFolders = fs.readdirSync(tmsProcessDir)
