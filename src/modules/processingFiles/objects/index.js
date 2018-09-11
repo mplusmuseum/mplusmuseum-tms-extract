@@ -60,11 +60,14 @@ const getConstituents = constituents => {
 const getSortnumber = objectNumber => {
   //  We have a sort number, if the objectNumber is numeric then we can use
   //  it for the sort number, if it's not then we just leave it null
+  /*
   let sortNumber = null
   if (!isNaN(parseFloat(objectNumber))) {
     sortNumber = parseFloat(objectNumber)
   }
   return sortNumber
+  */
+  return objectNumber
 }
 
 const getClassifications = classifications => {
@@ -110,6 +113,69 @@ const getClassifications = classifications => {
   return classificationsObj
 }
 
+//  Turn the list of ids into an actual array
+const getExhibitionIds = ids => {
+  if (ids === undefined || ids === null) return null
+  if (!Array.isArray(ids)) ids = [ids]
+  return ids.map((id) => {
+    //  Sometimes we are a string, sometimes an object
+    if (typeof (id) === 'string') return parseInt(id, 10)
+    if (typeof (id) === 'object' && '_' in id) return parseInt(id._, 10)
+    return null
+  }).filter(Boolean)
+}
+
+//  Turn the list of ids into an actual array
+const getExhibitionSections = ids => {
+  if (ids === undefined || ids === null) return null
+  if (!Array.isArray(ids)) ids = [ids]
+  return JSON.stringify(ids.map((id) => {
+    //  Sometimes we are a string, sometimes an object
+    if (typeof (id) === 'object' && '_' in id && 'Section' in id) {
+      const returnObj = {}
+      returnObj[parseInt(id._, 10)] = id.Section
+      return returnObj
+    }
+    return null
+  }).filter(Boolean))
+}
+
+//  Grab the label text
+const getExhibitionLabelText = labelText => {
+  if (labelText === undefined || labelText === null) return null
+  if (!Array.isArray(labelText)) labelText = [labelText]
+  const labelObj = {
+    purposes: [],
+    labels: []
+  }
+  labelObj.purposes = labelText.map((label) => {
+    if (typeof (label) === 'object' && 'Purpose' in label) return label.Purpose
+    return null
+  }).filter(Boolean)
+  labelObj.labels = labelText.map((label) => {
+    if (typeof (label) === 'string') {
+      return {
+        'purpose': null,
+        'text': label
+      }
+    }
+    if (typeof (label) === 'object' && '_' in label && 'Purpose' in label) {
+      return {
+        'purpose': label.Purpose,
+        'text': label._
+      }
+    }
+    return null
+  }).filter(Boolean)
+  return labelObj
+}
+
+const forceIDArray = ids => {
+  if (ids === undefined || ids === null) return null
+  if (!Array.isArray(ids)) ids = [ids]
+  return ids
+}
+
 //  Extract all the languages out of the data object we have been passed
 const getTextByLanguage = (objThing, key) => {
   //  Make sure the key actually exists
@@ -133,24 +199,44 @@ const parseItem = item => {
   const newItem = {
     objectID: parseInt(item.ObjectID, 10),
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
-    objectNumber: item.objectnumber,
+    onView: parseInt(item.OnView, 10) === 1,
+    objectNumber: item.ObjectNumber,
     sortNumber: getSortnumber(item.SortNumber),
     classification: getClassifications(item.AreaCat),
     consituents: getConstituents(item.ObjectRelatedConstituents),
-    /*
-    title: getTextByLanguage(item.titles, 'title'),
-    displayDate: item.dated,
-    beginDate: parseFloat(item.datebegin),
-    endDate: parseFloat(item.dateend),
-    dimension: getTextByLanguage(item.dimensions, 'dimensions'),
-    medium: getTextByLanguage(item.mediums, 'medium'),
-    creditLine: getTextByLanguage(item.creditlines, 'creditline'),
-    */
+    exhibition: {
+      ids: getExhibitionIds(item.RelatedExhibitionID),
+      sections: getExhibitionSections(item.RelatedExhibitionID),
+      exhibitionLabelText: {}
+    },
+    relatedEventIds: forceIDArray(item.RelatedEventID),
+    relatedConceptID: forceIDArray(item.RelatedConceptID),
+    allORC: item.AllORC,
+    title: {},
+    objectStatus: {},
+    displayDate: {},
+    beginDate: parseFloat(item.DateBegin),
+    endDate: parseFloat(item.Dateend),
+    dimension: {},
+    medium: {},
+    creditLine: {},
     id: parseInt(item.ObjectID, 10)
   }
-  if (newItem.id === 9121) {
-    console.log(newItem)
-  }
+  //  Now drop in all the languages
+  if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
+  if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
+  if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
+  if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
+  if ('Dated' in item) newItem.displayDate['en'] = item.Dated
+  if ('DateTC' in item) newItem.displayDate['zh-hant'] = item.DateTC
+  if ('Dimensions' in item) newItem.dimension['en'] = item.Dimensions
+  if ('DimensionTC' in item) newItem.dimension['zh-hant'] = item.DimensionTC
+  if ('Medium' in item) newItem.medium['en'] = item.Medium
+  if ('MediumTC' in item) newItem.medium['zh-hant'] = item.MediumTC
+  if ('CreditLine' in item) newItem.creditLine['en'] = item.CreditLine
+  if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
+  if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
+  if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
   return newItem
 }
 
@@ -179,9 +265,6 @@ const processJsonFile = async (tms, parentNode, childNode) => {
   //  it now and work out how many objects are new or modified
   itemsJSON.forEach((item) => {
     totalItems += 1
-    if (totalItems < 4) {
-      console.log(item)
-    }
     const id = parseInt(item.id, 10)
     const subFolder = String(Math.floor(id / 1000) * 1000)
     const filename = path.join(rootDir, 'imports', parentNode, tms, 'processed', subFolder, `${id}.json`)
