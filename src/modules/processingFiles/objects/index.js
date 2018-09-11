@@ -173,21 +173,10 @@ const getExhibitionLabelText = labelText => {
 const forceIDArray = ids => {
   if (ids === undefined || ids === null) return null
   if (!Array.isArray(ids)) ids = [ids]
-  return ids
-}
-
-//  Extract all the languages out of the data object we have been passed
-const getTextByLanguage = (objThing, key) => {
-  //  Make sure the key actually exists
-  if (objThing === null || objThing === undefined || !(key in objThing)) return null
-  if (!Array.isArray(objThing[key])) objThing[key] = [objThing[key]]
-  const rtnObj = {}
-  objThing[key].forEach((textLang) => {
-    if ('lang' in textLang && '_' in textLang && textLang.lang !== null && textLang.lang !== '' && textLang._ !== null && textLang._ !== '' && textLang._ !== 'zh-hans') {
-      rtnObj[textLang.lang] = textLang._
-    }
+  ids = ids.map((id) => {
+    return parseInt(id, 10)
   })
-  return rtnObj
+  return ids
 }
 
 // #########################################################################
@@ -210,7 +199,7 @@ const parseItem = item => {
       exhibitionLabelText: {}
     },
     relatedEventIds: forceIDArray(item.RelatedEventID),
-    relatedConceptID: forceIDArray(item.RelatedConceptID),
+    relatedConceptIds: forceIDArray(item.RelatedConceptID),
     allORC: item.AllORC,
     title: {},
     objectStatus: {},

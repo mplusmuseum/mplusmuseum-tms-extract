@@ -5,7 +5,7 @@ const rootDir = path.join(__dirname, '../../../data')
 const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
-const upsertItem = async (type, tms, id) => {
+const upsertTheItem = async (type, tms, id) => {
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have elasticsearch configured
@@ -19,10 +19,10 @@ const upsertItem = async (type, tms, id) => {
 
   //  Check to make sure the file exists
   const subFolder = String(Math.floor(id / 1000) * 1000)
-  const processFilename = path.join(rootDir, type, tms, 'process', subFolder, `${id}.json`)
+  const processFilename = path.join(rootDir, 'imports', type.parent, tms, 'process', subFolder, `${id}.json`)
   if (!fs.existsSync(processFilename)) return
   //  And the matching perfect file
-  const perfectFilename = path.join(rootDir, type, tms, 'perfect', subFolder, `${id}.json`)
+  const perfectFilename = path.join(rootDir, 'imports', type.parent, tms, 'perfect', subFolder, `${id}.json`)
   if (!fs.existsSync(perfectFilename)) return
 
   //  Read in the processFile
@@ -41,7 +41,7 @@ const upsertItem = async (type, tms, id) => {
   const startTime = new Date().getTime()
 
   //  Create the index if we need to
-  const index = `${type}_${tms}`
+  const index = `${type.parent}_${tms}`.toLowerCase()
   const exists = await esclient.indices.exists({
     index
   })
@@ -54,7 +54,7 @@ const upsertItem = async (type, tms, id) => {
   //  Upsert the item
   esclient.update({
     index,
-    type,
+    type: type.child.toLowerCase(),
     id,
     body: {
       doc: upsertItem,
@@ -62,16 +62,17 @@ const upsertItem = async (type, tms, id) => {
     }
   }).then(() => {
     //  Move it from the process to the processed folder
-    const processedFilename = path.join(rootDir, type, tms, 'processed', subFolder, `${id}.json`)
-    if (!fs.existsSync(path.join(rootDir, type, tms, 'processed'))) fs.mkdirSync(path.join(rootDir, type, tms, 'processed'))
-    if (!fs.existsSync(path.join(rootDir, type, tms, 'processed', subFolder))) fs.mkdirSync(path.join(rootDir, type, tms, 'processed', subFolder))
+    const processedFilename = path.join(rootDir, 'imports', type.parent, tms, 'processed', subFolder, `${id}.json`)
+    if (!fs.existsSync(path.join(rootDir, 'imports', type.parent, tms, 'processed'))) fs.mkdirSync(path.join(rootDir, 'imports', type.parent, tms, 'processed'))
+    if (!fs.existsSync(path.join(rootDir, 'imports', type.parent, tms, 'processed', subFolder))) fs.mkdirSync(path.join(rootDir, 'imports', type.parent, tms, 'processed', subFolder))
 
     fs.renameSync(processFilename, processedFilename)
     const endTime = new Date().getTime()
-    tmsLogger.object(`Upserted item for ${type} ${id} for ${tms}`, {
-      action: `upserted_${type}`,
-      id: id,
-      tms: tms,
+    tmsLogger.object(`Upserted ${type.child} for ${type.child} ${id} for ${tms}`, {
+      action: `upserted`,
+      type: type.child,
+      id,
+      tms,
       ms: endTime - startTime
     })
     //  We are going to reset the timeout to update the aggrigations
@@ -79,7 +80,6 @@ const upsertItem = async (type, tms, id) => {
 }
 
 const checkItems = async () => {
-  return
   const config = new Config()
   const elasticsearchConfig = config.get('elasticsearch')
   const tmsLogger = logging.getTMSLogger()
@@ -90,7 +90,6 @@ const checkItems = async () => {
     tmsLogger.object(`No elasticsearch configured`, {
       action: 'checkingProcess'
     })
-    
   }
 
   //  Only carry on if we have a data and tms directory
@@ -101,7 +100,10 @@ const checkItems = async () => {
     return
   }
 
-  const types = ['objects', 'constituents']
+  const types = [{
+    parent: 'Objects',
+    child: 'Object'
+  }]
   const tmsses = config.get('tms')
 
   //  Now we need to look through all the folders in the data/[something]/[tms]perfect/[number]
@@ -111,8 +113,8 @@ const checkItems = async () => {
     if (foundItemToUpload === true) return
     tmsses.forEach((tms) => {
       if (foundItemToUpload === true) return
-      const tmsDir = path.join(rootDir, type, tms.stub, 'process')
-      const tmsPerfectDir = path.join(rootDir, type, tms.stub, 'perfect')
+      const tmsDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'process')
+      const tmsPerfectDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'perfect')
       if (fs.existsSync(tmsDir)) {
         if (foundItemToUpload === true) return
         const subFolders = fs.readdirSync(tmsDir)
@@ -139,7 +141,7 @@ const checkItems = async () => {
             if (!('artInt' in perfectFile) || perfectFile.artInt === null || perfectFile.artInt === '') return
 
             foundItemToUpload = true
-            upsertItem(type, tms.stub, file.split('.')[0])
+            upsertTheItem(type, tms.stub, file.split('.')[0])
           })
         })
       }
