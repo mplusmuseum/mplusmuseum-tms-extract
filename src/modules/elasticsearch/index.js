@@ -79,6 +79,7 @@ const upsertItem = async (type, tms, id) => {
 }
 
 const checkItems = async () => {
+  return
   const config = new Config()
   const elasticsearchConfig = config.get('elasticsearch')
   const tmsLogger = logging.getTMSLogger()
@@ -89,7 +90,7 @@ const checkItems = async () => {
     tmsLogger.object(`No elasticsearch configured`, {
       action: 'checkingProcess'
     })
-    return
+    
   }
 
   //  Only carry on if we have a data and tms directory

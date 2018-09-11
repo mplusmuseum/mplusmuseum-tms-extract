@@ -136,6 +136,7 @@ router.use(function (req, res, next) {
       Object.assign(i18n[key], values)
     })
   }
+  req.templateValues.selectedLang = selectedLang
   req.templateValues.i18n = i18n
 
   //  If there is no Auth0 setting in config then we _must_
@@ -235,6 +236,7 @@ router.get('/:lang/config', ensureLoggedIn, config.index)
 router.post('/:lang/config', ensureLoggedIn, config.index)
 router.get('/:lang/settings', ensureLoggedIn, user.settings)
 router.get('/:lang/admin', ensureLoggedIn, admin.index)
+router.post('/:lang/admin', ensureLoggedIn, admin.index)
 router.post('/:lang/admin/blow/away/index/:index', ensureLoggedIn, admin.blowaway)
 router.get('/:lang/admin/blow/away/index/:index', ensureLoggedIn, admin.blowaway)
 router.post('/:lang/admin/aggregate/:tms', ensureLoggedIn, admin.aggrigateObjects)

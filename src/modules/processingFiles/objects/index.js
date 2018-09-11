@@ -19,65 +19,42 @@ These are all the cool parse functions to get the data into the right format
 */
 // #########################################################################
 
-const getConsituents = authors => {
-  const consituentsObj = {
+const getConstituents = constituents => {
+  const constituentsObj = {
     ids: [],
     idsToRoleRank: []
   }
-  if (authors === null || authors === undefined) return null
-  if (!('author' in authors)) return null
-  if (authors.author === null) return null
-
-  if (!Array.isArray(authors.author)) authors.author = [authors.author]
+  if (constituents === null || constituents === undefined) return null
+  if (!Array.isArray(constituents)) constituents = [constituents]
 
   //  We are going to make an array of id/rank/role objects so we can match them
   //  up again on the other side
-  authors.author.forEach((author) => {
-    const newAuthorObj = {}
+  constituents.forEach((constituent) => {
+    const newConstituentObj = {}
 
-    //  We pretty much need an author for anything to work
-    if ('author' in author) {
-      const authorId = parseInt(author.author, 10)
-      if (!consituentsObj.ids.includes(authorId)) consituentsObj.ids.push(authorId)
-      newAuthorObj.id = authorId
+    const constituentId = parseInt(constituent.ConstituentID, 10)
+    if (!constituentsObj.ids.includes(constituentId)) constituentsObj.ids.push(constituentId)
 
-      //  Now do the ranks
-      if ('rank' in author) {
-        const rank = parseInt(author.rank, 10)
-        newAuthorObj.rank = rank
-      }
-
-      //  Incase we have roles in other languages we need to build up
-      if ('roles' in author) {
-        let roles = author.roles
-        //  If we don't have an array of roles, turn it into one
-        if (!Array.isArray(roles)) roles = [roles]
-        //  Loop through the roles
-        roles.forEach((roleParent) => {
-          //  This is where we are going to put all the language versions of the role
-          newAuthorObj.roles = {}
-          //  If we have a role node...
-          if ('role' in roleParent) {
-            const role = roleParent.role
-            //  And in the role node we have the lang and the text
-            if ('_' in role && role._ !== null && role._ !== undefined && role._ !== '' && 'lang' in role && role.lang !== null && role.lang !== undefined && role.lang !== '' && role.lang !== 'zh-hans') {
-              //  Set the role against the language in the object
-              newAuthorObj.roles[role.lang] = role._
-            }
-          }
-        })
-      }
-      //  Add the object to the array of id/rank/roles
-      consituentsObj.idsToRoleRank.push(newAuthorObj)
+    newConstituentObj.id = constituentId
+    if ('Displayorder' in constituent) {
+      const rank = parseInt(constituent.Displayorder, 10)
+      newConstituentObj.rank = rank
     }
+    if ('Role' in constituent) {
+      newConstituentObj.roles = {
+        en: constituent.Role
+      }
+    }
+    //  Add the object to the array of id/rank/roles
+    constituentsObj.idsToRoleRank.push(newConstituentObj)
   })
   //  To stop theElasticSearch trying to make a large number of fields
   //  based on this nested data, we're going to store it as a string.
   //  We don't need to ever search on it, we just need to be able to
   //  unpack it again on the other side.
-  consituentsObj.idsToRoleRank = JSON.stringify(consituentsObj.idsToRoleRank)
+  constituentsObj.idsToRoleRank = JSON.stringify(constituentsObj.idsToRoleRank)
 
-  return consituentsObj
+  return constituentsObj
 }
 
 const getSortnumber = objectNumber => {
@@ -92,29 +69,44 @@ const getSortnumber = objectNumber => {
 
 const getClassifications = classifications => {
   const classificationsObj = {}
-  if ('areacategory' in classifications) {
-    if (!Array.isArray(classifications.areacategory)) classifications.areacategory = [classifications.areacategory]
-    classifications.areacategory.forEach((area) => {
-      if ('type' in area) {
-        const areaLower = area.type.toLowerCase()
-        if (!(areaLower in classificationsObj)) {
-          classificationsObj[areaLower] = {}
+  if (!Array.isArray(classifications)) {
+    classifications = [classifications]
+  }
+  classifications.forEach((cat) => {
+    //  Get the area or category
+    if ('Classification' in cat) {
+      const catSplit = cat.Classification.split('-')[0]
+
+      //  If we have an area then put it there
+      if (catSplit === 'Area') {
+        classificationsObj.area = {
+          rank: parseInt(cat.Displayorder, 10),
+          areacat: {}
         }
-        if ('rank' in area) {
-          classificationsObj[areaLower].rank = parseInt(area.rank, 10)
+        //  Add the languages if we have them
+        if ('Classification' in cat) {
+          classificationsObj.area.areacat['en'] = cat.Classification.replace('Area-', '')
         }
-        if ('areacat' in area) {
-          if (!Array.isArray(area.areacat)) area.areacat = [area.areacat]
-          classificationsObj[areaLower].areacat = {}
-          area.areacat.forEach((area) => {
-            if (area.lang !== 'zh-hans') {
-              classificationsObj[areaLower].areacat[area.lang] = area._
-            }
-          })
+        if ('ClassificationTC' in cat) {
+          classificationsObj.area.areacat['zh-hant'] = cat.ClassificationTC
         }
       }
-    })
-  }
+      //  If we have an category then put it there
+      if (catSplit === 'Category') {
+        classificationsObj.category = {
+          rank: parseInt(cat.Displayorder, 10),
+          areacat: {}
+        }
+        //  Add the languages if we have them
+        if ('Classification' in cat) {
+          classificationsObj.category.areacat['en'] = cat.Classification.replace('Category-', '')
+        }
+        if ('ClassificationTC' in cat) {
+          classificationsObj.category.areacat['zh-hant'] = cat.ClassificationTC
+        }
+      }
+    }
+  })
   return classificationsObj
 }
 
@@ -137,94 +129,47 @@ const getTextByLanguage = (objThing, key) => {
  * The actual object parsing
  */
 // #########################################################################
-const parseObject = o => {
-  const newObject = {
-    objectID: parseInt(o.id, 10),
-    publicAccess: parseInt(o.PublicAccess, 10) === 1,
-    objectNumber: o.objectnumber,
-    sortNumber: getSortnumber(o.objectnumber),
-    classification: getClassifications(o.areacategories),
-    consituents: getConsituents(o.authors),
-    title: getTextByLanguage(o.titles, 'title'),
-    displayDate: o.dated,
-    beginDate: parseFloat(o.datebegin),
-    endDate: parseFloat(o.dateend),
-    dimension: getTextByLanguage(o.dimensions, 'dimensions'),
-    medium: getTextByLanguage(o.mediums, 'medium'),
-    creditLine: getTextByLanguage(o.creditlines, 'creditline'),
-    id: parseInt(o.id, 10)
+const parseItem = item => {
+  const newItem = {
+    objectID: parseInt(item.ObjectID, 10),
+    publicAccess: parseInt(item.PublicAccess, 10) === 1,
+    objectNumber: item.objectnumber,
+    sortNumber: getSortnumber(item.SortNumber),
+    classification: getClassifications(item.AreaCat),
+    consituents: getConstituents(item.ObjectRelatedConstituents),
+    /*
+    title: getTextByLanguage(item.titles, 'title'),
+    displayDate: item.dated,
+    beginDate: parseFloat(item.datebegin),
+    endDate: parseFloat(item.dateend),
+    dimension: getTextByLanguage(item.dimensions, 'dimensions'),
+    medium: getTextByLanguage(item.mediums, 'medium'),
+    creditLine: getTextByLanguage(item.creditlines, 'creditline'),
+    */
+    id: parseInt(item.ObjectID, 10)
   }
-  return newObject
+  if (newItem.id === 9121) {
+    console.log(newItem)
+  }
+  return newItem
 }
 
-const processFile = async (tms, filename) => {
+const processJsonFile = async (tms, parentNode, childNode) => {
   //  TODO: Check what type of XML file we have been passed, we will do this
   //  based on the 'action' field. And will then validate (as best we can)
   //  the contents of the file based on what we've been passed
-  let newObjects = 0
-  let modifiedObjects = 0
-  let totalObjects = 0
+  let newItems = 0
+  let modifiedItems = 0
+  let totalItems = 0
   const startTime = new Date().getTime()
   const tmsLogger = logging.getTMSLogger()
 
-  //  We need to read in the XML file and convert it to JSON
-  const XMLRaw = fs.readFileSync(filename, 'utf-8')
-
-  //  Before we do anything with the JSON version, I want to split the
-  //  XML up into seperate chunks so we can store those too.
-  const splitRaw = XMLRaw
-    .replace('<?xml version="1.0" encoding="utf-8"?><ExportForMPlus><objects>', '')
-    .replace('</objects></ExportForMPlus>', '')
-    .split('</object>')
-    .map((xml) => `${xml}</object>`)
-
-  //  Now we need to make sure an XML directory exists to put these files into
-  if (!fs.existsSync(path.join(rootDir, 'objects'))) fs.mkdirSync(path.join(rootDir, 'objects'))
-  if (!fs.existsSync(path.join(rootDir, 'objects', tms))) fs.mkdirSync(path.join(rootDir, 'objects', tms))
-  if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'xml'))) fs.mkdirSync(path.join(rootDir, 'objects', tms, 'xml'))
-
-  splitRaw.forEach((xml) => {
-    const xmlSplit = xml.split('"')
-    if (xmlSplit.length > 2) {
-      const id = parseInt(xmlSplit[1], 10)
-      if (!isNaN(id)) {
-        const subFolder = String(Math.floor(id / 1000) * 1000)
-        if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'xml', subFolder))) fs.mkdirSync(path.join(rootDir, 'objects', tms, 'xml', subFolder))
-        const filename = path.join(rootDir, 'objects', tms, 'xml', subFolder, `${id}.xml`)
-        fs.writeFileSync(filename, xmlformat(xml), 'utf-8')
-      }
-    }
-  })
-
-  //  Add try catch here
-  let objectsJSON = null
-  try {
-    const json = await new Promise((resolve, reject) =>
-      parser.parseString(XMLRaw, (err, result) => {
-        if (err) {
-          reject(err)
-        }
-        resolve(result)
-      }))
-    objectsJSON = json.objects.object.map((object) => parseObject(object))
-  } catch (er) {
-    console.log(er)
-    tmsLogger.object(`Failed to parse that file tms ${tms}`, {
-      action: 'error',
-      stub: tms
-    })
-    return {
-      status: 'error',
-      msg: 'Sorry, we failed to parse that file, please try again.'
-    }
+  const filename = path.join(rootDir, 'imports', parentNode, tms, 'files.json')
+  if (!fs.existsSync(filename)) {
+    console.log('Cant find file: ', filename)
   }
-
-  tmsLogger.object(`New objectFile uploaded for tms ${tms}`, {
-    action: 'upload',
-    stub: tms,
-    ms: new Date().getTime() - startTime
-  })
-
+  const itemsRAW = fs.readFileSync(filename, 'utf-8')
+  const itemsJSON = JSON.parse(itemsRAW)[childNode].map((item) => parseItem(item))
   /* ##########################################################################
 
   This is where the PROCESSING STARTS
@@ -232,36 +177,41 @@ const processFile = async (tms, filename) => {
   ########################################################################## */
   //  In theory we now have a valid(ish) objects file. Let's go through
   //  it now and work out how many objects are new or modified
-  objectsJSON.forEach((object) => {
-    totalObjects += 1
-    const id = parseInt(object.id, 10)
+  itemsJSON.forEach((item) => {
+    totalItems += 1
+    if (totalItems < 4) {
+      console.log(item)
+    }
+    const id = parseInt(item.id, 10)
     const subFolder = String(Math.floor(id / 1000) * 1000)
-    const filename = path.join(rootDir, 'objects', tms, 'processed', subFolder, `${id}.json`)
+    const filename = path.join(rootDir, 'imports', parentNode, tms, 'processed', subFolder, `${id}.json`)
 
     //  See if the files exists in processed, if it doesn't then it's a new file
     let needToUpload = false
     if (!fs.existsSync(filename)) {
-      tmsLogger.object(`Creating process file for object ${id} for ${tms}`, {
+      tmsLogger.object(`Creating process file for ${childNode} ${id} for ${tms}`, {
         action: 'new',
+        type: childNode,
         id: id,
         stub: tms
       })
-      newObjects += 1
+      newItems += 1
       needToUpload = true
     } else {
       //  We need to read in the file and compare to see if it's different
       const processedFileRaw = fs.readFileSync(filename, 'utf-8')
       const processedFile = JSON.stringify(JSON.parse(processedFileRaw))
-      const thisObject = JSON.stringify(object)
+      const thisItem = JSON.stringify(item)
       //  If there's a difference between the objects then we know it's been modified
       //  and we need to upload it.
-      if (thisObject !== processedFile) {
+      if (thisItem !== processedFile) {
         needToUpload = true
-        modifiedObjects += 1
+        modifiedItems += 1
         //  Remove it from the processed fold, to force us to reupload it
         fs.unlinkSync(filename)
-        tmsLogger.object(`Found changed object JSON for object ${id} for ${tms}`, {
+        tmsLogger.object(`Found changed ${childNode} JSON for ${childNode} ${id} for ${tms}`, {
           action: 'modified',
+          type: childNode,
           id: id,
           stub: tms
         })
@@ -270,20 +220,23 @@ const processFile = async (tms, filename) => {
 
     //  If we need to upload the file then pop it into the process folder
     if (needToUpload === true) {
-      if (!fs.existsSync(path.join(rootDir, 'objects'))) {
-        fs.mkdirSync(path.join(rootDir, 'objects'))
+      if (!fs.existsSync(path.join(rootDir, 'imports'))) {
+        fs.mkdirSync(path.join(rootDir, 'imports'))
       }
-      if (!fs.existsSync(path.join(rootDir, 'objects', tms))) {
-        fs.mkdirSync(path.join(rootDir, 'objects', tms))
+      if (!fs.existsSync(path.join(rootDir, 'imports', parentNode))) {
+        fs.mkdirSync(path.join(rootDir, 'imports', parentNode))
       }
-      if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'process'))) {
-        fs.mkdirSync(path.join(rootDir, 'objects', tms, 'process'))
+      if (!fs.existsSync(path.join(rootDir, 'imports', parentNode, tms))) {
+        fs.mkdirSync(path.join(rootDir, 'imports', parentNode, tms))
       }
-      if (!fs.existsSync(path.join(rootDir, 'objects', tms, 'process', subFolder))) {
-        fs.mkdirSync(path.join(rootDir, 'objects', tms, 'process', subFolder))
+      if (!fs.existsSync(path.join(rootDir, 'imports', parentNode, tms, 'process'))) {
+        fs.mkdirSync(path.join(rootDir, 'imports', parentNode, tms, 'process'))
       }
-      const newFilename = path.join(rootDir, 'objects', tms, 'process', subFolder, `${id}.json`)
-      const processedFileJSONPretty = JSON.stringify(object, null, 4)
+      if (!fs.existsSync(path.join(rootDir, 'imports', parentNode, tms, 'process', subFolder))) {
+        fs.mkdirSync(path.join(rootDir, 'imports', parentNode, tms, 'process', subFolder))
+      }
+      const newFilename = path.join(rootDir, 'imports', parentNode, tms, 'process', subFolder, `${id}.json`)
+      const processedFileJSONPretty = JSON.stringify(item, null, 4)
       fs.writeFileSync(newFilename, processedFileJSONPretty, 'utf-8')
     }
   })
@@ -298,61 +251,62 @@ const processFile = async (tms, filename) => {
   //  and let us know if we've found any new ones
 
   //  Check to see if we already have a file containing all the fields, if so read it in
-  let objectFields = []
-  const objectsFieldsFilename = path.join(rootDir, 'objects', tms, 'objectFields.json')
-  if (fs.existsSync(objectsFieldsFilename)) {
-    objectFields = fs.readFileSync(objectsFieldsFilename, 'utf-8')
-    objectFields = JSON.parse(objectFields)
+  let itemFields = []
+  const itemFieldsFilename = path.join(rootDir, 'imports', parentNode, tms, 'fields.json')
+  if (fs.existsSync(itemFieldsFilename)) {
+    itemFields = fs.readFileSync(itemFieldsFilename, 'utf-8')
+    itemFields = JSON.parse(itemFields)
   }
-  const objectFieldsMap = {}
+  const itemFieldsMap = {}
 
   //  Now go through all the objects looking at all the keys
   //  checking to see if we already have a record of them, if so
   //  mark them as new
-  objectsJSON.forEach((object) => {
-    Object.keys(object).forEach((key) => {
+  itemsJSON.forEach((item) => {
+    Object.keys(item).forEach((key) => {
       //  If we don't have a record, then add it to the fields
-      if (!objectFields.includes(key)) {
-        objectFields.push(key)
+      if (!itemFields.includes(key)) {
+        itemFields.push(key)
         //  If we don't already have it in the fields, then it's
         //  all new
-        if (!(key in objectFieldsMap)) {
-          objectFieldsMap[key] = true
+        if (!(key in itemFieldsMap)) {
+          itemFieldsMap[key] = true
         }
       } else {
         //  If we don't have it, then we need to add it to the map
         //  but it's not new as it already exists in the array
-        if (!(key in objectFieldsMap)) {
-          objectFieldsMap[key] = false
+        if (!(key in itemFieldsMap)) {
+          itemFieldsMap[key] = false
         }
       }
     })
   })
 
   //  Now write the fields back out so we can compare against them next time
-  const objectFieldsJSONPretty = JSON.stringify(objectFields, null, 4)
-  fs.writeFileSync(objectsFieldsFilename, objectFieldsJSONPretty, 'utf-8')
+  const objectFieldsJSONPretty = JSON.stringify(itemFields, null, 4)
+  fs.writeFileSync(itemFieldsFilename, objectFieldsJSONPretty, 'utf-8')
 
   const endTime = new Date().getTime()
-  tmsLogger.object(`Finished uploading object JSON file for object ${tms}`, {
+  tmsLogger.object(`Finished uploading ${parentNode} JSON file for ${childNode} ${tms}`, {
     action: 'finished',
     stub: tms,
-    newObjects: newObjects,
-    modifiedObjects: modifiedObjects,
-    totalObjects: totalObjects,
+    type: parentNode,
+    newItems,
+    modifiedItems,
+    totalItems,
     ms: endTime - startTime
   })
 
   return {
-    fields: objectFieldsMap,
-    type: 'objects',
-    newObjects,
-    modifiedObjects,
-    totalObjects,
+    fields: itemFieldsMap,
+    type: parentNode,
+    newItems,
+    modifiedItems,
+    totalItems,
     ms: endTime - startTime
   }
 }
-exports.processFile = processFile
+exports.processJsonFile = processJsonFile
 
 /*
    ##################################################################################
@@ -388,8 +342,8 @@ const makePerfect = async () => {
 
   tmsses.forEach((tms) => {
     if (foundItemToUpload === true) return
-    const tmsProcessDir = path.join(rootDir, 'objects', tms.stub, 'process')
-    const tmsPerfectDir = path.join(rootDir, 'objects', tms.stub, 'perfect')
+    const tmsProcessDir = path.join(rootDir, 'imports', 'Objects', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'imports', 'Objects', tms.stub, 'perfect')
     if (fs.existsSync(tmsProcessDir)) {
       if (foundItemToUpload === true) return
       const subFolders = fs.readdirSync(tmsProcessDir)

@@ -2,12 +2,23 @@ const User = require('../../classes/user')
 const Users = require('../../classes/users')
 const Config = require('../../classes/config')
 const logging = require('../../modules/logging')
+const processingFiles = require('../../modules/processingFiles')
 const elasticsearch = require('elasticsearch')
 const myElasticsearch = require('../../modules/elasticsearch')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  if ('action' in req.body) {
+    if (req.body.action === 'reimport') {
+      processingFiles.processFile(req.body.tms)
+      req.templateValues.notification = {
+        type: 'info',
+        msg: `The import process for ${req.body.tms} has been started`
+      }
+    }
+  }
 
   return res.render('admin/index', req.templateValues)
 }
