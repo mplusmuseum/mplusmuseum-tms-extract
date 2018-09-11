@@ -58,7 +58,7 @@
                 <ul>
                   <li>Total {{toLowerCase @key}} processed: <span class="has-text-weight-bold">{{prettyNumber
                       itemsProcessed}}</span></li>
-                  <li>{{../../i18n.stats.object_files_waiting}}: <span class="has-text-weight-bold">{{prettyNumber
+                  <li>{{child}} files waiting to be processed: <span class="has-text-weight-bold">{{prettyNumber
                       waitingToBeProcessed}}</span> {{#ifNotEqual waitingToBeProcessed 0}}(Finishes
                     {{timeAgo ../timeToUpsert}}, estimate){{/ifNotEqual}}</li>
                 </ul>

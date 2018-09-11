@@ -103,6 +103,21 @@ const checkItems = async () => {
   const types = [{
     parent: 'Objects',
     child: 'Object'
+  }, {
+    parent: 'Constituents',
+    child: 'Constituent'
+  }, {
+    parent: 'Exhibitions',
+    child: 'Exhibition'
+  }, {
+    parent: 'BibiolographicData',
+    child: 'Bibiolography'
+  }, {
+    parent: 'Events',
+    child: 'Event'
+  }, {
+    parent: 'Concepts',
+    child: 'Concept'
   }]
   const tmsses = config.get('tms')
 

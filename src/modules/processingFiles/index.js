@@ -3,6 +3,7 @@ const path = require('path')
 const Config = require('../../classes/config')
 const xmlformat = require('xml-formatter')
 const processObjects = require('./objects')
+const processConstituents = require('./constituents')
 const rootDir = path.join(__dirname, '../../../data')
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser({
@@ -118,6 +119,9 @@ exports.processFile = async (tms) => {
             //  Now call the thing that's going to parse the objects
             if (element.parent === 'Objects') {
               processObjects.processJsonFile(tms, element.parent, element.child)
+            }
+            if (element.parent === 'Constituents') {
+              processConstituents.processJsonFile(tms, element.parent, element.child)
             }
           }
         })

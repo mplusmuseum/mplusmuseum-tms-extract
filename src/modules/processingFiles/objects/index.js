@@ -1,12 +1,4 @@
 const Config = require('../../../classes/config')
-const xml2js = require('xml2js')
-const xmlformat = require('xml-formatter')
-const parser = new xml2js.Parser({
-  trim: true,
-  explicitArray: false,
-  explicitRoot: false,
-  mergeAttrs: true
-})
 const fs = require('fs')
 const path = require('path')
 const rootDir = path.join(__dirname, '../../../../data')
@@ -355,8 +347,8 @@ const processJsonFile = async (tms, parentNode, childNode) => {
   })
 
   //  Now write the fields back out so we can compare against them next time
-  const objectFieldsJSONPretty = JSON.stringify(itemFields, null, 4)
-  fs.writeFileSync(itemFieldsFilename, objectFieldsJSONPretty, 'utf-8')
+  const itemFieldsJSONPretty = JSON.stringify(itemFields, null, 4)
+  fs.writeFileSync(itemFieldsFilename, itemFieldsJSONPretty, 'utf-8')
 
   const endTime = new Date().getTime()
   tmsLogger.object(`Finished uploading ${parentNode} JSON file for ${childNode} ${tms}`, {
