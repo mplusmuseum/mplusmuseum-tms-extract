@@ -34,84 +34,68 @@ exports.index = async (req, res) => {
       const startTime = new Date().getTime()
       const timers = config.get('timers')
 
-      //  Now we are doing roughly the same with the objects
-      let objectsWaitingToBeProcessed = 0
-      const processObjectsDir = path.join(rootDir, 'objects', tms.stub, 'process')
-      if (fs.existsSync(processObjectsDir)) {
-        const subFolders = fs.readdirSync(processObjectsDir)
-        subFolders.forEach((subFolder) => {
-          const jsonFiles = fs.readdirSync(path.join(processObjectsDir, subFolder)).filter((file) => {
-            const filesSplit = file.split('.')
-            if (filesSplit.length !== 2) return false
-            if (filesSplit[1] !== 'json') return false
-            return true
+      const types = [{
+        parent: 'Objects',
+        child: 'Object'
+      }, {
+        parent: 'Constituents',
+        child: 'Constituent'
+      }, {
+        parent: 'Exhibitions',
+        child: 'Exhibition'
+      }, {
+        parent: 'BibiolographicData',
+        child: 'Bibiolography'
+      }, {
+        parent: 'Events',
+        child: 'Event'
+      }, {
+        parent: 'Concepts',
+        child: 'Concept'
+      }]
+      const processingData = {}
+      types.forEach((type) => {
+        processingData[type.parent] = {
+          child: type.child,
+          waitingToBeProcessed: 0
+        }
+        const processDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'process')
+        if (fs.existsSync(processDir)) {
+          const subFolders = fs.readdirSync(processDir)
+          subFolders.forEach((subFolder) => {
+            const jsonFiles = fs.readdirSync(path.join(processDir, subFolder)).filter((file) => {
+              const filesSplit = file.split('.')
+              if (filesSplit.length !== 2) return false
+              if (filesSplit[1] !== 'json') return false
+              return true
+            })
+            processingData[type.parent].waitingToBeProcessed += jsonFiles.length
           })
-          objectsWaitingToBeProcessed += jsonFiles.length
-        })
-      }
-      thisTMS.objectsWaitingToBeProcessed = objectsWaitingToBeProcessed
-      let timeToUpsertObjects = objectsWaitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
-      if (timers !== null && 'elasticsearch' in timers) {
-        timeToUpsertObjects = objectsWaitingToBeProcessed * parseInt(timers.elasticsearch, 10)
-      }
-      thisTMS.timeToUpsertObjects = new Date().getTime() + timeToUpsertObjects
+        }
+        processingData[type.parent].timeToUpsert = processingData[type.parent].waitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
+        if (timers !== null && 'elasticsearch' in timers) {
+          processingData[type.parent].timeToUpsert = processingData[type.parent].waitingToBeProcessed * parseInt(timers.elasticsearch, 10)
+        }
+        processingData[type.parent].timeToUpsert = new Date().getTime() + processingData[type.parent].timeToUpsert
 
-      //  Again but processed
-      let objectsProcessed = 0
-      const processedObjectsDir = path.join(rootDir, 'objects', tms.stub, 'processed')
-      if (fs.existsSync(processedObjectsDir)) {
-        const subFolders = fs.readdirSync(processedObjectsDir)
-        subFolders.forEach((subFolder) => {
-          const jsonFiles = fs.readdirSync(path.join(processedObjectsDir, subFolder)).filter((file) => {
-            const filesSplit = file.split('.')
-            if (filesSplit.length !== 2) return false
-            if (filesSplit[1] !== 'json') return false
-            return true
+        //  Again but processed
+        const processedDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'processed')
+        processingData[type.parent].itemsProcessed = 0
+        if (fs.existsSync(processedDir)) {
+          const subFolders = fs.readdirSync(processedDir)
+          subFolders.forEach((subFolder) => {
+            const jsonFiles = fs.readdirSync(path.join(processedDir, subFolder)).filter((file) => {
+              const filesSplit = file.split('.')
+              if (filesSplit.length !== 2) return false
+              if (filesSplit[1] !== 'json') return false
+              return true
+            })
+            processingData[type.parent].itemsProcessed += jsonFiles.length
           })
-          objectsProcessed += jsonFiles.length
-        })
-      }
-      thisTMS.objectsProcessed = objectsProcessed
+        }
+      })
 
-      //  Now we are doing roughly the same with the constituents
-      let constituentsWaitingToBeProcessed = 0
-      const processConstituentsDir = path.join(rootDir, 'constituents', tms.stub, 'process')
-      if (fs.existsSync(processConstituentsDir)) {
-        const subFolders = fs.readdirSync(processConstituentsDir)
-        subFolders.forEach((subFolder) => {
-          const jsonFiles = fs.readdirSync(path.join(processConstituentsDir, subFolder)).filter((file) => {
-            const filesSplit = file.split('.')
-            if (filesSplit.length !== 2) return false
-            if (filesSplit[1] !== 'json') return false
-            return true
-          })
-          constituentsWaitingToBeProcessed += jsonFiles.length
-        })
-      }
-      thisTMS.constituentsWaitingToBeProcessed = constituentsWaitingToBeProcessed
-      let timeToUpsertConstituents = constituentsWaitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
-      if (timers !== null && 'elasticsearch' in timers) {
-        timeToUpsertConstituents = constituentsWaitingToBeProcessed * parseInt(timers.elasticsearch, 10)
-      }
-      thisTMS.timeToUpsertConstituents = new Date().getTime() + timeToUpsertConstituents
-
-      //  Again but processed
-      let constituentsProcessed = 0
-      const processedConstituentsDir = path.join(rootDir, 'constituents', tms.stub, 'processed')
-      if (fs.existsSync(processedConstituentsDir)) {
-        const subFolders = fs.readdirSync(processedConstituentsDir)
-        subFolders.forEach((subFolder) => {
-          const jsonFiles = fs.readdirSync(path.join(processedConstituentsDir, subFolder)).filter((file) => {
-            const filesSplit = file.split('.')
-            if (filesSplit.length !== 2) return false
-            if (filesSplit[1] !== 'json') return false
-            return true
-          })
-          constituentsProcessed += jsonFiles.length
-        })
-      }
-      thisTMS.constituentsProcessed = constituentsProcessed
-
+      thisTMS.processingData = processingData
       const endTime = new Date().getTime()
       thisTMS.ms = endTime - startTime
       newTMS.push(thisTMS)

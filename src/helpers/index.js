@@ -98,6 +98,9 @@ exports.or = (v1, v2) => {
   return v1 || v2
 }
 
+exports.toLowerCase = text => {
+  return text.toLowerCase()
+}
 exports.prettyMonth = month => {
   if (month === '01') {
     return 'January'

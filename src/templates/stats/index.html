@@ -43,74 +43,87 @@
       </p>
       {{/ifEqual}}
 
+      {{#each processingData}}
+      {{#ifEven @index}}
       <div class="columns">
+        {{/ifEven}}
+
         <div class="column">
+          <form method="post">
+            <input type="hidden" name="tms" value="{{../stub}}">
+            <input type="hidden" name="action" value="search">
+            <div class="panel">
+              <div class="panel-heading">{{@key}}</div>
+              <div class="panel-block">
+                <ul>
+                  <li>Total {{toLowerCase @key}} processed: <span class="has-text-weight-bold">{{prettyNumber
+                      itemsProcessed}}</span></li>
+                  <li>{{child}} files waiting to be processed: <span class="has-text-weight-bold">{{prettyNumber
+                      waitingToBeProcessed}}</span> {{#ifNotEqual waitingToBeProcessed 0}}(Finishes
+                    {{timeAgo ../timeToUpsert}}, estimate){{/ifNotEqual}}</li>
+                </ul>
+              </div>
 
-          <div class="panel">
-            <p class="panel-heading">Objects</p>
-            <div class="panel-block">
-              <ul>
-                <li>{{../i18n.stats.total_objects_processed}}: <span class="has-text-weight-bold">{{prettyNumber
-                    objectsProcessed}}</span></li>
-                <li>{{../i18n.stats.object_files_waiting}}: <span class="has-text-weight-bold">{{prettyNumber
-                    objectsWaitingToBeProcessed}}</span> (Finishes
-                  {{timeAgo timeToUpsertObjects}}, estimate)</li>
-              </ul>
-            </div>
-
-            <form method="post">
-              <input type="hidden" name="tms" value="{{stub}}">
-              <input type="hidden" name="action" value="search">
               <div class="panel-block">
                 <p class="control has-icons-left">
-                  <input class="input" type="text" name="objectID" placeholder="{{../i18n.stats.search_object}}">
+                  <input class="input" type="text" name="objectID" placeholder="Search {{toLowerCase child}} by id">
                   <span class="icon is-small is-left">
                     <i class="fas fa-search" aria-hidden="true"></i>
                   </span>
                 </p>
               </div>
-            </form>
+            </div>
+          </form>
+        </div class="column">
+
+        {{#ifOdd @index}}
+      </div class="columns">
+      {{/ifOdd}}
+      {{/each}}
+
+      {{#ifOdd processingData.length}}
+    </div class="columns">
+    {{/ifOdd}}
+    {{!---
+    <div class="columns">
+      <div class="column">
+
+        <div class="panel">
+          <div class="panel-heading">Objects</div>
+          <div class="panel-block">
+            <ul>
+              <li>{{../i18n.stats.total_objects_processed}}: <span class="has-text-weight-bold">{{prettyNumber
+                  objectsProcessed}}</span></li>
+              <li>{{../i18n.stats.object_files_waiting}}: <span class="has-text-weight-bold">{{prettyNumber
+                  objectsWaitingToBeProcessed}}</span> (Finishes
+                {{timeAgo timeToUpsertObjects}}, estimate)</li>
+            </ul>
           </div>
 
-        </div>
-
-        <div class="column">
-
-          <div class="panel">
-            <p class="panel-heading">Constituents</p>
-            <div class="panel-block">
-              <ul>
-                <li>{{../i18n.stats.total_constituents_processed}}: <span class="has-text-weight-bold">{{prettyNumber
-                    constituentsProcessed}}</span></li>
-                <li>{{../i18n.stats.constituent_files_waiting}}: <span class="has-text-weight-bold">{{prettyNumber
-                    constituentsWaitingToBeProcessed}}</span> (Finishes
-                  {{timeAgo timeToUpsertConstituents}}, estimate)</li>
-              </ul>
-            </div>
-
+          <div class="panel-block">
             <form method="post">
               <input type="hidden" name="tms" value="{{stub}}">
               <input type="hidden" name="action" value="search">
-              <div class="panel-block">
-                <p class="control has-icons-left">
-                  <input class="input" type="text" name="constituentID" placeholder="{{../i18n.stats.search_constituent}}">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                  </span>
-                </p>
-              </div>
+              <p class="control has-icons-left">
+                <input class="input" type="text" name="objectID" placeholder="{{../i18n.stats.search_object}}">
+                <span class="icon is-small is-left">
+                  <i class="fas fa-search" aria-hidden="true"></i>
+                </span>
+              </p>
             </form>
           </div>
-
         </div>
-      </div>
 
-      {{#if ../user.roles.isAdmin}}
-      <div class="notification is-info">
-        {{{../i18n.stats.lot_of_files_to_upload}}}
       </div>
-      {{/if}}
-      {{/each}} {{/if}}
+    </div>
+    ---}}
+
+    {{#if ../user.roles.isAdmin}}
+    <div class="notification is-info">
+      {{{../i18n.stats.lot_of_files_to_upload}}}
+    </div>
+    {{/if}}
+    {{/each}} {{/if}}
 
     </div>
   </section>
