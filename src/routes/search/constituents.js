@@ -24,10 +24,10 @@ exports.index = async (req, res) => {
   const id = req.params.id
 
   const subFolder = String(Math.floor(id / 1000) * 1000)
-  const processFilename = path.join(rootDir, 'constituents', tms, 'process', subFolder, `${id}.json`)
-  const processedFilename = path.join(rootDir, 'constituents', tms, 'processed', subFolder, `${id}.json`)
-  const perfectFilename = path.join(rootDir, 'constituents', tms, 'perfect', subFolder, `${id}.json`)
-  const xmlFilename = path.join(rootDir, 'constituents', tms, 'xml', subFolder, `${id}.xml`)
+  const processFilename = path.join(rootDir, 'imports', 'Constituents', tms, 'process', subFolder, `${id}.json`)
+  const processedFilename = path.join(rootDir, 'imports', 'Constituents', tms, 'processed', subFolder, `${id}.json`)
+  const perfectFilename = path.join(rootDir, 'imports', 'Constituents', tms, 'perfect', subFolder, `${id}.json`)
+  const xmlFilename = path.join(rootDir, 'imports', 'Constituents', tms, 'xml', subFolder, `${id}.xml`)
 
   if (fs.existsSync(processFilename)) {
     const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
@@ -62,7 +62,7 @@ exports.index = async (req, res) => {
   if (elasticsearchConfig !== null) {
     const esclient = new elasticsearch.Client(elasticsearchConfig)
     const index = `constituents_${tms}`
-    const type = 'constituents'
+    const type = 'constituent'
     try {
       const record = await esclient.get({
         index,

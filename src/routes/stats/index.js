@@ -10,11 +10,8 @@ exports.index = async (req, res) => {
   }
 
   if ('action' in req.body && req.body.action === 'search') {
-    if ('tms' in req.body && 'objectID' in req.body && req.body.objectID !== '') {
-      return res.redirect(`/search/objects/${req.body.tms}/${req.body.objectID}`)
-    }
-    if ('tms' in req.body && 'constituentID' in req.body && req.body.constituentID !== '') {
-      return res.redirect(`/search/constituents/${req.body.tms}/${req.body.constituentID}`)
+    if ('tms' in req.body && 'itemID' in req.body && req.body.itemID !== '' && 'itemType' in req.body) {
+      return res.redirect(`/search/${req.body.itemType.toLowerCase()}/${req.body.tms}/${req.body.itemID}`)
     }
   }
 

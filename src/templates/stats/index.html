@@ -51,6 +51,7 @@
         <div class="column">
           <form method="post">
             <input type="hidden" name="tms" value="{{../stub}}">
+            <input type="hidden" name="itemType" value="{{@key}}">
             <input type="hidden" name="action" value="search">
             <div class="panel">
               <div class="panel-heading">{{@key}}</div>
@@ -66,7 +67,7 @@
 
               <div class="panel-block">
                 <p class="control has-icons-left">
-                  <input class="input" type="text" name="objectID" placeholder="Search {{toLowerCase child}} by id">
+                  <input class="input" type="text" name="itemID" placeholder="Search {{toLowerCase child}} by id">
                   <span class="icon is-small is-left">
                     <i class="fas fa-search" aria-hidden="true"></i>
                   </span>
