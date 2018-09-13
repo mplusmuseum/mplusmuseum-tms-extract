@@ -25,9 +25,19 @@ const parseItem = item => {
     title: {},
     description: {},
     displayDate: 'DateText' in item ? item.DateText : null,
-    beginDate: 'DateBegSearch' in item ? item.DateBegSearch : null,
-    endDate: 'ExhibitonEndDate' in item ? item.DateEndSearch : null,
+    beginDate: null,
+    endDate: null,
     id: parseInt(item.ConceptID, 10)
+  }
+
+  if ('BeginDate' in item) {
+    const newBeginDate = parseInt(item.DateBegSearch, 10)
+    if (!isNaN(newBeginDate) && newBeginDate !== 0) newItem.beginDate = newBeginDate
+  }
+
+  if ('DateEndSearch' in item) {
+    const newEndDate = parseInt(item.DateEndSearch, 10)
+    if (!isNaN(newEndDate) && newEndDate !== 0) newItem.endDate = newEndDate
   }
 
   if ('ConceptTitle' in item) newItem.title['en'] = item.ConceptTitle
