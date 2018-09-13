@@ -1,0 +1,110 @@
+<html>
+
+<head>
+  <title>Dashboard - search - exhibitions</title>
+  {{> head}}
+  <link href="/css/prism.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  {{> nav}}
+
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Exhibition - {{id}}
+        </h1>
+        <h2 class="subtitle is-3">
+          All the information we know about this exhibition
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+
+      {{#if config.spelunker}}
+      <p>
+        <a href="{{config.spelunker.host}}/exhibitions/{{id}}">View Exhibition {{id}} on the spelunker</a>
+      </p>
+      {{/if}}
+      <h1 class="title">Local JSON data</h1>
+
+      <h2 class="title is-4">To process</h2>
+      {{#if processJSON}}
+      <pre class="query json">{{{jsonCode processJSON}}}</pre>{{else}}
+      <p>There is no file to process.</p> {{/if}}
+
+      <h2 class="title is-4">Processed file</h2>
+      {{#if processedJSON}}
+      <pre class="query json">{{{jsonCode processedJSON}}}</pre>{{else}}
+      <p>There is no processed file.</p> {{/if}}
+
+      <h2 class="title is-4">TMS &amp; extra information</h2>
+      {{#if perfectJSON}}
+      <pre class="query json">{{{jsonCode perfectJSON}}}</pre> {{#if config.cloudinary}} {{#if perfectJSON.remote}}
+      <div class="image_viewer">
+        <span class="image_holder">
+          <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/w_423,h_500,c_fill_pad,g_auto,b_rgb:{{backgroundColor}}/v{{perfectJSON.remote.version}}/{{perfectJSON.remote.public_id}}.{{perfectJSON.remote.format}}">
+        </span>
+        <span class="predominant">
+          {{#if predominant}} {{#each predominant}}
+          <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>
+          {{/each}} {{/if}}
+        </span>
+        <span class="swatch">
+          {{#if cloudinary}} {{#each cloudinary}}
+          <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>
+          {{/each}} {{/if}}
+        </span>
+      </div>
+      {{/if}} {{/if}} {{else}}
+      <p>There is no TMS or extra information.</p> {{/if}}
+
+      <h2 class="title is-4">Original XML file</h2>
+      {{#if xmlXML}}
+      <pre class="query xml">{{{xmlCode xmlXML}}}</pre>{{else}}
+      <p>There is no original XML file.</p> {{/if}}
+
+      <hr>
+
+      <h1 class="title">ElasticSearch results</h1>
+
+      {{#if elasticSearchJSON}}
+      <pre class="query json">{{{jsonCode elasticSearchJSON}}}</pre>{{else}}
+      <p>No elasticSearch configured, or no response.</p> {{/if}}
+
+      <hr>
+
+      <h1 class="title">GraphQL response</h1>
+
+      {{#if graphQLresults}}
+      <pre class="query json">{{{jsonCode graphQLresults}}}</pre>{{else}}
+      <p>No graphQL configured, or no response.</p> {{/if}}
+
+      {{#if queries.exhibitionsLarge}}
+      <hr>
+
+      <h1 class="title">GraphQL query</h1>
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.exhibitionsLarge searchFilter config.graphql.host}}'>Run in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.exhibitionsLarge searchFilter}}}</pre>
+      <hr>
+      {{/if}}
+
+      <p>
+        All queries executed in {{executionTime}}ms
+      </p>
+
+    </div>
+    </div>
+
+    {{> tail}}
+</body>
+
+</html>
