@@ -480,6 +480,8 @@ const perfectConstituents = require('./app/modules/processingFiles/constituents'
 perfectConstituents.startMakingPerfect()
 const perfectExhibitions = require('./app/modules/processingFiles/exhibitions')
 perfectExhibitions.startMakingPerfect()
+const perfectConcepts = require('./app/modules/processingFiles/concepts')
+perfectConcepts.startMakingPerfect()
 
 //  This starts off checking for items to upload to elastic search
 const elasticsearch = require('./app/modules/elasticsearch')

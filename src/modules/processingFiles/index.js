@@ -5,6 +5,7 @@ const xmlformat = require('xml-formatter')
 const processObjects = require('./objects')
 const processConstituents = require('./constituents')
 const processExhibitions = require('./exhibitions')
+const processConcepts = require('./concepts')
 const rootDir = path.join(__dirname, '../../../data')
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser({
@@ -126,6 +127,9 @@ exports.processFile = async (tms) => {
             }
             if (element.parent === 'Exhibitions') {
               processExhibitions.processJsonFile(tms, element.parent, element.child)
+            }
+            if (element.parent === 'Concepts') {
+              processConcepts.processJsonFile(tms, element.parent, element.child)
             }
           }
         })

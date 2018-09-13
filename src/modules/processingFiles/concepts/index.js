@@ -10,105 +10,31 @@ const artisanalints = require('../../artisanalints')
 These are all the cool parse functions to get the data into the right format
 */
 // #########################################################################
-const getBiography = biographies => {
-  if (biographies === null || biographies === undefined) return null
-  if (!Array.isArray(biographies)) biographies = [biographies]
-  biographies = biographies.map((biography) => {
-    return {
-      purpose: biography.Purpose,
-      text: biography.LabelText
-    }
-  })
-  return biographies
-}
-
-const getBiographyPurpose = biographies => {
-  if (biographies === null || biographies === undefined) return null
-  if (!Array.isArray(biographies)) biographies = [biographies]
-  biographies = biographies.map((biography) => {
-    return biography.Purpose
-  })
-  return biographies
-}
 
 // #########################################################################
 /*
- * The actual constituent parsing
+ * The actual concept parsing
  */
 // #########################################################################
 
 const parseItem = item => {
   const newItem = {
-    constituentID: parseInt(item.AuthorID, 10),
+    conceptID: parseInt(item.ConceptID, 10),
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
-    name: {},
-    type: 'ConstituentType' in item ? item.ConstituentType : null,
-    gender: {},
-    displayBio: {},
-    nationality: {},
-    region: {},
-    activeCity: {},
-    birthCity: {},
-    deathCity: {},
-    beginDate: null,
-    deathyear: null,
-    exhibitions: {
-      biographies: {},
-      purpose: {}
-    },
-    id: parseInt(item.AuthorID, 10)
+    timeline: 'Timeline' in item ? item.Timeline : null,
+    title: {},
+    description: {},
+    displayDate: 'DateText' in item ? item.DateText : null,
+    beginDate: 'DateBegSearch' in item ? item.DateBegSearch : null,
+    endDate: 'ExhibitonEndDate' in item ? item.DateEndSearch : null,
+    id: parseInt(item.ConceptID, 10)
   }
 
-  //  Make sure the birth year is actually numeric and not 0
-  if ('BeginDate' in item) {
-    const newBirth = parseInt(item.BeginDate, 10)
-    if (!isNaN(newBirth) && newBirth !== 0) newItem.beginDate = newBirth
-  }
+  if ('ConceptTitle' in item) newItem.title['en'] = item.ConceptTitle
+  if ('ConceptTitleTC' in item) newItem.title['zh-hant'] = item.ConceptTitleTC
+  if ('ConceptDescription' in item) newItem.description['en'] = item.ConceptDescription
+  if ('ConceptDescriptionTC' in item) newItem.description['zh-hant'] = item.ConceptDescriptionTC
 
-  if ('EndDate' in item) {
-    const newDeath = parseInt(item.EndDate, 10)
-    if (!isNaN(newDeath) && newDeath !== 0) newItem.EndDate = newDeath
-  }
-
-  // Grab extra name information
-  if ('Name' in item) {
-    newItem.name['en'] = {
-      'displayName': item.Name
-    }
-    if ('AlphaSort' in item) {
-      newItem.name['en'].alphasort = item.AlphaSort
-    }
-  }
-  if ('NameTC' in item) {
-    newItem.name['zh-hant'] = {
-      'displayName': item.NameTC
-    }
-    if ('AlphaSortTC' in item) {
-      newItem.name['zh-hant'].alphasort = item.AlphaSortTC
-    } else {
-      newItem.name['zh-hant'].alphasort = item.NameTC
-    }
-  }
-
-  if ('Gender' in item) newItem.gender['en'] = item.Gender
-  if ('GenderTC' in item) newItem.gender['zh-hant'] = item.GenderTC
-  if ('DisplayBio' in item) newItem.displayBio['en'] = item.DisplayBio
-  if ('DisplayBioTC' in item) newItem.displayBio['zh-hant'] = item.DisplayBioTC
-  if ('Nationality' in item) newItem.nationality['en'] = item.Nationality
-  if ('NationalityTC' in item) newItem.nationality['zh-hant'] = item.NationalityTC
-  if ('Region' in item) newItem.region['en'] = item.Region
-  if ('RegionTC' in item) newItem.region['zh-hant'] = item.RegionTC
-  if ('ActiveCity' in item) newItem.activeCity['en'] = item.ActiveCity
-  if ('ActiveCityTC' in item) newItem.activeCity['zh-hant'] = item.ActiveCityTC
-  if ('BirthCity' in item) newItem.birthCity['en'] = item.BirthCity
-  if ('BirthCityTC' in item) newItem.birthCity['zh-hant'] = item.BirthCity
-  if ('DeathCity' in item) newItem.deathCity['en'] = item.DeathCity
-  if ('DeathCityTC' in item) newItem.deathCity['zh-hant'] = item.DeathCityTC
-
-  if ('ExhibitionBiography' in item) newItem.exhibitions.biographies['en'] = getBiography(item.ExhibitionBiography)
-  if ('ExhibitionBiography' in item) newItem.exhibitions.purpose['en'] = getBiographyPurpose(item.ExhibitionBiography)
-  if ('ExhibitionBiographyTC' in item) newItem.exhibitions.biographies['zh-hant'] = getBiography(item.ExhibitionBiographyTC)
-  if ('ExhibitionBiographyTC' in item) newItem.exhibitions.purpose['zh-hant'] = getBiographyPurpose(item.ExhibitionBiographyTC)
   return newItem
 }
 
@@ -297,8 +223,8 @@ const makePerfect = async () => {
 
   tmsses.forEach((tms) => {
     if (foundItemToUpload === true) return
-    const tmsProcessDir = path.join(rootDir, 'imports', 'Constituents', tms.stub, 'process')
-    const tmsPerfectDir = path.join(rootDir, 'imports', 'Constituents', tms.stub, 'perfect')
+    const tmsProcessDir = path.join(rootDir, 'imports', 'Concepts', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'imports', 'Concepts', tms.stub, 'perfect')
     if (fs.existsSync(tmsProcessDir)) {
       if (foundItemToUpload === true) return
       const subFolders = fs.readdirSync(tmsProcessDir)
