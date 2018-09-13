@@ -144,7 +144,7 @@
         {{{i18n.documentation.graphql-communicating-2}}}
       </p>
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.hello "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.hello "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.hello ''}}}</pre>
 
@@ -171,7 +171,7 @@
 
       <p>
         {{{i18n.documentation.graphql-communicating-6}}}
-        <a href='{{exploreQuery queries.objectsMedium "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsMedium "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <hr>
@@ -193,7 +193,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.schema "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.schema "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <pre class="query">{{{graphQLQuery queries.schema}}}</pre>
@@ -203,7 +203,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.type "(name:\"Object\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.type "(name:\"Object\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
 
       <pre class="query">{{{graphQLQuery queries.type '(name: "Object")'}}}</pre>
@@ -234,7 +234,7 @@
       </h3>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMini "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsMini "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMini ''}}}</pre>
 
@@ -261,7 +261,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMedium "(page:0, per_page: 5, area: \"Moving Image\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsMedium "(page:0, per_page: 5, area: \"Moving Image\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMedium '(page:0, per_page: 5, area: "Moving Image")'}}}</pre>
 
@@ -288,7 +288,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsLarge "(sort_field: \"sortNumber\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsLarge "(sort_field: \"sortNumber\", sort: \"asc\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsLarge '(sort_field: "sortNumber", sort: "asc")'}}}</pre>
 
@@ -315,7 +315,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsMedium "(ids:[1, 4, 6, 7])" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsMedium "(ids:[1, 4, 6, 7])" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsMedium '(ids:[1, 4, 6, 7])'}}}</pre>
 
@@ -344,7 +344,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectLarge "(id: 3000)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectLarge "(id: 3000)" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectLarge '(id: 3000)'}}}</pre>
 
@@ -390,7 +390,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.areas "(lang: \"zh-hant\", sort_field: \"count\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.areas "(lang: \"zh-hant\", sort_field: \"count\", sort: \"asc\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.areas '(lang: "zh-hant", sort_field: "count", sort: "asc")'}}}</pre>
 
@@ -435,7 +435,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.categories "(lang: \"zh-hant\", sort_field: \"count\", sort: \"desc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.categories "(lang: \"zh-hant\", sort_field: \"count\", sort: \"desc\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.categories '(lang: "zh-hant", sort_field: "count", sort: "desc")'}}}</pre>
 
@@ -480,7 +480,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.mediums "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.mediums "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.mediums ''}}}</pre>
 
@@ -528,7 +528,7 @@
       </h3>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituents "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents ''}}}</pre>
 
@@ -555,7 +555,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(page:3, per_page: 5, gender: \"Female\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituents "(page:3, per_page: 5, gender: \"Female\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(page:3, per_page: 5, gender: "Female")'}}}</pre>
 
@@ -582,7 +582,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(sort_field: \"alphaSortName\", sort: \"asc\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituents "(sort_field: \"alphaSortName\", sort: \"asc\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(sort_field: "alphaSortName", sort: "asc")'}}}</pre>
 
@@ -609,7 +609,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituents "(ids:[238, 382, 459, 608], lang: \"zh-hant\")" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituents "(ids:[238, 382, 459, 608], lang: \"zh-hant\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituents '(ids:[238, 382, 459, 608], lang: "zh-hant")'}}}</pre>
 
@@ -638,7 +638,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituent "(id: 238)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituent "(id: 238)" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituent '(id: 238)'}}}</pre>
 
@@ -667,7 +667,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsConstituent "" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsConstituent "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsConstituent ''}}}</pre>
 
@@ -676,7 +676,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectConstituent "(id: 238)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectConstituent "(id: 238)" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectConstituent '(id: 119)'}}}</pre>
 
@@ -699,7 +699,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.constituent "(id: 478)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.constituent "(id: 478)" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.constituent '(id: 478)'}}}</pre>
 
@@ -708,7 +708,7 @@
       </p>
 
       <p class="runinexplore">
-        <a href='{{exploreQuery queries.objectsConstituentMini "(constituent: 478)" config.graphql.host}}'>{{i18n.documentation.run-in-playground}}</a>
+        <a href='{{exploreQuery queries.objectsConstituentMini "(constituent: 478)" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsConstituentMini '(constituent: 478)'}}}</pre>
 

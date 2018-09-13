@@ -23,6 +23,7 @@ exports.index = (req, res) => {
   const responseCode = `{
   "status":"ok",
   "msg":"Token found, valid for the number of seconds shown in expires_in",
+  "roles":{"isVendor":true,"isStaff":false,"isAdmin":false}
   "expires_in":86400
 }`
 
@@ -141,6 +142,12 @@ exports.checkToken = async (req, res) => {
   }
 
   //  Now we know everything is valid, we can test to see if the token exists
+  const roles = {
+    isVendor: false,
+    isStaff: false,
+    isAdmin: false
+  }
+
   let foundToken = false
   const filename = path.join(rootDir, 'data', 'tokens.json')
   if (fs.existsSync(filename)) {
@@ -149,6 +156,9 @@ exports.checkToken = async (req, res) => {
     //  If we have a record of the token, then it's valid
     if (req.body.token in tokensJSON.valid) {
       foundToken = true
+      if (tokensJSON.valid[req.body.token].isVendor) roles.isVendor = tokensJSON.valid[req.body.token].isVendor
+      if (tokensJSON.valid[req.body.token].isStaff) roles.isStaff = tokensJSON.valid[req.body.token].isStaff
+      if (tokensJSON.valid[req.body.token].isAdmin) roles.isAdmin = tokensJSON.valid[req.body.token].isAdmin
     }
     //  Unless of course it's not
     if (req.body.token in tokensJSON.rejected) {
@@ -171,6 +181,7 @@ exports.checkToken = async (req, res) => {
   const rtnJSON = {
     status: 'ok',
     msg: `Token found, valid for the number of seconds shown in expires_in`,
+    roles,
     expires_in: (60 * 60 * 24)
   }
   res.setHeader('Content-Type', 'application/json')

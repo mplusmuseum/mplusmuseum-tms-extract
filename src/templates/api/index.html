@@ -6,24 +6,36 @@
   <link href="/css/prism.css" rel="stylesheet" />
 </head>
 
-<body class="cover" style="background-image: url(/images/cover_001.jpg);">
+<body>
 
   {{> nav}}
 
-  <div class="wrapper">
-    <div class="container admin-layout documentation">
 
 
-      <h1>API</h1>
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          API
+        </h1>
+        <h2 class="subtitle is-3">
+          Help in how to validate API keys
+        </h2>
+      </div>
+    </div>
+  </section>
 
+  <section class="section">
+    <div class="container">
       <p>
-        The dashboard currently offers one API function, but may soon end up offering more. To communicate with the API securely
+        The dashboard currently offers one API function, but may soon end up offering more. To communicate with the API
+        securely
         a "handshake" token will need to be passed over, normally in a
         <code>POST</code> operation and normally as an "
         <code>Authorization: bearer [xxxxxxxxxxxxxxxxxxxxxxxxxx]</code>" token. See examples below for details.
       </p>
 
-      <h2>Developers API token test</h2>
+      <h2 class="title is-3">Developers API token test</h2>
 
       <p>
         To test to see if a developers API token is valid you should call the following API endpoint.
@@ -38,7 +50,7 @@
         <code>Authorization: bearer</code>.
       </p>
 
-      <h3>cURL</h3>
+      <h3 class="title is-4">cURL</h3>
 
       <p>
         This is how you would check your own token using cURL.
@@ -53,7 +65,7 @@
         <pre class="query terminal">{{{curlCode responseCode}}}</pre>
       </p>
 
-      <h3>Node</h3>
+      <h3 class="title is-4">Node</h3>
 
       <p>
         And this code is how you would check your own developers token using node.
@@ -62,18 +74,19 @@
         <pre class="query node">{{{nodeCode nodeCode}}}</pre>
       </p>
 
-      <h4>Caching and expiring</h4>
+      <h4 class="title is-5">Caching and expiring</h4>
       <p>
         You
         <em>should
           <strong>not</strong>
         </em> check the developers token each time they make a GraphQL call. The
-        <code>expires_in</code> tells you in seconds how long you should cache the check for before requesting a new check.
+        <code>expires_in</code> tells you in seconds how long you should cache the check for before requesting a new
+        check.
       </p>
     </div>
-  </div>
+    </div>
 
-  {{> tail}}
+    {{> tail}}
 </body>
 
 </html>

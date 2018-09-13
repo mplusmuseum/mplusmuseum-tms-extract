@@ -85,26 +85,35 @@ const getAllUserTokens = async (page) => {
     search_engine: 'v2'
   }
   const users = await request({
-      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
-      method: 'GET',
-      headers: {
+    url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
+    method: 'GET',
+    headers: {
         'content-type': 'application/json',
         Authorization: `bearer ${auth0Token}`
       },
-      qs: qs
-    })
+    qs: qs
+  })
     .then(response => {
       const users = JSON.parse(response)
       return users.map((user) => {
-          let id = null
-          if ('user_id' in user) id = user.user_id
-          let token = null
-          if ('user_metadata' in user && 'apitoken' in user.user_metadata) token = user.user_metadata.apitoken
-          return {
+        let id = null
+        if ('user_id' in user) id = user.user_id
+        let token = null
+        let isVendor = false
+        let isStaff = false
+        let isAdmin = false
+        if (user && user.user_metadata && user.user_metadata.apitoken) token = user.user_metadata.apitoken
+        if (user && user.user_metadata && user.user_metadata.roles && user.user_metadata.roles.isVendor) isVendor = user.user_metadata.roles.isVendor
+        if (user && user.user_metadata && user.user_metadata.roles && user.user_metadata.roles.isStaff) isStaff = user.user_metadata.roles.isStaff
+        if (user && user.user_metadata && user.user_metadata.roles && user.user_metadata.roles.isAdmin) isAdmin = user.user_metadata.roles.isAdmin
+        return {
             id,
-            token
+            token,
+            isVendor,
+            isStaff,
+            isAdmin
           }
-        })
+      })
         .filter((user) => {
           return (user.token !== '' && user.token !== null && user.token !== undefined)
         })
@@ -130,6 +139,9 @@ const getAllUserTokens = async (page) => {
       }
     }
     tokensJSON.valid[user.token].updated = new Date().getTime()
+    tokensJSON.valid[user.token].isVendor = user.isVendor
+    tokensJSON.valid[user.token].isStaff = user.isStaff
+    tokensJSON.valid[user.token].isAdmin = user.isAdmin
   })
 
   const tokensJSONPretty = JSON.stringify(tokensJSON, null, 4)
