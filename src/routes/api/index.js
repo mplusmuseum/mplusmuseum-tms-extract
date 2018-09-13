@@ -18,7 +18,7 @@ exports.index = (req, res) => {
 -H "Content-Type: application/json" \\
 -H "Authorization: bearer ${config.get('handshake')}" \\
 -d '{"token": "${req.user.apitoken}"}' \\
--X POST http://${req.headers.host}/api/checkToken`
+-X POST https://${req.headers.host}/api/checkToken`
 
   const responseCode = `{
   "status":"ok",
@@ -65,7 +65,6 @@ request(
 }
 
 const validate = async (req, res) => {
-  console.log('In validate')
   const config = new Config()
 
   //  Check we have a handshake token against which to check
@@ -110,11 +109,8 @@ const validate = async (req, res) => {
 }
 
 exports.checkToken = async (req, res) => {
-  console.log('In checkToken')
-
   //  Check to see if we have a valid call
   const isValid = await validate(req, res)
-  console.log('isValid: ', isValid)
 
   if (isValid === false) {
     return
@@ -183,14 +179,12 @@ exports.checkToken = async (req, res) => {
     return
   }
 
-  console.log('Got all the way to the valid return')
   const rtnJSON = {
     status: 'ok',
     msg: `Token found, valid for the number of seconds shown in expires_in`,
     roles,
     expires_in: (60 * 60 * 24)
   }
-  console.log(rtnJSON)
   res.setHeader('Content-Type', 'application/json')
   res.send(JSON.stringify(rtnJSON))
 }
