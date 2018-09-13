@@ -35,7 +35,7 @@ const payload = {
 
 request(
   {
-    url: 'http://${req.headers.host}/api/checkToken',
+    url: 'https://${req.headers.host}/api/checkToken',
     method: 'POST',
     headers: {
       'content-type': 'application/json',
