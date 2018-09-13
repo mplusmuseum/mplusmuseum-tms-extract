@@ -7,6 +7,32 @@ const artisanalints = require('../../artisanalints')
 
 // #########################################################################
 /*
+These are all the cool parse functions to get the data into the right format
+*/
+// #########################################################################
+const getBiography = biographies => {
+  if (biographies === null || biographies === undefined) return null
+  if (!Array.isArray(biographies)) biographies = [biographies]
+  biographies = biographies.map((biography) => {
+    return {
+      purpose: biography.Purpose,
+      text: biography.LabelText
+    }
+  })
+  return biographies
+}
+
+const getBiographyPurpose = biographies => {
+  if (biographies === null || biographies === undefined) return null
+  if (!Array.isArray(biographies)) biographies = [biographies]
+  biographies = biographies.map((biography) => {
+    return biography.Purpose
+  })
+  return biographies
+}
+
+// #########################################################################
+/*
  * The actual constituent parsing
  */
 // #########################################################################
@@ -26,6 +52,10 @@ const parseItem = item => {
     deathCity: {},
     beginDate: null,
     deathyear: null,
+    exhibitions: {
+      biographies: {},
+      purpose: {}
+    },
     id: parseInt(item.AuthorID, 10)
   }
 
@@ -75,6 +105,13 @@ const parseItem = item => {
   if ('DeathCity' in item) newItem.deathCity['en'] = item.DeathCity
   if ('DeathCityTC' in item) newItem.deathCity['zh-hant'] = item.DeathCityTC
 
+  if ('ExhibitionBiography' in item) newItem.exhibitions.biographies['en'] = getBiography(item.ExhibitionBiography)
+  if ('ExhibitionBiography' in item) newItem.exhibitions.purpose['en'] = getBiographyPurpose(item.ExhibitionBiography)
+  if ('ExhibitionBiographyTC' in item) newItem.exhibitions.biographies['zh-hant'] = getBiography(item.ExhibitionBiographyTC)
+  if ('ExhibitionBiographyTC' in item) newItem.exhibitions.purpose['zh-hant'] = getBiographyPurpose(item.ExhibitionBiographyTC)
+  if (newItem.id === 97) {
+    console.log(newItem.exhibitions.biographies)
+  }
   return newItem
 }
 
