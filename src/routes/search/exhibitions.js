@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const rootDir = path.join(__dirname, '../../../data')
 const elasticsearch = require('elasticsearch')
-const Queries = require('../../classes/queries')
+const Queries = require('../../classes/queries/vendors.js')
 const GraphQL = require('../../classes/graphQL')
 
 exports.index = async (req, res) => {

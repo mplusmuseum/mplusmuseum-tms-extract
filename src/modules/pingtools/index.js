@@ -1,4 +1,4 @@
-const Queries = require('../../classes/queries')
+const Queries = require('../../classes/queries/vendors.js')
 const GraphQL = require('../../classes/graphQL')
 const Config = require('../../classes/config')
 const Elasticsearch = require('elasticsearch')
