@@ -103,7 +103,7 @@ router.use(function (req, res, next) {
 
   //  If we are *not* on a login, logout or callback url then
   //  we need to check for langage stuff
-  const nonLangUrls = ['login', 'logout', 'callback', 'images']
+  const nonLangUrls = ['login', 'logout', 'callback', 'images', 'api']
   const urlClean = req.url.split('?')[0]
   const urlSplit = urlClean.split('/')
   if (urlSplit[0] === '') urlSplit.shift()
@@ -259,7 +259,7 @@ router.get('/:lang/search/constituents/:tms/:id', ensureLoggedIn, search.constit
 router.get('/:lang/search/exhibitions/:tms/:id', ensureLoggedIn, search.exhibitions.index)
 router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
-router.get('/api', ensureLoggedIn, api.index)
+router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)
 
 module.exports = router
