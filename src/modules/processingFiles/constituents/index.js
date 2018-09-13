@@ -51,7 +51,7 @@ const parseItem = item => {
     birthCity: {},
     deathCity: {},
     beginDate: null,
-    deathyear: null,
+    endDate: null,
     exhibitions: {
       biographies: {},
       purpose: {}
@@ -66,8 +66,8 @@ const parseItem = item => {
   }
 
   if ('EndDate' in item) {
-    const newDeath = parseInt(item.EndDate, 10)
-    if (!isNaN(newDeath) && newDeath !== 0) newItem.EndDate = newDeath
+    const newEnd = parseInt(item.EndDate, 10)
+    if (!isNaN(newEnd) && newEnd !== 0) newItem.endDate = newEnd
   }
 
   // Grab extra name information
