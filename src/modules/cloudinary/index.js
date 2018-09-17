@@ -51,6 +51,9 @@ const checkImages = () => {
     return
   }
 
+  console.log('Checking for images')
+
+  /*
   //  Only carry on if we have a data and tms directory
   if (!fs.existsSync(rootDir) || !fs.existsSync(path.join(rootDir, 'tms'))) {
     tmsLogger.object(`No data or data/tms found`, {
@@ -99,6 +102,7 @@ const checkImages = () => {
       action: 'checkingImages'
     })
   }
+  */
 }
 
 /**

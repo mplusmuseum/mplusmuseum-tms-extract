@@ -168,7 +168,7 @@ const getMedia = medias => {
   if (medias.length === 0) return null
   return medias.map((media) => {
     if (media._) {
-      media.src = media._.replace(/\\\\/g, '\\')
+      media.src = media._.replace(/\\\\/g, '/').replace(/\\/g, '/')
       media.rank = media.Rank
       media.primaryDisplay = parseInt(media.PrimaryDisplay, 10) === 1
       media.publicAccess = parseInt(media.PublicAccess, 10) === 1

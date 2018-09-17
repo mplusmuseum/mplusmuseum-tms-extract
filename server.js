@@ -491,6 +491,10 @@ elasticsearch.startUpserting()
 const auth0Users = require('./app/modules/auth0')
 auth0Users.startGettingAllUserTokens()
 
+//  This starts checking for images to upload
+const cloudinary = require('./app/modules/cloudinary')
+cloudinary.startUploading()
+
 console.log('')
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)

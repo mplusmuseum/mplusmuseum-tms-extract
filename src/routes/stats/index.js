@@ -28,6 +28,15 @@ exports.index = async (req, res) => {
       const thisTMS = {
         stub: tms.stub
       }
+      //  Grab the image path for this TMS system
+      /*
+      let imagePath = ''
+      if (config.tms) {
+        config.tms.forEach((imageTms) => {
+          if (imageTms.stub === tms.stub) imagePath = imageTms.imagePath
+        })
+      }
+      */
       const startTime = new Date().getTime()
       const timers = config.get('timers')
 
@@ -51,6 +60,21 @@ exports.index = async (req, res) => {
         child: 'Concept'
       }]
       const processingData = {}
+      //  Keep track of which objects have images uploaded
+      const images = {
+        all: {
+          hasImage: 0,
+          noImage: 0,
+          missingImage: 0,
+          uploadedImage: 0
+        },
+        sigg: {
+          hasImage: 0,
+          noImage: 0,
+          missingImage: 0,
+          uploadedImage: 0
+        }
+      }
       types.forEach((type) => {
         processingData[type.parent] = {
           child: type.child,
@@ -67,6 +91,39 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].waitingToBeProcessed += jsonFiles.length
+
+            // Get all the image details
+            /*
+            jsonFiles.forEach((file) => {
+              const filename = path.join(processDir, subFolder, file)
+              if (fs.existsSync(filename)) {
+                const fileRaw = fs.readFileSync(filename, 'utf-8')
+                const fileJSON = JSON.parse(fileRaw)
+                if (fileJSON.images && fileJSON.images !== null) {
+                  let missingImage = true
+                  fileJSON.images.forEach((img) => {
+                    if (img.src) {
+                      const imgPath = path.join(imagePath, img.src)
+                      if (fs.existsSync(imgPath)) {
+                        missingImage = false
+                      }
+                    }
+                  })
+                  if (missingImage) images.all.missingImage += 1
+                  images.all.hasImage += 1
+                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
+                    if (missingImage) images.sigg.missingImage += 1
+                    images.sigg.hasImage += 1
+                  }
+                } else {
+                  images.all.noImage += 1
+                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
+                    images.sigg.noImage += 1
+                  }
+                }
+              }
+            })
+            */
           })
         }
         processingData[type.parent].timeToUpsert = processingData[type.parent].waitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
@@ -88,11 +145,46 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].itemsProcessed += jsonFiles.length
+
+            // Get all the image details
+            /*
+            jsonFiles.forEach((file) => {
+              const filename = path.join(processedDir, subFolder, file)
+              if (fs.existsSync(filename)) {
+                const fileRaw = fs.readFileSync(filename, 'utf-8')
+                const fileJSON = JSON.parse(fileRaw)
+                if (fileJSON.images && fileJSON.images !== null) {
+                  let missingImage = true
+                  fileJSON.images.forEach((img) => {
+                    if (img.src) {
+                      const imgPath = path.join(imagePath, img.src)
+                      if (fs.existsSync(imgPath)) {
+                        missingImage = false
+                        console.log(imgPath)
+                      }
+                    }
+                  })
+                  if (missingImage) images.all.missingImage += 1
+                  images.all.hasImage += 1
+                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
+                    if (missingImage) images.sigg.missingImage += 1
+                    images.sigg.hasImage += 1
+                  }
+                } else {
+                  images.all.noImage += 1
+                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
+                    images.sigg.noImage += 1
+                  }
+                }
+              }
+            })
+            */
           })
         }
       })
 
       thisTMS.processingData = processingData
+      thisTMS.images = images
       const endTime = new Date().getTime()
       thisTMS.ms = endTime - startTime
       newTMS.push(thisTMS)
