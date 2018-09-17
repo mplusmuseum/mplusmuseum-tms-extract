@@ -162,6 +162,25 @@ const getExhibitionLabelText = labelText => {
   return labelObj
 }
 
+const getMedia = medias => {
+  if (medias === undefined || medias === null) return null
+  if (!Array.isArray(medias)) medias = [medias]
+  if (medias.length === 0) return null
+  return medias.map((media) => {
+    if (media._) {
+      media.src = media._.replace(/\\\\/g, '\\')
+      media.rank = media.Rank
+      media.primaryDisplay = parseInt(media.PrimaryDisplay, 10) === 1
+      media.publicAccess = parseInt(media.PublicAccess, 10) === 1
+      delete media._
+      delete media.Rank
+      delete media.PrimaryDisplay
+      delete media.PublicAccess
+      return media
+    }
+  }).filter(Boolean)
+}
+
 const forceIDArray = ids => {
   if (ids === undefined || ids === null) return null
   if (!Array.isArray(ids)) ids = [ids]
@@ -201,6 +220,7 @@ const parseItem = item => {
     dimension: {},
     medium: {},
     creditLine: {},
+    images: getMedia(item.Media),
     id: parseInt(item.ObjectID, 10)
   }
   //  Now drop in all the languages
