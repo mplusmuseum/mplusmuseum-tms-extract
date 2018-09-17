@@ -80,13 +80,15 @@ exports.index = (req, res) => {
       tms.forEach((thisTMS) => {
         if (thisTMS.stub === req.body.tmsstub) {
           thisTMS.filepath = req.body.filepath
+          thisTMS.imagePath = req.body.imagePath
           foundMatch = true
         }
       })
       if (foundMatch === false) {
         tms.push({
           stub: req.body.tmsstub,
-          filepath: req.body.filepath
+          filepath: req.body.filepath,
+          imagePath: req.body.imagePath
           // key: req.body.key
         })
       }
