@@ -15,8 +15,8 @@ const logging = require('../logging')
  * @param {String} stub The name of the TMS folder we are going to look in
  * @param {String} id The id of the object we want to upload
  */
-const uploadImage = (stub, id) => {
-  // const tmsLogger = logging.getTMSLogger()
+const uploadImage = (stub, type, id) => {
+  const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have cloudinary configured
   const config = new Config()
@@ -26,7 +26,97 @@ const uploadImage = (stub, id) => {
   if (cloudinaryConfig === null) {
     return
   }
-  console.log('uploading image')
+
+  //  Grab the perfect file to find out which image we need to upload
+  const subFolder = String(Math.floor(id / 1000) * 1000)
+  const perfectFilename = path.join(rootDir, 'imports', type, stub, 'perfect', subFolder, `${id}.json`)
+  if (!fs.existsSync(perfectFilename)) {
+    console.log('Perfect file not found')
+    return
+  }
+  const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
+  const perfectFileJSON = JSON.parse(perfectFileRaw)
+
+  //  And get the file path
+  let imagePath = null
+  if (!config.tms == null) return
+  config.tms.forEach((imageTms) => {
+    if (imageTms.stub === stub) imagePath = imageTms.imagePath
+  })
+
+  //  Loop through the remote looking for an image to upload
+  let fullImagePath = null
+  let imageSrc = null
+  if (perfectFileJSON.remote && perfectFileJSON.remote.images) {
+    Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+      const imageObj = remoteImage[1]
+      if (imageObj.status === 'upload') {
+        imageSrc = imageObj.src
+        fullImagePath = path.join(imagePath, imageObj.src)
+      }
+    })
+  }
+
+  // If the file is missing then we mark it as missing
+  if (!fs.existsSync(fullImagePath)) {
+    perfectFileJSON.remote.images[imageSrc].status = 'missing'
+    const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+    fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+    return
+  }
+
+  //  Set up cloudinary
+  cloudinary.config(cloudinaryConfig)
+
+  const startTime = new Date().getTime()
+  tmsLogger.object(`Uploading image for ${type} ${id} for ${stub}`, {
+    action: 'uploadImage',
+    id,
+    stub,
+    type,
+    source: imageSrc
+  })
+
+  console.log(`about to upload image for ${id}`)
+  cloudinary.uploader.upload(fullImagePath, (result) => {
+    //  Check to see if we had an error, if so we add that to the perfect file
+    //  instead, so maybe we can go back and retry them
+    const endTime = new Date().getTime()
+    console.log('Uploaded id: ', id)
+    if ('error' in result) {
+      perfectFileJSON.remote.images[imageSrc].status = 'error'
+      perfectFileJSON.remote.images[imageSrc].status = result.error.message
+      perfectFileJSON.remote.images[imageSrc].status = result.error.https_code
+      tmsLogger.object(`Failed uploading image for ${type} ${id} for ${stub}`, {
+        action: 'error',
+        id,
+        stub,
+        type,
+        source: imageSrc,
+        ms: endTime - startTime,
+        error: result
+      })
+    } else {
+      tmsLogger.object(`Uploaded image for ${type} ${id} for ${stub}`, {
+        action: 'uploadedImage',
+        id,
+        stub,
+        type,
+        source: imageSrc,
+        ms: endTime - startTime
+      })
+      perfectFileJSON.remote.images[imageSrc].status = 'ok'
+      perfectFileJSON.remote.images[imageSrc].original_image_src = imageSrc
+      perfectFileJSON.remote.images[imageSrc].public_id = result.public_id
+      perfectFileJSON.remote.images[imageSrc].version = result.version
+      perfectFileJSON.remote.images[imageSrc].signature = result.signature
+      perfectFileJSON.remote.images[imageSrc].width = result.width
+      perfectFileJSON.remote.images[imageSrc].height = result.height
+      perfectFileJSON.remote.images[imageSrc].format = result.format
+    }
+    const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+    fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+  })
 }
 
 /**
@@ -51,58 +141,98 @@ const checkImages = () => {
     return
   }
 
-  console.log('Checking for images')
+  const tmsses = config.get('tms')
+  let foundImageToUpload = null
 
-  /*
-  //  Only carry on if we have a data and tms directory
-  if (!fs.existsSync(rootDir) || !fs.existsSync(path.join(rootDir, 'tms'))) {
-    tmsLogger.object(`No data or data/tms found`, {
-      action: 'checkingImages'
-    })
-    return
-  }
+  const types = [{
+    parent: 'Objects',
+    child: 'Object'
+  }]
+  if (tmsses !== null) {
+    tmsses.forEach((tms) => {
+      if (foundImageToUpload !== null) return
 
-  //  Now we need to look through all the folders in the tms/[something]/perfect/[number]
-  //  folder looking for one that has an image that needs uploading, but hasn't been uploaded
-  //  yet.
-  let foundImageToUpload = false
-  const tmsses = fs.readdirSync(path.join(rootDir, 'tms'))
-  tmsLogger.object(`Checking for a new image to upload`, {
-    action: 'checkingImages'
-  })
-  tmsses.forEach((tms) => {
-    if (foundImageToUpload === true) return
-    //  Check to see if a 'perfect' directory exists
-    const tmsDir = path.join(rootDir, 'tms', tms, 'perfect')
-    if (fs.existsSync(tmsDir)) {
-      if (foundImageToUpload === true) return
-      const subFolders = fs.readdirSync(tmsDir)
-      subFolders.forEach((subFolder) => {
-        if (foundImageToUpload === true) return
-        const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
-          const fileFragments = file.split('.')
-          if (fileFragments.length !== 2) return false
-          if (fileFragments[1] !== 'json') return false
-          return true
-        })
-        files.forEach((file) => {
-          if (foundImageToUpload === true) return
-          const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
-          const perfectFile = JSON.parse(perfectFileRaw)
-          if (perfectFile.tmsSource !== null && perfectFile.remote === null) {
-            foundImageToUpload = true
-            uploadImage(tms, file.split('.')[0])
-          }
-        })
+      types.forEach((type) => {
+        if (foundImageToUpload !== null) return
+        //  Grab the process and perfect folders
+        const processDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'process')
+        const perfectDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'perfect')
+        //  Make sure we have something to
+        if (fs.existsSync(processDir)) {
+          const subFolders = fs.readdirSync(processDir)
+          subFolders.forEach((subFolder) => {
+            const jsonFiles = fs.readdirSync(path.join(processDir, subFolder)).filter((file) => {
+              const filesSplit = file.split('.')
+              if (filesSplit.length !== 2) return false
+              if (filesSplit[1] !== 'json') return false
+              return true
+            }).filter(Boolean)
+            jsonFiles.forEach((file) => {
+              if (foundImageToUpload !== null) return
+              const processFilename = path.join(processDir, subFolder, file)
+              const perfectFilename = path.join(perfectDir, subFolder, file)
+              //  If we have a process file *and* a perfect file, then we need to read in
+              //  the process file to look at the images it has
+              if (fs.existsSync(processFilename) && fs.existsSync(perfectFilename)) {
+                const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
+                const processFileJSON = JSON.parse(processFileRaw)
+                if (!processFileJSON.images || processFileJSON.images.length === 0) return
+                //  Now we know we have some images, we need to read in the perfect file
+                //  and see if any of the images don't exist in the remote part of it
+                const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
+                const perfectFileJSON = JSON.parse(perfectFileRaw)
+                //  If we don't even have a remote field in the perfect, then we need to
+                //  add the remote information
+                if (!perfectFileJSON.remote) {
+                  perfectFileJSON.remote = {
+                    status: 'uploading',
+                    images: {}
+                  }
+                  processFileJSON.images.forEach((image) => {
+                    perfectFileJSON.remote.images[image.src] = image
+                    perfectFileJSON.remote.images[image.src].status = 'upload'
+                    perfectFileJSON.remote.images[image.src].public_id = null
+                    perfectFileJSON.remote.images[image.src].version = null
+                    perfectFileJSON.remote.images[image.src].signature = null
+                    perfectFileJSON.remote.images[image.src].width = null
+                    perfectFileJSON.remote.images[image.src].height = null
+                    perfectFileJSON.remote.images[image.src].format = null
+                  })
+                  //  Save the data back out
+                  const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+                  fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+                }
+
+                //  Now look through the remote, looking for an image to upload
+                Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+                  const imageObj = remoteImage[1]
+                  if (imageObj.status === 'upload') {
+                    foundImageToUpload = {
+                      tms: tms.stub,
+                      type: type.parent,
+                      id: processFileJSON.id
+                    }
+                  }
+                })
+
+                //  If we've gotten through all the remote images and still don't have one to
+                //  upload then we can mark it as 'ok'
+                if (foundImageToUpload === null) {
+                  perfectFileJSON.remote.status = 'ok'
+                  const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+                  fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+                }
+              }
+            })
+          })
+        }
       })
-    }
-  })
-  if (foundImageToUpload === false) {
-    tmsLogger.object(`No new images found to upload`, {
-      action: 'checkingImages'
     })
   }
-  */
+
+  if (foundImageToUpload !== null) {
+    uploadImage(foundImageToUpload.tms, foundImageToUpload.type, foundImageToUpload.id)
+  }
 }
 
 /**

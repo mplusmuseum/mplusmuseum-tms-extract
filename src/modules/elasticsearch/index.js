@@ -36,6 +36,12 @@ const upsertTheItem = async (type, tms, id) => {
   const upsertItem = processFile
   //  Copy the fields from the perfect file into the one we are going to upsert
   upsertItem.artInt = perfectFile.artInt
+  if (perfectFile.remote && perfectFile.remote) {
+    upsertItem.remote = perfectFile.remote
+    if (upsertItem.remote.images) {
+      upsertItem.remote.images = JSON.stringify(upsertItem.remote.images)
+    }
+  }
 
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const startTime = new Date().getTime()
@@ -161,10 +167,11 @@ const checkItems = async () => {
             if (!(fs.existsSync(processFilename))) return
             const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
             const processFile = JSON.parse(processFileRaw)
-            //  If we have an images node, but no remote node in perfect, then we
-            //  can't upload them yet
-            if ('images' in processFile && processFile.images !== null && !perfectFile.remote) return
-
+            //  If we have an images node, then we need to check more stuff
+            if ('images' in processFile && processFile.images !== null && processFile.images.length !== 0) {
+              if (!perfectFile.remote) return
+              if (perfectFile.remote.status !== 'ok') return
+            }
             foundItemToUpload = true
             upsertTheItem(type, tms.stub, file.split('.')[0])
           })
