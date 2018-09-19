@@ -92,6 +92,20 @@ class Queries {
       area
       category
     }
+    images {
+      rank
+      primaryDisplay
+      publicAccess
+      public_id
+      status
+      version
+      signature
+      width
+      height
+      format
+      altText
+      mediaUse
+    }
   }
 }`
 
@@ -167,6 +181,20 @@ class Queries {
     classification {
       area
       category
+    }
+    images {
+      rank
+      primaryDisplay
+      publicAccess
+      public_id
+      status
+      version
+      signature
+      width
+      height
+      format
+      altText
+      mediaUse
     }
   }
 }`
