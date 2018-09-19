@@ -802,25 +802,6 @@
 
         <h3 class="title is-5">Concepts</h3>
 
-        <h3 class="title is-4">Timeline</h3>
-
-        <p>
-          There is a single call you can make to fetch the timeline related to Sigg. You can filter the language by
-          using
-          the <code class="red">lang</code> parameter, set to either <code>en</code> or <code>zh-hant</code>. The call
-          below includes all the fields, there are no other filters or parameters.
-        </p>
-        <p class="runinexplore">
-          <a href='{{exploreQuery queries.timeline "(lang:\"en\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
-        </p>
-        <pre class="query">{{{graphQLQuery queries.timeline '(lang:"en")'}}}</pre>
-
-        <h2 class="title is-3">What is missing</h2>
-
-        <p>
-          Currently the system is missing images (use <a href="https://placekitten.com/">https://placekitten.com/</a>,
-          these will be coming shortly.
-        </p>
         <p>To get all concepts you used a query such as</p>
 
         <p class="runinexplore">
@@ -897,12 +878,18 @@
           match the labels and bios with the exhibition using the "purpose" label.
         </p>
 
-        <h2 class="title is-3">What is missing</h2>
+        <h3 class="title is-4">Timeline</h3>
 
         <p>
-          Currently the system is missing images (use <a href="https://placekitten.com/">https://placekitten.com/</a>)
-          for the moment. We are also missing the timeline data, both of these will be coming shortly.
+          There is a single call you can make to fetch the timeline related to Sigg. You can filter the language by
+          using
+          the <code class="red">lang</code> parameter, set to either <code>en</code> or <code>zh-hant</code>. The call
+          below includes all the fields, there are no other filters or parameters.
         </p>
+        <p class="runinexplore">
+          <a href='{{exploreQuery queries.timeline "(lang:\"en\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
+        </p>
+        <pre class="query">{{{graphQLQuery queries.timeline '(lang:"en")'}}}</pre>
 
         <p>
           The graphQL endpoints and this documentation will continue to evolve over the next few weeks, hang tight!
