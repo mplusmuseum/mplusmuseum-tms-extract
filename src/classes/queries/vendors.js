@@ -92,6 +92,20 @@ class Queries {
       area
       category
     }
+    images {
+      rank
+      primaryDisplay
+      publicAccess
+      public_id
+      status
+      version
+      signature
+      width
+      height
+      format
+      altText
+      mediaUse
+    }
   }
 }`
 
@@ -167,6 +181,20 @@ class Queries {
     classification {
       area
       category
+    }
+    images {
+      rank
+      primaryDisplay
+      publicAccess
+      public_id
+      status
+      version
+      signature
+      width
+      height
+      format
+      altText
+      mediaUse
     }
   }
 }`
@@ -396,6 +424,20 @@ class Queries {
         purpose
       }
     }
+    images {
+      rank
+      primaryDisplay
+      publicAccess
+      public_id
+      status
+      version
+      signature
+      width
+      height
+      format
+      altText
+      mediaUse
+    }
   }
 }`
     this.exhibitions = `query {
@@ -428,6 +470,20 @@ class Queries {
     objects {
       id
       title
+      images {
+        rank
+        primaryDisplay
+        publicAccess
+        public_id
+        status
+        version
+        signature
+        width
+        height
+        format
+        altText
+        mediaUse
+      }
     }
   }
 }`
