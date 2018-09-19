@@ -16,6 +16,7 @@ const logging = require('../logging')
  * @param {String} id The id of the object we want to upload
  */
 const uploadImage = (stub, type, id) => {
+  console.log(`Image uploading ${id}`)
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have cloudinary configured
@@ -59,6 +60,7 @@ const uploadImage = (stub, type, id) => {
 
   // If the file is missing then we mark it as missing
   if (!fs.existsSync(fullImagePath)) {
+    console.log('File not found: ', fullImagePath)
     perfectFileJSON.remote.images[imageSrc].status = 'missing'
     const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
     fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
@@ -77,12 +79,18 @@ const uploadImage = (stub, type, id) => {
     source: imageSrc
   })
 
+  if (global.uploading && global.uploading === true) {
+    console.log('Already uploading image ', id)
+    return
+  }
+  global.uploading = true
   console.log(`about to upload image for ${id}`)
   cloudinary.uploader.upload(fullImagePath, (result) => {
     //  Check to see if we had an error, if so we add that to the perfect file
     //  instead, so maybe we can go back and retry them
     const endTime = new Date().getTime()
-    console.log('Uploaded id: ', id)
+    console.log(`Uploaded id: ${id} in ${endTime - startTime}ms`)
+    global.uploading = false
     if ('error' in result) {
       perfectFileJSON.remote.images[imageSrc].status = 'error'
       perfectFileJSON.remote.images[imageSrc].status = result.error.message

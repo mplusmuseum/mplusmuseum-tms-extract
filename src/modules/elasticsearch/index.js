@@ -6,6 +6,7 @@ const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
 const upsertTheItem = async (type, tms, id) => {
+  console.log(`Upserting ${id}`)
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have elasticsearch configured
