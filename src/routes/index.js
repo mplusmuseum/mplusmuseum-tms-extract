@@ -107,11 +107,13 @@ router.use(function (req, res, next) {
   const urlSplit = urlClean.split('/')
   if (urlSplit[0] === '') urlSplit.shift()
   if (!nonLangUrls.includes(urlSplit[0])) {
-    // console.log(urlSplit)
     //  Check to see if the first entry isn't a language,
     //  if it's not pop the selectedLang into the url
     //  and try again
     if (!(langs.includes(urlSplit[0]))) {
+      if (req.user && req.user.lang) {
+        return res.redirect(`/${req.user.lang}${req.url}`)
+      }
       return res.redirect(`/${defaultLang}${req.url}`)
     } else {
       selectedLang = urlSplit[0]
