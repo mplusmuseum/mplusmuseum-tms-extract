@@ -1,9 +1,9 @@
 <nav id="navbar" class="navbar has-background-light" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     {{#if loggedIn}}
-    <a class="navbar-item" href="/">
-      M+
-    </a>
+      <a class="navbar-item" href="/">
+        M+
+      </a>
     {{/if}}
     <div class="navbar-burger burger" onclick="document.querySelector('.navbar-menu').classList.toggle('is-active');">
       <span aria-hidden="true"></span>
@@ -15,32 +15,29 @@
   <div class="navbar-menu">
     <div class="navbar-start capitalise">
       {{#if user}}
-      {{#if user.roles.isDeveloper}}
-      <a class="navbar-item" href="/developer">
-        {{i18n.nav.developer}}
-      </a>
-      {{/if}}
+        {{#if user.roles.isDeveloper}}
+          <a class="navbar-item" href="/developer">
+            {{i18n.nav.developer}}
+          </a>
+        {{/if}}
 
-      {{#if user.roles.isAdmin}}
-      <a class="navbar-item" href="/config">
-        {{i18n.nav.config}}
-      </a>
-      {{/if}}
+        {{#if user.roles.isAdmin}}
+          <a class="navbar-item" href="/config">
+            {{i18n.nav.config}}
+          </a>
+        {{/if}}
 
-      {{#if (or user.roles.isAdmin user.roles.isStaff)}}
-      <a class="navbar-item" href="/uploadFile">
-        {{i18n.nav.upload_files}}
-      </a>
-      <a class="navbar-item" href="/stats">
-        {{{i18n.nav.stats_and_search}}}
-      </a>
-      <a class="navbar-item" href="/stats/logs">
-        {{{i18n.nav.logs}}}
-      </a>
-      <a class="navbar-item" href="/apihelp">
-        Dashboard API
-      </a>
-      {{/if}}
+        {{#if (or user.roles.isAdmin user.roles.isStaff)}}
+          <a class="navbar-item" href="/stats">
+            {{{i18n.nav.stats_and_search}}}
+          </a>
+          <a class="navbar-item" href="/stats/logs">
+            {{{i18n.nav.logs}}}
+          </a>
+          <a class="navbar-item" href="/apihelp">
+            Dashboard API
+          </a>
+        {{/if}}
       {{/if}}
       <a class="navbar-item" href="/developer/terms">
         {{i18n.nav.apiterms}}
@@ -50,24 +47,24 @@
 
     <div class="navbar-end">
       {{#if user}}
-      <a class="navbar-item" href="/settings">
-        <figure class="image is-32x32">
-          <img class="avatar" src="{{user.picture}}" />
-        </figure>&nbsp;{{user.nickname}}
-      </a>
-      </a>
-      {{#if user.roles.isAdmin}}
-      <a class="navbar-item capitalise" href="/admin">
-        {{i18n.nav.admin}}
-      </a>
-      {{/if}}
-      <a class="navbar-item capitalise" href="/logout">
-        {{i18n.nav.logout}}
-      </a>
+        <a class="navbar-item" href="/settings">
+          <figure class="image is-32x32">
+            <img class="avatar" src="{{user.picture}}" />
+          </figure>&nbsp;{{user.nickname}}
+        </a>
+        </a>
+        {{#if user.roles.isAdmin}}
+          <a class="navbar-item capitalise" href="/admin">
+            {{i18n.nav.admin}}
+          </a>
+        {{/if}}
+        <a class="navbar-item capitalise" href="/logout">
+          {{i18n.nav.logout}}
+        </a>
       {{else}}
-      <a class="navbar-item capitalise" href="/login">
-        {{i18n.nav.login}}
-      </a>
+        <a class="navbar-item capitalise" href="/login">
+          {{i18n.nav.login}}
+        </a>
       {{/if}}
     </div>
   </div>

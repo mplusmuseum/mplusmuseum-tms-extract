@@ -18,7 +18,6 @@ const developer = require('./developer')
 const main = require('./main')
 const search = require('./search')
 const stats = require('./stats')
-const uploadFile = require('./uploadFile')
 const user = require('./user')
 
 //  Redirect to https, make sure...
@@ -251,8 +250,6 @@ router.get('/:lang/developer/elasticsearch/status', ensureLoggedIn, developer.st
 router.get('/:lang/stats', ensureLoggedIn, stats.index)
 router.get('/:lang/stats/logs', ensureLoggedIn, stats.logs)
 router.post('/:lang/stats', ensureLoggedIn, stats.index)
-router.get('/:lang/uploadFile', ensureLoggedIn, uploadFile.index)
-router.post('/:lang/uploadFile', ensureLoggedIn, uploadFile.getfile)
 router.get('/:lang/wait', main.wait)
 router.get('/:lang/search/concepts/:tms/:id', ensureLoggedIn, search.concepts.index)
 router.get('/:lang/search/constituents/:tms/:id', ensureLoggedIn, search.constituents.index)
