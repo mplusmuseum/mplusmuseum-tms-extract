@@ -5,7 +5,7 @@ const LineByLineReader = require('line-by-line')
 const elasticsearch = require('elasticsearch')
 
 exports.index = async (req, res) => {
-  if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
+  if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true && req.user.roles.isVendor !== true) {
     return res.redirect('/')
   }
 
