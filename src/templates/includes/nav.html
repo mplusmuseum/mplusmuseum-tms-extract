@@ -37,6 +37,12 @@
           <a class="navbar-item" href="/apihelp">
             Dashboard API
           </a>
+        {{else}}
+          {{#if user.roles.isVendor}}
+            <a class="navbar-item" href="/stats">
+              {{{i18n.nav.stats_and_search}}}
+            </a>
+          {{/if}}
         {{/if}}
       {{/if}}
       <a class="navbar-item" href="/developer/terms">

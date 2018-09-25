@@ -8,7 +8,7 @@ const Queries = require('../../classes/queries/vendors.js')
 const GraphQL = require('../../classes/graphQL')
 
 exports.index = async (req, res) => {
-  if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
+  if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true && req.user.roles.isVendor !== true) {
     return res.redirect('/')
   }
 

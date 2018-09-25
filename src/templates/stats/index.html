@@ -26,64 +26,65 @@
     <div class="container">
 
       {{#if tms}}
-      <h1 class="title">{{i18n.stats.tms_system}}</h1>
-      <h2 class="subtitle">Each TMS instance we are using is listed below, showing the progress of each</h2>
+        <h1 class="title">{{i18n.stats.tms_system}}</h1>
+        <h2 class="subtitle">Each TMS instance we are using is listed below, showing the progress of each</h2>
 
 
-      {{#each tms}}
-      <hr />
-      <h3 class="title">{{stub}}</h3>
+        {{#each tms}}
+          <hr />
+          <h3 class="title">{{stub}}</h3>
 
-      {{#ifEqual stub "mplus"}}
-      <p class="is-spaced">{{../../i18n.stats.publicAccess}}</p>
-      <progress class="progress is-success is-large is-spaced" value="{{../../publicAccess.truePercent}}" max="100">{{../../publicAccess.truePercent}}%</progress>
-      <p class="is-spaced">
-        {{prettyNumber ../../publicAccess.trueTotal}} ({{../../publicAccess.truePercent}}%) objects have been made
-        public, {{prettyNumber ../../publicAccess.falseTotal}} are still remaining.
-      </p>
-      {{/ifEqual}}
+          {{#ifEqual stub "mplus"}}
+            <p class="is-spaced">{{../../i18n.stats.publicAccess}}</p>
+            <progress class="progress is-success is-large is-spaced" value="{{../../publicAccess.truePercent}}" max="100">{{../../publicAccess.truePercent}}%</progress>
+            <p class="is-spaced">
+              {{prettyNumber ../../publicAccess.trueTotal}} ({{../../publicAccess.truePercent}}%) objects have been
+              made
+              public, {{prettyNumber ../../publicAccess.falseTotal}} are still remaining.
+            </p>
+          {{/ifEqual}}
 
-      {{#each processingData}}
-      {{#ifEven @index}}
-      <div class="columns">
-        {{/ifEven}}
+          {{#each processingData}}
+            {{#ifEven @index}}
+              <div class="columns">
+            {{/ifEven}}
 
-        <div class="column">
-          <form method="post">
-            <input type="hidden" name="tms" value="{{../stub}}">
-            <input type="hidden" name="itemType" value="{{@key}}">
-            <input type="hidden" name="action" value="search">
-            <div class="panel">
-              <div class="panel-heading">{{@key}}</div>
-              <div class="panel-block">
-                <ul>
-                  <li>Total {{toLowerCase @key}} processed: <span class="has-text-weight-bold">{{prettyNumber
+            <div class="column">
+              <form method="post">
+                <input type="hidden" name="tms" value="{{../stub}}">
+                <input type="hidden" name="itemType" value="{{@key}}">
+                <input type="hidden" name="action" value="search">
+                <div class="panel">
+                  <div class="panel-heading">{{@key}}</div>
+                  <div class="panel-block">
+                    <ul>
+                      <li>Total {{toLowerCase @key}} processed: <span class="has-text-weight-bold">{{prettyNumber
                       itemsProcessed}}</span></li>
-                  <li>{{child}} files waiting to be processed: <span class="has-text-weight-bold">{{prettyNumber
+                      <li>{{child}} files waiting to be processed: <span class="has-text-weight-bold">{{prettyNumber
                       waitingToBeProcessed}}</span> {{#ifNotEqual waitingToBeProcessed 0}}(Finishes
-                    {{timeAgo ../timeToUpsert}}, estimate){{/ifNotEqual}}</li>
-                </ul>
-              </div>
+                          {{timeAgo ../timeToUpsert}}, estimate){{/ifNotEqual}}</li>
+                    </ul>
+                  </div>
 
-              <div class="panel-block">
-                <p class="control has-icons-left">
-                  <input class="input" type="text" name="itemID" placeholder="Search {{toLowerCase child}} by id">
-                  <span class="icon is-small is-left">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                  </span>
-                </p>
-              </div>
-            </div>
-          </form>
-        </div class="column">
+                  <div class="panel-block">
+                    <p class="control has-icons-left">
+                      <input class="input" type="text" name="itemID" placeholder="Search {{toLowerCase child}} by id"
+                        {{#unless itemsProcessed}} disabled{{/unless}}> <span class="icon is-small is-left">
+                      <i class="fas fa-search" aria-hidden="true"></i>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </form>
+            </div class="column">
 
-        {{#ifOdd @index}}
-      </div class="columns">
-      {{/ifOdd}}
-      {{/each}}
-
-      {{#ifOdd processingData.length}}
+            {{#ifOdd @index}}
     </div class="columns">
+    {{/ifOdd}}
+    {{/each}}
+
+    {{#ifOdd processingData.length}}
+      </div class="columns">
     {{/ifOdd}}
     {{!---
     <div class="columns">
@@ -120,9 +121,9 @@
     ---}}
 
     {{#if ../user.roles.isAdmin}}
-    <div class="notification is-info">
-      {{{../i18n.stats.lot_of_files_to_upload}}}
-    </div>
+      <div class="notification is-info">
+        {{{../i18n.stats.lot_of_files_to_upload}}}
+      </div>
     {{/if}}
     {{/each}} {{/if}}
 
