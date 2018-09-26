@@ -112,7 +112,7 @@ const parseItem = item => {
   return newItem
 }
 
-const processJsonFile = async (tms, parentNode, childNode) => {
+const processJsonFile = (tms, parentNode, childNode) => {
   //  TODO: Check what type of XML file we have been passed, we will do this
   //  based on the 'action' field. And will then validate (as best we can)
   //  the contents of the file based on what we've been passed
@@ -121,6 +121,13 @@ const processJsonFile = async (tms, parentNode, childNode) => {
   let totalItems = 0
   const startTime = new Date().getTime()
   const tmsLogger = logging.getTMSLogger()
+
+  tmsLogger.object(`Starting processing ${parentNode} JSON file for ${childNode} ${tms}`, {
+    action: 'Start processJsonFile',
+    status: 'info',
+    tms,
+    type: parentNode
+  })
 
   const filename = path.join(rootDir, 'imports', parentNode, tms, 'items.json')
   if (!fs.existsSync(filename)) {
@@ -242,9 +249,10 @@ const processJsonFile = async (tms, parentNode, childNode) => {
   fs.writeFileSync(itemFieldsFilename, itemFieldsJSONPretty, 'utf-8')
 
   const endTime = new Date().getTime()
-  tmsLogger.object(`Finished uploading ${parentNode} JSON file for ${childNode} ${tms}`, {
-    action: 'finished',
-    stub: tms,
+  tmsLogger.object(`Finished processing ${parentNode} JSON file for ${childNode} ${tms}`, {
+    action: 'finished processJsonFile',
+    status: 'ok',
+    tms,
     type: parentNode,
     newItems,
     modifiedItems,

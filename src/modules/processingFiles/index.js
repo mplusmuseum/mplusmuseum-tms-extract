@@ -7,6 +7,7 @@ const processConstituents = require('./constituents')
 const processExhibitions = require('./exhibitions')
 const processConcepts = require('./concepts')
 const rootDir = path.join(__dirname, '../../../data')
+const logging = require('../../modules/logging')
 const xml2js = require('xml2js')
 const parser = new xml2js.Parser({
   trim: true,
@@ -16,22 +17,42 @@ const parser = new xml2js.Parser({
 })
 
 exports.processFile = async (tms) => {
-  console.log('Checking for XML file')
+  const tmsLogger = logging.getTMSLogger()
+
+  tmsLogger.object(`Called processFile for tms: ${tms}`, {
+    action: 'processFile',
+    status: 'info',
+    tms
+  })
+
   const config = new Config()
   let filepath = null
-  console.log('processing file for tms: ', tms)
+
   if ('tms' in config) {
     config.tms.forEach((t) => {
       if ('stub' in t && t.stub === tms && 'filepath') {
-        console.log('We have found the right one')
         filepath = t.filepath
       }
     })
   }
-  if (filepath === null) return
-  if (!fs.existsSync(filepath)) return
+  const veryStartTime = new Date().getTime()
 
-  console.log('Trying to parse: ', filepath)
+  if (filepath === null || !fs.existsSync(filepath)) {
+    tmsLogger.object(`Missing file for processing for tms: ${tms}`, {
+      action: `processFile`,
+      status: 'warning',
+      filepath,
+      tms
+    })
+    return
+  }
+
+  tmsLogger.object(`Found file for processing for tms: ${tms}`, {
+    action: `Start processFile`,
+    status: 'ok',
+    filepath,
+    tms
+  })
 
   const xml = fs.readFileSync(filepath, 'utf-8')
 
@@ -57,26 +78,57 @@ exports.processFile = async (tms) => {
   }]
 
   elements.forEach((element) => {
-    console.log('looking for: ', element.parent)
+    tmsLogger.object(`looking for: ${element.parent}`, {
+      action: 'Checking element',
+      status: 'info',
+      element: element.parent,
+      filepath,
+      tms
+    })
     const xmlSplit = xml.split(`<${element.parent}>`)
     if (xmlSplit.length === 1) {
-      console.log('No element found')
+      tmsLogger.object(`looking for: ${element.parent}`, {
+        action: 'No element found',
+        status: 'warning',
+        element: element.parent,
+        filepath,
+        tms
+      })
     } else {
       const xmlTail = xmlSplit.pop()
       const xmlTailSplit = xmlTail.split(`</${element.parent}>`)
       if (xmlTailSplit.length === 1) {
-        console.log('No closing element found')
+        tmsLogger.object(`looking for: ${element.parent}`, {
+          action: 'No closing element found',
+          status: 'warning',
+          element: element.parent,
+          filepath,
+          tms
+        })
       } else {
-        console.log('Found elements')
         const XMLRaw = xmlTailSplit[0]
+        const spiltStartTime = new Date().getTime()
         const itemCount = xmlTailSplit[0].split(`</${element.child}>`).length
-        console.log(`Found ${itemCount} items`)
+        const splitEndTime = new Date().getTime()
+        let totalms = splitEndTime - spiltStartTime
+        if (totalms <= 1) totalms = 1
+
+        tmsLogger.object(`found ${itemCount} ${element.parent}`, {
+          action: `Element found`,
+          status: 'info',
+          element: element.parent,
+          filepath,
+          tms,
+          ms: totalms
+        })
 
         //  Construct the XML output diretories
         if (!fs.existsSync(path.join(rootDir, 'imports'))) fs.mkdirSync(path.join(rootDir, 'imports'))
         if (!fs.existsSync(path.join(rootDir, 'imports', element.parent))) fs.mkdirSync(path.join(rootDir, 'imports', element.parent))
         if (!fs.existsSync(path.join(rootDir, 'imports', element.parent, tms))) fs.mkdirSync(path.join(rootDir, 'imports', element.parent, tms))
         if (!fs.existsSync(path.join(rootDir, 'imports', element.parent, tms, 'xml'))) fs.mkdirSync(path.join(rootDir, 'imports', element.parent, tms, 'xml'))
+
+        const xmlStartTime = new Date().getTime()
 
         //  Before we do anything with the JSON version, I want to split the
         //  XML up into seperate chunks so we can store those too.
@@ -87,8 +139,6 @@ exports.processFile = async (tms) => {
             }
             return null
           }).filter(Boolean)
-
-        // const startTime = new Date().getTime()
 
         //  Write out the XML files
         splitRaw.forEach((xml) => {
@@ -106,34 +156,72 @@ exports.processFile = async (tms) => {
             }
           }
         })
+        tmsLogger.object(`split XML for: ${element.parent}`, {
+          action: `Splitting XML`,
+          status: 'info',
+          element: element.parent,
+          filepath,
+          tms,
+          ms: new Date().getTime() - xmlStartTime
+        })
 
         const XMLRestructured = `<${element.parent}>${splitRaw.join('')}</${element.parent}>`
         fs.writeFileSync(path.join(rootDir, 'imports', element.parent, tms, 'items.xml'), XMLRestructured, 'utf-8')
+        const parseStartTime = new Date().getTime()
         parser.parseString(XMLRestructured, (err, result) => {
           if (err) {
-            console.log(err)
+            tmsLogger.object(`failed to parse XML into JSON`, {
+              action: `Parsing XML`,
+              status: 'error',
+              element: element.parent,
+              filepath,
+              tms,
+              ms: new Date().getTime() - parseStartTime
+            })
           } else {
-            console.log('ok')
+            tmsLogger.object(`parsed XML into JSON`, {
+              action: `Parsing XML`,
+              status: 'error',
+              element: element.parent,
+              filepath,
+              tms,
+              ms: new Date().getTime() - parseStartTime
+            })
             const fileJSONPretty = JSON.stringify(result, null, 4)
             const filename = path.join(rootDir, 'imports', element.parent, tms, 'items.json')
             fs.writeFileSync(filename, fileJSONPretty, 'utf-8')
 
             //  Now call the thing that's going to parse the objects
             if (element.parent === 'Objects') {
-              processObjects.processJsonFile(tms, element.parent, element.child)
+              setTimeout(() => {
+                processObjects.processJsonFile(tms, element.parent, element.child)
+              }, 100)
             }
             if (element.parent === 'Constituents') {
-              processConstituents.processJsonFile(tms, element.parent, element.child)
+              setTimeout(() => {
+                processConstituents.processJsonFile(tms, element.parent, element.child)
+              }, 200)
             }
             if (element.parent === 'Exhibitions') {
-              processExhibitions.processJsonFile(tms, element.parent, element.child)
+              setTimeout(() => {
+                processExhibitions.processJsonFile(tms, element.parent, element.child)
+              }, 300)
             }
             if (element.parent === 'Concepts') {
-              processConcepts.processJsonFile(tms, element.parent, element.child)
+              setTimeout(() => {
+                processConcepts.processJsonFile(tms, element.parent, element.child)
+              }, 400)
             }
           }
         })
       }
     }
+  })
+
+  tmsLogger.object(`Finished processFile for tms: ${tms}`, {
+    action: 'processFile',
+    status: 'ok',
+    tms,
+    ms: new Date().getTime() - veryStartTime
   })
 }
