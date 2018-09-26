@@ -267,6 +267,16 @@ exports.timePretty = t => {
   return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
 }
 
+exports.prettyDate = t => {
+  if (t === null || t === undefined) return ''
+  return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
+}
+
+exports.prettyDateShort = t => {
+  if (t === null || t === undefined) return ''
+  return moment(t).format('MMMM Do YYYY')
+}
+
 exports.timeDiff = diff => {
   if (diff === null || diff === undefined) return ''
   return moment.duration(diff).humanize()
