@@ -24,13 +24,100 @@
 
   <section class="section">
     <div class="container documentation">
-      <ul>
-        {{#each users}}
-        <li>
-          <a href="/admin/user/{{user_id}}">{{nickname}}</a>
-        </li>
-        {{/each}}
-      </ul>
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Source</th>
+            <th>Contact</th>
+            <th>Login Count</th>
+            <th>Last Login</th>
+            <th>Developer</th>
+            <th>Vendor</th>
+            <th>Staff</th>
+            <th>Admin</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each users}}
+            <tr>
+              <td>
+                <a href="/admin/user/{{user_id}}">{{nickname}}</a>
+              </td>
+              <td>
+                {{#if email}}
+                  Email
+                {{else}}
+                  {{#each identities}}
+                    {{#ifEqual provider 'facebook'}}
+                      Facebook
+                  {{else}}
+                    Twitter
+                    {{/ifEqual}}
+                  {{/each}}
+                {{/if}}
+              </td>
+              <td>
+                {{#if email}}
+                  {{email}}
+                {{else}}
+                  {{#each identities}}
+                    {{#ifEqual provider 'facebook'}}
+                      &nbsp;
+                  {{else}}
+                    <a href="https://twitter.com/{{user_id}}">@{{../../screen_name}}</a>
+                    {{/ifEqual}}
+                  {{/each}}
+                {{/if}}
+              </td>
+              <td>
+                {{#if logins_count}}
+                  {{logins_count}}
+                {{else}}
+                  0
+                {{/if}}
+              </td>
+              <td class="capitalise">
+                {{#if last_login}}
+                  {{timeAgo last_login}}
+                {{else}}
+                  Never
+                {{/if}}
+              </td>
+              <td>
+                {{#if user_metadata.roles.isDeveloper}}<span class="icon has-text-primary"><i class="fas fa-check"></i></span>{{else}}&nbsp;{{/if}}
+              </td>
+              <td>
+                {{#if user_metadata.roles.isVendor}}<span class="icon has-text-primary"><i class="fas fa-check"></i></span>{{else}}&nbsp;{{/if}}
+              </td>
+              <td>
+                {{#if user_metadata.roles.isStaff}}<span class="icon has-text-primary"><i class="fas fa-check"></i></span>{{else}}&nbsp;{{/if}}
+              </td>
+              <td>
+                {{#if user_metadata.roles.isAdmin}}<span class="icon has-text-primary"><i class="fas fa-check"></i></span>{{else}}&nbsp;{{/if}}
+              </td>
+              <td>
+                {{timeAgo created_at}}
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>User</td>
+            <th>Source</th>
+            <th>Contact</th>
+            <th>Login Count</th>
+            <th>Last Login</th>
+            <th>Developer</th>
+            <th>Vendor</th>
+            <th>Staff</th>
+            <th>Admin</th>
+            <th>Created</th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   </section>
 
