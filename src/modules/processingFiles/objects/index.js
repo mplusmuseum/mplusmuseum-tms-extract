@@ -260,7 +260,15 @@ const processJsonFile = (tms, parentNode, childNode) => {
 
   const filename = path.join(rootDir, 'imports', parentNode, tms, 'items.json')
   if (!fs.existsSync(filename)) {
-    console.log('Cant find file: ', filename)
+    tmsLogger.object(`Failed processing ${parentNode} JSON file for ${childNode} ${tms}`, {
+      action: `finished processJsonFile`,
+      status: 'error',
+      tms,
+      type: parentNode,
+      filename,
+      ms: new Date().getTime() - startTime
+    })
+    return
   }
   const itemsRAW = fs.readFileSync(filename, 'utf-8')
   const itemsJSON = JSON.parse(itemsRAW)[childNode].map((item) => parseItem(item))
@@ -281,10 +289,11 @@ const processJsonFile = (tms, parentNode, childNode) => {
     let needToUpload = false
     if (!fs.existsSync(filename)) {
       tmsLogger.object(`Creating process file for ${childNode} ${id} for ${tms}`, {
-        action: 'new',
+        action: 'New file',
+        status: 'info',
         type: childNode,
-        id: id,
-        stub: tms
+        id,
+        tms
       })
       newItems += 1
       needToUpload = true
@@ -296,16 +305,17 @@ const processJsonFile = (tms, parentNode, childNode) => {
       //  If there's a difference between the objects then we know it's been modified
       //  and we need to upload it.
       if (thisItem !== processedFile) {
-        needToUpload = true
-        modifiedItems += 1
         //  Remove it from the processed fold, to force us to reupload it
         fs.unlinkSync(filename)
-        tmsLogger.object(`Found changed ${childNode} JSON for ${childNode} ${id} for ${tms}`, {
-          action: 'modified',
+        tmsLogger.object(`Removing old processed file for ${childNode} ${id} for ${tms}`, {
+          action: 'Modified item',
+          status: 'info',
           type: childNode,
-          id: id,
-          stub: tms
+          id,
+          tms
         })
+        modifiedItems += 1
+        needToUpload = true
       }
     }
 
@@ -328,6 +338,13 @@ const processJsonFile = (tms, parentNode, childNode) => {
       }
       const newFilename = path.join(rootDir, 'imports', parentNode, tms, 'process', subFolder, `${id}.json`)
       const processedFileJSONPretty = JSON.stringify(item, null, 4)
+      tmsLogger.object(`Creating new process file for ${childNode} ${id} for ${tms}`, {
+        action: 'Creating file',
+        status: 'info',
+        type: childNode,
+        id,
+        tms
+      })
       fs.writeFileSync(newFilename, processedFileJSONPretty, 'utf-8')
     }
   })
