@@ -252,7 +252,7 @@ const processJsonFile = (tms, parentNode, childNode) => {
   const tmsLogger = logging.getTMSLogger()
 
   tmsLogger.object(`Starting processing ${parentNode} JSON file for ${childNode} ${tms}`, {
-    action: 'Start processJsonFile',
+    action: 'start processJsonFile',
     status: 'info',
     tms,
     type: parentNode

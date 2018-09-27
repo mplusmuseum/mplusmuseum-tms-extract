@@ -29,9 +29,11 @@
         <li>
           <a href="#entries">Last 100 entries</a>
         </li>
-        <li>
-          <a href="#objects">Last 100 objects upserted (Average ms: {{prettyNumber averageObjectsUpsertedms}}ms)</a>
-        </li>
+        {{#each last100Upserted}}
+          <li>
+            <a href="#objects">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
+          </li>
+        {{/each}}
       </ul>
 
       <hr>
@@ -45,51 +47,63 @@
             <tr>
               <th>Time</th>
               <th>Action</th>
+              <th>Status</th>
+              <th>Type</th>
               <th>Message</th>
               <th>ms</th>
             </tr>
           </thead>
           <tbody>
             {{#each last100Lines}}
-            <tr>
-              <td>{{timeAgo timestamp}}</td>
-              <td>{{data.action}}</td>
-              <td>{{data.message}}</td>
-              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
-            </tr>
+              <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
+                {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
+                {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+                <td>{{timeAgo timestamp}}</td>
+                <td>{{data.action}}</td>
+                <td>{{data.status}}</td>
+                <td>{{data.type}}</td>
+                <td>{{data.message}}</td>
+                <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+              </tr>
             {{/each}}
           </tbody>
         </table>
       </p>
 
-      <hr>
+      {{#each last100Upserted}}
+        <hr>
 
-      <h1 class="title">
-        <a name="objects" class="hidename">Last 100 objects upserted (Average ms: {{prettyNumber
-          averageObjectsUpsertedms}}ms)</a>
-      </h1>
-      <p>
-        <table class="table is-striped is-fullwidth">
-          <thead>
-            <tr>
-              <th>Time</th>
-              <th>Action</th>
-              <th>Message</th>
-              <th>ms</th>
-            </tr>
-          </thead>
-          <tbody>
-            {{#each last100ObjectsUpserted}}
-            <tr>
-              <td>{{timeAgo timestamp}}</td>
-              <td>{{data.action}}</td>
-              <td>{{data.message}}</td>
-              <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
-            </tr>
-            {{/each}}
-          </tbody>
-        </table>
-      </p>
+        <h1 class="title">
+          <a name="objects" class="hidename">Last 100 {{@key}} upserted (Average ms: {{prettyNumber
+          averageUpsertedms}}ms)</a>
+        </h1>
+        <p>
+          <table class="table is-striped is-fullwidth">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Message</th>
+                <th>ms</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each items}}
+                <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
+                  {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
+                  {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+                  <td>{{timeAgo timestamp}}</td>
+                  <td>{{data.action}}</td>
+                  <td>{{data.status}}</td>
+                  <td>{{data.message}}</td>
+                  <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+                </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </p>
+      {{/each}}
 
 
     </div>
