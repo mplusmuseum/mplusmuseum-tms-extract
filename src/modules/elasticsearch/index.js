@@ -6,7 +6,16 @@ const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
 const upsertTheItem = async (type, tms, id) => {
+  const startTime = new Date().getTime()
+
   const tmsLogger = logging.getTMSLogger()
+  tmsLogger.object(`starting upserting ${type.child} ${id} for ${tms}`, {
+    action: 'start upsertTheItem',
+    status: 'info',
+    type: type.child,
+    tms,
+    id
+  })
 
   //  Check to see that we have elasticsearch configured
   const config = new Config()
@@ -14,16 +23,43 @@ const upsertTheItem = async (type, tms, id) => {
   //  If there's no elasticsearch configured then we don't bother
   //  to do anything
   if (elasticsearchConfig === null) {
+    tmsLogger.object(`No ElasticSearch found`, {
+      action: 'finished upsertTheItem',
+      status: 'warning',
+      type: type.child,
+      tms,
+      id
+    })
     return
   }
 
   //  Check to make sure the file exists
   const subFolder = String(Math.floor(id / 1000) * 1000)
   const processFilename = path.join(rootDir, 'imports', type.parent, tms, 'process', subFolder, `${id}.json`)
-  if (!fs.existsSync(processFilename)) return
+  if (!fs.existsSync(processFilename)) {
+    tmsLogger.object(`No ${type.parent} process file found, ${type.child} ${id} for ${tms}`, {
+      action: 'finished upsertTheItem',
+      status: 'error',
+      type: type.child,
+      tms,
+      id,
+      processFilename
+    })
+    return
+  }
   //  And the matching perfect file
   const perfectFilename = path.join(rootDir, 'imports', type.parent, tms, 'perfect', subFolder, `${id}.json`)
-  if (!fs.existsSync(perfectFilename)) return
+  if (!fs.existsSync(perfectFilename)) {
+    tmsLogger.object(`No ${type.parent} perfect file found, ${type.child} ${id} for ${tms}`, {
+      action: 'finished upsertTheItem',
+      status: 'error',
+      type: type.child,
+      tms,
+      id,
+      perfectFilename
+    })
+    return
+  }
 
   //  Read in the processFile
   const processFileRaw = fs.readFileSync(processFilename, 'utf-8')
@@ -44,7 +80,6 @@ const upsertTheItem = async (type, tms, id) => {
   }
 
   const esclient = new elasticsearch.Client(elasticsearchConfig)
-  const startTime = new Date().getTime()
 
   //  Create the index if we need to
   const index = `${type.parent}_${tms}`.toLowerCase()
@@ -72,14 +107,27 @@ const upsertTheItem = async (type, tms, id) => {
     if (!fs.existsSync(path.join(rootDir, 'imports', type.parent, tms, 'processed'))) fs.mkdirSync(path.join(rootDir, 'imports', type.parent, tms, 'processed'))
     if (!fs.existsSync(path.join(rootDir, 'imports', type.parent, tms, 'processed', subFolder))) fs.mkdirSync(path.join(rootDir, 'imports', type.parent, tms, 'processed', subFolder))
 
-    fs.renameSync(processFilename, processedFilename)
-    const endTime = new Date().getTime()
-    tmsLogger.object(`Upserted ${type.child} for ${type.child} ${id} for ${tms}`, {
-      action: `upserted`,
+    try {
+      fs.renameSync(processFilename, processedFilename)
+    } catch (er) {
+      tmsLogger.object(`Failed to move ${type.parent} file ${type.child} for ${type.child} ${id} for ${tms}, (doing them too quickly?)`, {
+        action: `renaming file in upsertTheItem`,
+        status: 'error',
+        type: type.child,
+        tms,
+        id,
+        processFilename,
+        processedFilename
+      })
+    }
+
+    tmsLogger.object(`Upserted ${type.parent} for ${type.child} ${id} for ${tms}`, {
+      action: `finished upsertTheItem`,
+      status: 'ok',
       type: type.child,
-      id,
       tms,
-      ms: endTime - startTime
+      id,
+      ms: new Date().getTime() - startTime
     })
     //  We are going to reset the timeout to update the aggrigations
   })
@@ -89,19 +137,29 @@ const checkItems = async () => {
   const config = new Config()
   const elasticsearchConfig = config.get('elasticsearch')
   const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`in checkItems`, {
+    action: 'start checkItems',
+    status: 'info'
+  })
 
   //  If there's no elasticsearch configured then we don't bother
   //  to do anything
   if (elasticsearchConfig === null) {
-    tmsLogger.object(`No elasticsearch configured`, {
-      action: 'checkingProcess'
+    tmsLogger.object(`No ElasticSearch found in checkItems`, {
+      action: 'finished checkItems',
+      status: 'warning'
     })
+    return
   }
 
   //  Only carry on if we have a data and tms directory
   if (!fs.existsSync(rootDir)) {
-    tmsLogger.object(`No data or data found`, {
-      action: 'checkingProcess'
+    tmsLogger.object(`No rootDir found`, {
+      action: 'finished checkItems',
+      status: 'warning',
+      rootDir
     })
     return
   }
@@ -174,12 +232,28 @@ const checkItems = async () => {
               if (perfectFile.remote.status !== 'ok') return
             }
             foundItemToUpload = true
+            tmsLogger.object(`We found ${type.child} ${file.split('.')[0]} for ${tms.stub} to upload`, {
+              action: 'finished checkItems',
+              status: 'info',
+              type: type.child,
+              tms: tms.stub,
+              id: file.split('.')[0],
+              ms: new Date().getTime() - startTime
+            })
             upsertTheItem(type, tms.stub, file.split('.')[0])
           })
         })
       }
     })
   })
+
+  if (!foundItemToUpload) {
+    tmsLogger.object(`No item found to upload`, {
+      action: 'finished checkItems',
+      status: 'info',
+      ms: new Date().getTime() - startTime
+    })
+  }
 }
 
 exports.startUpserting = () => {
@@ -199,4 +273,10 @@ exports.startUpserting = () => {
     checkItems()
   }, interval)
   checkItems()
+
+  const tmsLogger = logging.getTMSLogger()
+  tmsLogger.object(`In startUpserting`, {
+    action: 'startUpserting',
+    status: 'info'
+  })
 }

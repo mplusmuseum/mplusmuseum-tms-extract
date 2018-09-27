@@ -12,7 +12,9 @@ exports.index = (req, res) => {
 
   if ('action' in req.body) {
     if (req.body.action === 'reimport') {
-      processingFiles.processFile(req.body.tms)
+      setTimeout(() => {
+        processingFiles.processFile(req.body.tms)
+      }, 50)
       req.templateValues.notification = {
         type: 'info',
         msg: `The import process for ${req.body.tms} has been started`

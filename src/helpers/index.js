@@ -259,6 +259,7 @@ exports.elasticsearchStatus = () => {
 
 exports.prettyNumber = x => {
   if (x === null || x === undefined) return ''
+  if (x === '0' || x === 0) return '0'
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 

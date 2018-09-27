@@ -1,6 +1,8 @@
 const Queries = require('../../classes/queries/vendors.js')
 const GraphQL = require('../../classes/graphQL')
 const Config = require('../../classes/config')
+const logging = require('../logging')
+
 const Elasticsearch = require('elasticsearch')
 
 const pingGraphQL = async () => {
@@ -16,12 +18,24 @@ const pingGraphQL = async () => {
   const endms = new Date().getTime()
   ping.ms = endms - startms
   ping.timestamp = endms
+
   //  If we got an array back, it means we had an error
   //  and we should count that as a miss, otherwise assume
   //  all is good
+  const tmsLogger = logging.getTMSLogger()
   if (Array.isArray(results)) {
+    tmsLogger.object(`Pinging GraphQL failed`, {
+      action: 'pinging GraphQL',
+      status: 'warning',
+      ms: endms - startms
+    })
     ping.valid = false
   } else {
+    tmsLogger.object(`Pinging GraphQL succeeded`, {
+      action: 'pinging GraphQL',
+      status: 'ok',
+      ms: endms - startms
+    })
     ping.valid = true
   }
 
@@ -45,6 +59,13 @@ exports.startPingingGraphQL = () => {
     pingGraphQL()
   }, 60 * 1000)
   pingGraphQL()
+
+  //  Log that we are starting
+  const tmsLogger = logging.getTMSLogger()
+  tmsLogger.object(`Staring to ping GraphQL`, {
+    action: 'startPingingGraphQL',
+    status: 'info'
+  })
 }
 
 /**
@@ -82,6 +103,22 @@ const pingES = async () => {
     valid: worked
   }
 
+  //  Log it
+  const tmsLogger = logging.getTMSLogger()
+  if (worked) {
+    tmsLogger.object(`Pinging ElasticSearch succeeded`, {
+      action: 'pinging ElasticSearch',
+      status: 'ok',
+      ms: endTime - startTime
+    })
+  } else {
+    tmsLogger.object(`Pinging ElasticSearch failed`, {
+      action: 'pinging ElasticSearch',
+      status: 'warning',
+      ms: endTime - startTime
+    })
+  }
+
   if (!('elasticsearchping' in global)) {
     global.elasticsearchping = []
   }
@@ -95,4 +132,11 @@ exports.startPingingES = () => {
     pingES()
   }, 60 * 1000)
   pingES()
+
+  //  Log that we are starting
+  const tmsLogger = logging.getTMSLogger()
+  tmsLogger.object(`Staring to ping ElasticSearch`, {
+    action: 'startPingingES',
+    status: 'info'
+  })
 }

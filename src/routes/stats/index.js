@@ -273,9 +273,30 @@ exports.logs = (req, res) => {
 
   //  Now we want to get the 100 most recent
   const last100Lines = []
-  const last100ObjectsUpserted = []
+  const last100Upserted = {}
+
+  const types = [{
+    parent: 'Objects',
+    child: 'Object'
+  }, {
+    parent: 'Constituents',
+    child: 'Constituent'
+  }, {
+    parent: 'Exhibitions',
+    child: 'Exhibition'
+  }, {
+    parent: 'BibiolographicData',
+    child: 'Bibiolography'
+  }, {
+    parent: 'Events',
+    child: 'Event'
+  }, {
+    parent: 'Concepts',
+    child: 'Concept'
+  }]
 
   const lr = new LineByLineReader(path.join(rootDir, lastLog))
+
   lr.on('line', function (line) {
     //  Split the line and get the data
     const lineSplit = line.split(' [object]: ')
@@ -291,29 +312,38 @@ exports.logs = (req, res) => {
     if (last100Lines.length > 100) {
       last100Lines.shift()
     }
-
     //  And the upserted items
-    if ('action' in data && data.action === 'upserted_objects') {
-      last100ObjectsUpserted.push(logEntry)
-      if (last100ObjectsUpserted.length > 100) {
-        last100ObjectsUpserted.shift()
+    types.forEach((type) => {
+      if (!last100Upserted[type.child]) {
+        last100Upserted[type.child] = {
+          items: [],
+          averageUpsertedms: 0
+        }
       }
-    }
+      if (data.action && data.type && data.action === 'finished upsertTheItem' && data.type === type.child) {
+        last100Upserted[type.child].items.push(logEntry)
+        if (last100Upserted[type.child].items.length > 100) {
+          last100Upserted[type.child].items.shift()
+        }
+      }
+    })
   })
+
   lr.on('end', function () {
     req.templateValues.last100Lines = last100Lines.reverse()
 
     //  Get the total ms spent uploading the images
-    const objectsUpsertedms = last100ObjectsUpserted.map((record) => {
-      return parseInt(record.data.ms, 10)
+    types.forEach((type) => {
+      const objectsUpsertedms = last100Upserted[type.child].items.map((record) => {
+        return parseInt(record.data.ms, 10)
+      })
+      //  Get the average time to upsert an object
+      if (objectsUpsertedms.length > 0) {
+        last100Upserted[type.child].averageUpsertedms = Math.floor(objectsUpsertedms.reduce((p, c) => p + c, 0) / objectsUpsertedms.length)
+      }
+      last100Upserted[type.child].items = last100Upserted[type.child].items.reverse()
     })
-    //  Get the average time to upsert an object
-    if (objectsUpsertedms.length > 0) {
-      req.templateValues.averageObjectsUpsertedms = Math.floor(objectsUpsertedms.reduce((p, c) => p + c, 0) / objectsUpsertedms.length)
-    } else {
-      req.templateValues.averageObjectsUpsertedms = 0
-    }
-    req.templateValues.last100ObjectsUpserted = last100ObjectsUpserted.reverse()
+    req.templateValues.last100Upserted = last100Upserted
 
     return res.render('stats/logs', req.templateValues)
   })
