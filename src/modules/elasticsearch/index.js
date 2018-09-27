@@ -6,7 +6,6 @@ const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
 const upsertTheItem = async (type, tms, id) => {
-  console.log(`Upserting ${id}`)
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have elasticsearch configured
@@ -127,6 +126,7 @@ const checkItems = async () => {
     child: 'Concept'
   }]
   const tmsses = config.get('tms')
+  if (!tmsses) return
 
   //  Now we need to look through all the folders in the data/[something]/[tms]perfect/[number]
   //  folder looking for ones that need uploading

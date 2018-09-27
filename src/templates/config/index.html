@@ -56,32 +56,32 @@
         <a name="graphql" class="hidename">GraphQL</a>
       </h1>
       {{#if config.graphql}}
-      <p>
-        Congratulations graphQL has been set up, visit it here:
-        <a href="{{config.graphql.host}}/playground">{{config.graphql.host}}/playground</a>, or check it's
-        <a href="/developer/graphql/status">status here</a>.
-      </p>
-      <p>
-        You can reconfigure it below if needed.
-      </p>
+        <p>
+          Congratulations graphQL has been set up, visit it here:
+          <a href="{{config.graphql.host}}/{{user.apitoken}}/playground">{{config.graphql.host}}/{{user.apitoken}}/playground</a>,
+          or check its <a href="/developer/graphql/status">status here</a>.
+        </p>
+        <p>
+          You can reconfigure it below if needed.
+        </p>
       {{else}}
-      <p>
-        You need to set GraphQL up, you can check out the repository from here
-        <a href="https://github.com/wcmaart/api">https://github.com/wcmaart/api</a>, follow the instructions found
-        there to get things up and running. Once you have
-        it running enter the host URL in the form below.
-      </p>
-      <p>
-        {{#ifEqual NODE_ENV 'development'}} This will probably be something like
-        <code>http://localhost:4000</code>
-        {{else}} This will be your domain URL that you've exposed as your graphQL server, you should
+        <p>
+          You need to set GraphQL up, you can check out the repository from here
+          <a href="https://github.com/wcmaart/api">https://github.com/wcmaart/api</a>, follow the instructions found
+          there to get things up and running. Once you have
+          it running enter the host URL in the form below.
+        </p>
+        <p>
+          {{#ifEqual NODE_ENV 'development'}} This will probably be something like
+            <code>http://localhost:4000</code>
+      {{else}} This will be your domain URL that you've exposed as your graphQL server, you should
         <em>not</em> include the
         <code>/graphql</code> path, we will add that. For example...
         <br /> Yes:
         <code>https://somedomain.com</code>
         <br /> No:
         <code>https://somedomain.com/graphql</code>. {{/ifEqual}}
-      </p>
+        </p>
       {{/if}}
 
       <form method="post">
@@ -121,12 +121,12 @@
         <a name="elasticsearch" class="hidename">Elastic Search</a>
       </h1>
       {{#if config.elasticsearch}}
-      <p>
-        Congratulations ElasticSearch has been set up
-      </p>
-      <p>
-        You can reconfigure it below if needed.
-      </p>
+        <p>
+          Congratulations ElasticSearch has been set up
+        </p>
+        <p>
+          You can reconfigure it below if needed.
+        </p>
       {{/if}}
       <form method="post">
 
@@ -195,12 +195,12 @@
         <a name="spelunker" class="hidename">Spelunker</a>
       </h1>
       {{#if config.spelunker}}
-      <p>
-        Congratulations the Spelunker has been set up
-      </p>
-      <p>
-        You can reconfigure it below if needed.
-      </p>
+        <p>
+          Congratulations the Spelunker has been set up
+        </p>
+        <p>
+          You can reconfigure it below if needed.
+        </p>
       {{/if}}
       <form method="post">
         <div class="field is-horizontal">
@@ -238,55 +238,58 @@
       <h1 class="title">
         <a name="tms" class="hidename">TMS</a></h1>
       {{#if config.tms}}
-      <p>
-        These are your current TMS setups.
-      </p>
-      {{#each config.tms}}
-      <p>
-        <h2 class="title is-5">TMS: <strong>{{stub}}</strong></h2>
-      </p>
-      <form method="post">
-        <input type="hidden" name="tmsstub" value="{{stub}}">
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">XML file location</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control">
-                <input class="input" type="text" name="filepath" placeholder="Full local path to filename, including the filename"
-                  value="{{filepath}}">
-              </p>
+        <p>
+          These are your current TMS setups.
+        </p>
+        {{#each config.tms}}
+          <p>
+            <h2 class="title is-5">TMS: <strong>{{stub}}</strong></h2>
+          </p>
+          <form method="post">
+            <input type="hidden" name="tmsstub" value="{{stub}}">
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">XML file location</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" name="filepath" placeholder="Full local path to filename, including the filename"
+                      value="{{filepath}}">
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-label is-normal">
-            <label class="label">Media files location</label>
-          </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control">
-                <input class="input" type="text" name="imagePath" placeholder="Full local path to the root directory holding the images"
-                  value="{{imagePath}}">
-              </p>
+            <div class="field is-horizontal">
+              <div class="field-label is-normal">
+                <label class="label">Media files location</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <p class="control">
+                    <input class="input" type="text" name="imagePath" placeholder="Full local path to the root directory holding the images"
+                      value="{{imagePath}}">
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div class="level">
-          <div class="level-left">
-            <div class="level-item">&nbsp;</div>
-          </div>
-          <div class="level-right">
-            <div class="level-item">
-              <p class="control">
-                <button class="button is-primary" type="submit" value="updatetms" name="action">Update</button>
-                <button class="button  is-danger" type="submit" value="deletetms" name="action">Remove</button>
-              </p>
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">&nbsp;</div>
+              </div>
+              <div class="level-right">
+                <div class="level-item">
+                  <p class="control">
+                    <button class="button is-primary" type="submit" value="updatetms" name="action">Update</button>
+                    <button class="button  is-danger" type="submit" value="deletetms" name="action">Remove</button>
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </form>{{/each}} {{else}} {{/if}}
+          </form>
+        {{/each}}
+      {{else}}
+      {{/if}}
       <p>
         Please use the form below to register a new TMS system.
       </p>
@@ -457,12 +460,12 @@
       </p>
 
       {{#if config.intercom.appId}}
-      <p>
-        Congratulations Intercom has been set up
-      </p>
-      <p>
-        You can reconfigure it below if needed.
-      </p>
+        <p>
+          Congratulations Intercom has been set up
+        </p>
+        <p>
+          You can reconfigure it below if needed.
+        </p>
       {{/if}}
       <form method="post">
         <div class="field is-horizontal">
