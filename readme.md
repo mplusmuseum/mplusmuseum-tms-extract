@@ -206,15 +206,9 @@ Where possible the round-trip tim eto complete the tasks is included, which is u
 
 ### Uploading XML files
 
-There are two places where information gets into the system. One is by direct connecton to the TMS system where _some_ information is extracted. Additional information can be supplemented via XML files, which are uploaded on the "Upload files" page.
+[This needs updating, the file is now automatically read in from a location specified in the config page]
 
-_Note:_ the code handles XML being formatted in a specific way and developers should be consulted to make sure the backend can handle a new format.
-
-When a XML file is uploaded it is split into separate entities which are queued for upserting to the database. Only entities that are new or have been modified since the last time they were seen are queued this way. Therefor you can upload full XML files and not worry about uploading duplicates.
-
-When a XML file upload is complete it will show you all the unique fields it found including any new ones, you can use this information to check against any schemas you're using for GraphQL queries as well as checking them against your expections.
-
-These fields are also outputted into the following file...
+[snip] fields are also outputted into the following file...
 
 ```
 data/objects/[tms stub]/objectFields.json
