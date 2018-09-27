@@ -338,6 +338,7 @@ const showQuery = (query, filter) => {
 exports.showQuery = showQuery
 
 exports.exploreQuery = (query, filter, graphQL, token) => {
+  if (!graphQL) return '#'
   const newQuery = showQuery(query, filter)
   const newUrl = `${graphQL}/${token}/playground?query=${querystring.escape(newQuery)}`
   return newUrl

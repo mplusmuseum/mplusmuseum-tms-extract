@@ -23,6 +23,21 @@
   <section class="section">
     <div class="container documentation">
 
+      {{#unless config.graphql}}
+        <div class="notification is-warning">
+          <h1 class="title">No graphQL set</h1>
+          <p>
+            This dashboard doesn't have a link to a graphQL server set up yet. Links to "Run in the playground" will
+            not
+            work.
+          </p>
+          {{#if user.roles.isAdmin}}
+            <p>
+              As an admin user you can set the <a href="/config#graphql">GraphQL details here</a>.
+            </p>
+          {{/if}}
+        </div>
+      {{/unless}}
       <p>
         <div class="card">
           <header class="card-header">
