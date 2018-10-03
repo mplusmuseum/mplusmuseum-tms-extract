@@ -29,6 +29,9 @@
         <li>
           <a href="#entries">Last 100 entries</a>
         </li>
+        <li>
+          <a href="#imports">Last 100 XML imports</a>
+        </li>
         {{#each last100Upserted}}
           <li>
             <a href="#objects">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
@@ -63,6 +66,44 @@
                 <td>{{data.status}}</td>
                 <td>{{data.type}}</td>
                 <td>{{data.message}}</td>
+                <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
+
+      <hr />
+
+      <h1 class="title">
+        <a name="imports" class="hidename">Last 100 imports</a>
+      </h1>
+      <p>
+        <table class="table is-striped is-fullwidth">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Action</th>
+              <th>Status</th>
+              <th>Type</th>
+              <th>New items</th>
+              <th>Modified items</th>
+              <th>Total items</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each processingMainXML}}
+              <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
+                {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
+                {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+                <td>{{timeAgo timestamp}}</td>
+                <td>{{data.action}}</td>
+                <td>{{data.status}}</td>
+                <td>{{data.type}}</td>
+                <td>{{data.newItems}}</td>
+                <td>{{data.modifiedItems}}</td>
+                <td>{{data.totalItems}}</td>
                 <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
               </tr>
             {{/each}}
