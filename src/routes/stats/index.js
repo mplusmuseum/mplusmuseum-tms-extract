@@ -295,6 +295,8 @@ exports.logs = (req, res) => {
     child: 'Concept'
   }]
 
+  const processingMainXML = []
+
   const lr = new LineByLineReader(path.join(rootDir, lastLog))
 
   lr.on('line', function (line) {
@@ -327,6 +329,13 @@ exports.logs = (req, res) => {
         }
       }
     })
+
+    if (data.action && data.action === 'finished processJsonFile') {
+      processingMainXML.push(logEntry)
+      if (processingMainXML.length > 100) {
+        processingMainXML.shift()
+      }
+    }
   })
 
   lr.on('end', function () {
@@ -343,6 +352,7 @@ exports.logs = (req, res) => {
       }
       last100Upserted[type.child].items = last100Upserted[type.child].items.reverse()
     })
+    req.templateValues.processingMainXML = processingMainXML.reverse()
     req.templateValues.last100Upserted = last100Upserted
 
     return res.render('stats/logs', req.templateValues)

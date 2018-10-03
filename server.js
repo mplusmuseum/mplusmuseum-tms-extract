@@ -483,6 +483,9 @@ perfectExhibitions.startMakingPerfect()
 const perfectConcepts = require('./app/modules/processingFiles/concepts')
 perfectConcepts.startMakingPerfect()
 
+const processAll = require('./app/modules/processingFiles')
+processAll.startProcessingMainXml()
+
 //  This starts off checking for items to upload to elastic search
 const elasticsearch = require('./app/modules/elasticsearch')
 elasticsearch.startUpserting()

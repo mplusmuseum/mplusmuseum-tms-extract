@@ -16,7 +16,7 @@ const parser = new xml2js.Parser({
   mergeAttrs: true
 })
 
-exports.processFile = async (tms) => {
+const processFile = async (tms) => {
   const tmsLogger = logging.getTMSLogger()
 
   tmsLogger.object(`Called processFile for tms: ${tms}`, {
@@ -181,7 +181,7 @@ exports.processFile = async (tms) => {
           } else {
             tmsLogger.object(`parsed XML into JSON`, {
               action: `Parsing XML`,
-              status: 'error',
+              status: 'ok',
               element: element.parent,
               filepath,
               tms,
@@ -223,5 +223,30 @@ exports.processFile = async (tms) => {
     status: 'ok',
     tms,
     ms: new Date().getTime() - veryStartTime
+  })
+}
+exports.processFile = processFile
+
+exports.startProcessingMainXml = () => {
+  //  Remove the old interval timer
+  clearInterval(global.processMainXml)
+
+  //  See if we have an interval timer setting in the
+  //  timers part of the config, if not use the default
+  //  of 20,000 (20 seconds)
+  const config = new Config()
+  if (!config) return
+  if (!config.tms) return
+  const interval = 1000 * 60 * 60 * 1 // 1 hour
+  config.tms.forEach((tms) => {
+    global.processMainXml = setInterval(() => {
+      processFile(tms.stub)
+    }, interval)
+  })
+  const tmsLogger = logging.getTMSLogger()
+
+  tmsLogger.object(`In startProcessingMainXml`, {
+    action: 'startProcessingMainXml',
+    status: 'info'
   })
 }
