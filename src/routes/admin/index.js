@@ -29,7 +29,7 @@ exports.users = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
   const users = await new Users().get()
-  req.templateValues.users = users
+  req.templateValues.users = users.reverse()
   return res.render('admin/users', req.templateValues)
 }
 
