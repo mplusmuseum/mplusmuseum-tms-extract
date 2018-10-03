@@ -251,16 +251,31 @@ const checkImages = () => {
  * @param {String} stub The name of the TMS folder we are going to look in
  * @param {String} id The id of the object we want to upload
  */
-const colorImage = (stub, id) => {
-  const tmsLogger = logging.getTMSLogger()
-  // const startTime = new Date().getTime()
-
-  //  Check to see that we have cloudinary configured
+const colorImage = (type, tms, id, imageId) => {
   const config = new Config()
   const cloudinaryConfig = config.get('cloudinary')
-  //  If there's no cloudinary configured then we don't bother
-  //  to do anything
+  const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`Coloring ${type} image ${id}, id: ${imageId} for ${tms}`, {
+    action: 'started colorImage',
+    status: 'info',
+    element: type,
+    tms,
+    id,
+    imageId
+  })
+
   if (cloudinaryConfig === null) {
+    tmsLogger.object(`No cloudinary configured`, {
+      action: 'finished colorImage',
+      status: 'info',
+      element: type,
+      tms,
+      id,
+      imageId,
+      ms: new Date().getTime() - startTime
+    })
     return
   }
 
@@ -269,33 +284,71 @@ const colorImage = (stub, id) => {
   //  If there's no elasticsearch configured then we don't bother
   //  to do anything
   if (elasticsearchConfig === null) {
+    tmsLogger.object(`No elasticsearch configured`, {
+      action: 'finished colorImage',
+      status: 'info',
+      element: type,
+      tms,
+      id,
+      imageId,
+      ms: new Date().getTime() - startTime
+    })
     return
   }
 
   //  Check to make sure the file exists
   const subFolder = String(Math.floor(id / 1000) * 1000)
-  const filename = path.join(rootDir, 'tms', stub, 'perfect', subFolder, `${id}.json`)
-  if (!fs.existsSync(filename)) return
+  const filename = path.join(rootDir, 'imports', type, tms, 'perfect', subFolder, `${id}.json`)
+  console.log(filename)
+  if (!fs.existsSync(filename)) {
+    tmsLogger.object(`No perfect file exists`, {
+      action: 'finished colorImage',
+      status: 'info',
+      element: type,
+      tms,
+      id,
+      imageId,
+      filename,
+      ms: new Date().getTime() - startTime
+    })
+    return
+  }
 
   //  Read in the perfectFile
   const perfectFileRaw = fs.readFileSync(filename, 'utf-8')
   const perfectFile = JSON.parse(perfectFileRaw)
-
-  //  Make sure we don't have a null source
-  if (perfectFile.tmsSource === null) return
+  if (!perfectFile.remote || !perfectFile.remote.images || !(imageId in perfectFile.remote.images) || (perfectFile.remote.status && perfectFile.remote.status !== 'ok') || (perfectFile.remote && perfectFile.remote.colors)) {
+    tmsLogger.object(`remote data in image file not ready for uploading`, {
+      action: 'finished colorImage',
+      status: 'info',
+      element: type,
+      tms,
+      id,
+      imageId,
+      filename,
+      ms: new Date().getTime() - startTime
+    })
+    return
+  }
 
   cloudinary.config(cloudinaryConfig)
 
-  tmsLogger.object(`Uploading color information for object ${id} for ${stub}`, {
-    action: 'colorImage',
-    id: id,
-    stub: stub
+  tmsLogger.object(`About to fetch color information for ${type} image ${id}, id: ${imageId} for ${tms}`, {
+    action: 'fetch color information',
+    status: 'info',
+    element: type,
+    tms,
+    id,
+    imageId,
+    filename
   })
-  /*
-  cloudinary.api.resource(perfectFile.remote.public_id,
+  console.log(`About to fetch color information for ${type} image ${id}, id: ${imageId} for ${tms}`)
+  console.log(perfectFile.remote.images[imageId])
+  cloudinary.api.resource(perfectFile.remote.images[imageId].public_id,
     function (result) {
       if ('error' in result) {
-        const endTime = new Date().getTime()
+        // const endTime = new Date().getTime()
+        /*
         tmsLogger.object(`Failed valid cloudinary color check for object ${id} for ${stub}`, {
           action: 'error',
           id: id,
@@ -303,10 +356,12 @@ const colorImage = (stub, id) => {
           ms: endTime - startTime,
           error: result
         })
+        */
+        console.log(result.error)
         return
       }
 
-      const esclient = new elasticsearch.Client(elasticsearchConfig)
+      // const esclient = new elasticsearch.Client(elasticsearchConfig)
       const colors = {}
       if ('colors' in result) {
         result.colors.forEach((color) => {
@@ -330,9 +385,12 @@ const colorImage = (stub, id) => {
           })
         }
       }
+      console.log(newColors)
+      console.log(predominant)
       //  Upsert the item
-      const index = 'objects_wcma'
-      const type = 'object'
+      // const index = 'objects_wcma'
+      // const type = 'object'
+      /*
       const upsertItem = {
         id: parseInt(id, 10),
         color: {
@@ -340,6 +398,8 @@ const colorImage = (stub, id) => {
           search: predominant
         }
       }
+      */
+      /*
       esclient.update({
         index,
         type,
@@ -376,10 +436,10 @@ const colorImage = (stub, id) => {
           error: result
         })
       })
+      */
     }, {
       colors: true
     })
-    */
 }
 
 /**
@@ -393,70 +453,104 @@ const checkImagesColor = () => {
   const config = new Config()
   const cloudinaryConfig = config.get('cloudinary')
   const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`Looking for images to colour`, {
+    action: 'started coloringImages',
+    status: 'info'
+  })
 
   //  If there's no cloudinary configured then we don't bother
   //  to do anything
   if (cloudinaryConfig === null) {
     tmsLogger.object(`No cloudinary configured`, {
-      action: 'coloringImages'
+      action: 'finished coloringImages',
+      status: 'info',
+      ms: new Date().getTime() - startTime
     })
     return
   }
 
-  //  Only carry on if we have a data and tms directory
-  if (!fs.existsSync(rootDir) || !fs.existsSync(path.join(rootDir, 'tms'))) {
-    tmsLogger.object(`No data or data/tms found`, {
-      action: 'coloringImages'
-    })
-    return
-  }
+  const elements = [{
+    parent: 'Objects',
+    child: 'Object'
+  }]
 
-  //  Now we need to look through all the folders in the tms/[something]/perfect/[number]
-  //  folder looking for one that has an image that needs uploading, but hasn't been uploaded
-  //  yet.
-  let foundImageToColor = false
-  const tmsses = fs.readdirSync(path.join(rootDir, 'tms'))
-  tmsLogger.object(`Checking for a new image to upload`, {
-    action: 'coloringImages'
-  })
-  tmsses.forEach((tms) => {
-    if (foundImageToColor === true) return
-    //  Check to see if a 'perfect' directory exists
-    const tmsDir = path.join(rootDir, 'tms', tms, 'perfect')
-    if (fs.existsSync(tmsDir)) {
+  elements.forEach((element) => {
+    //  Only carry on if we have a data and tms directory
+    const itemPath = path.join(rootDir, 'imports', element.parent)
+    if (!fs.existsSync(itemPath)) {
+      tmsLogger.object(`looking for: ${element.parent}`, {
+        action: 'finished coloringImages',
+        status: 'error',
+        element: element.parent,
+        itemPath,
+        ms: new Date().getTime() - startTime
+      })
+      return
+    }
+
+    //  Now we need to look through all the folders in the tms/[something]/perfect/[number]
+    //  folder looking for one that has an image that needs uploading, but hasn't been uploaded
+    //  yet.
+    let foundImageToColor = false
+    const tmsses = config.tms
+    tmsses.forEach((tms) => {
       if (foundImageToColor === true) return
-      const subFolders = fs.readdirSync(tmsDir)
-      subFolders.forEach((subFolder) => {
+      //  Check to see if a 'perfect' directory exists
+      const tmsDir = path.join(itemPath, tms.stub, 'perfect')
+      if (fs.existsSync(tmsDir)) {
         if (foundImageToColor === true) return
-        const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
-          const fileFragments = file.split('.')
-          if (fileFragments.length !== 2) return false
-          if (fileFragments[1] !== 'json') return false
-          return true
-        })
-        files.forEach((file) => {
+        const subFolders = fs.readdirSync(tmsDir)
+        subFolders.forEach((subFolder) => {
           if (foundImageToColor === true) return
-          const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
-          const perfectFile = JSON.parse(perfectFileRaw)
-          if (
-            perfectFile.tmsSource !== null &&
-            perfectFile.remote !== null &&
-            'status' in perfectFile.remote &&
-            perfectFile.remote.status !== 'error' &&
-            (!('color' in perfectFile) || perfectFile.color.predominant === '{}')
-          ) {
-            foundImageToColor = true
-            colorImage(tms, file.split('.')[0])
-          }
+          const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
+            const fileFragments = file.split('.')
+            if (fileFragments.length !== 2) return false
+            if (fileFragments[1] !== 'json') return false
+            return true
+          })
+          files.forEach((file) => {
+            if (foundImageToColor === true) return
+            const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
+            const perfectFile = JSON.parse(perfectFileRaw)
+            //  If we don't have a remote entry, or we *do* have a remote entry and it
+            //  already has colors then we don't need to do it again
+            if (!perfectFile.remote) return
+            if (!perfectFile.remote.images) return
+            if (perfectFile.remote.status && perfectFile.remote.status !== 'ok') return
+            if (perfectFile.remote && perfectFile.remote.colors) return
+
+            //  Otherwise, check to see if we have a primary image and that image is ok
+            Object.entries(perfectFile.remote.images).forEach((imageArr) => {
+              if (foundImageToColor === true) return
+              const image = imageArr[1]
+              if (image.primaryDisplay === true && image.status && image.status === 'ok') {
+                foundImageToColor = true
+                colorImage(element.parent, tms.stub, file.split('.')[0], imageArr[0])
+              }
+            })
+          })
         })
+      }
+    })
+
+    if (foundImageToColor === false) {
+      tmsLogger.object(`No new images found to color for: ${element.parent}`, {
+        action: 'finished coloringImages',
+        status: 'info',
+        element: element.parent,
+        ms: new Date().getTime() - startTime
+      })
+    } else {
+      tmsLogger.object(`Found an image to color for (and colored it): ${element.parent}`, {
+        action: 'finished coloringImages',
+        status: 'info',
+        element: element.parent,
+        ms: new Date().getTime() - startTime
       })
     }
   })
-  if (foundImageToColor === false) {
-    tmsLogger.object(`No new images found to color`, {
-      action: 'coloringImages'
-    })
-  }
 }
 
 exports.startUploading = () => {
