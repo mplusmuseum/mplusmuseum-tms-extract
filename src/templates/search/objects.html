@@ -50,11 +50,13 @@
       {{#if perfectJSON}}
         <pre class="query json">{{{jsonCode perfectJSON}}}</pre> {{#if config.cloudinary}} {{#if perfectJSON.remote.images}}
             {{#each perfectJSON.remote.images}}
-              <div class="image_viewer">
-                <span class="image_holder">
-                  <img src="http://res.cloudinary.com/{{../config.cloudinary.cloud_name}}/image/upload/w_423,h_500,c_fill_pad,g_auto,b_rgb:999999/v{{version}}/{{public_id}}.{{format}}">
-                </span>
-              </div>
+              {{#ifEqual status "ok"}}
+                <div class="image_viewer">
+                  <span class="image_holder">
+                    <img src="http://res.cloudinary.com/{{../../config.cloudinary.cloud_name}}/image/upload/w_423,h_500,c_fill_pad,g_auto,b_rgb:999999/v{{../version}}/{{../public_id}}.{{../format}}">
+                  </span>
+                </div>
+              {{/ifEqual}}
             {{/each}}
           {{/if}} {{/if}}
       {{else}}
