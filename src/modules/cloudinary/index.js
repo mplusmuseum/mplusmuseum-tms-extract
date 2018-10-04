@@ -5,7 +5,7 @@ const path = require('path')
 const rootDir = path.join(__dirname, '../../../data')
 const cloudinary = require('cloudinary')
 const logging = require('../logging')
-// const elasticsearch = require('elasticsearch')
+const elasticsearch = require('elasticsearch')
 
 /**
  * This method tries to grab a record of an object that has an image that needs
@@ -16,7 +16,6 @@ const logging = require('../logging')
  * @param {String} id The id of the object we want to upload
  */
 const uploadImage = (stub, type, id) => {
-  console.log(`Image uploading ${id}`)
   const tmsLogger = logging.getTMSLogger()
 
   //  Check to see that we have cloudinary configured
@@ -140,11 +139,17 @@ const checkImages = () => {
   const cloudinaryConfig = config.get('cloudinary')
   const tmsLogger = logging.getTMSLogger()
 
+  tmsLogger.object(`starting checkImages`, {
+    action: 'start checkImages',
+    status: 'info'
+  })
+
   //  If there's no cloudinary configured then we don't bother
   //  to do anything
   if (cloudinaryConfig === null) {
     tmsLogger.object(`No cloudinary configured`, {
-      action: 'checkingImages'
+      action: 'finished checkImages',
+      status: 'warning'
     })
     return
   }
@@ -257,10 +262,10 @@ const colorImage = (type, tms, id, imageId) => {
   const tmsLogger = logging.getTMSLogger()
   const startTime = new Date().getTime()
 
-  tmsLogger.object(`Coloring ${type} image ${id}, id: ${imageId} for ${tms}`, {
+  tmsLogger.object(`Coloring ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
     action: 'started colorImage',
     status: 'info',
-    element: type,
+    element: type.child,
     tms,
     id,
     imageId
@@ -270,7 +275,7 @@ const colorImage = (type, tms, id, imageId) => {
     tmsLogger.object(`No cloudinary configured`, {
       action: 'finished colorImage',
       status: 'info',
-      element: type,
+      element: type.child,
       tms,
       id,
       imageId,
@@ -287,7 +292,7 @@ const colorImage = (type, tms, id, imageId) => {
     tmsLogger.object(`No elasticsearch configured`, {
       action: 'finished colorImage',
       status: 'info',
-      element: type,
+      element: type.child,
       tms,
       id,
       imageId,
@@ -298,13 +303,12 @@ const colorImage = (type, tms, id, imageId) => {
 
   //  Check to make sure the file exists
   const subFolder = String(Math.floor(id / 1000) * 1000)
-  const filename = path.join(rootDir, 'imports', type, tms, 'perfect', subFolder, `${id}.json`)
-  console.log(filename)
+  const filename = path.join(rootDir, 'imports', type.parent, tms, 'perfect', subFolder, `${id}.json`)
   if (!fs.existsSync(filename)) {
     tmsLogger.object(`No perfect file exists`, {
       action: 'finished colorImage',
       status: 'info',
-      element: type,
+      element: type.child,
       tms,
       id,
       imageId,
@@ -321,7 +325,7 @@ const colorImage = (type, tms, id, imageId) => {
     tmsLogger.object(`remote data in image file not ready for uploading`, {
       action: 'finished colorImage',
       status: 'info',
-      element: type,
+      element: type.child,
       tms,
       id,
       imageId,
@@ -333,35 +337,32 @@ const colorImage = (type, tms, id, imageId) => {
 
   cloudinary.config(cloudinaryConfig)
 
-  tmsLogger.object(`About to fetch color information for ${type} image ${id}, id: ${imageId} for ${tms}`, {
+  tmsLogger.object(`About to fetch color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
     action: 'fetch color information',
     status: 'info',
-    element: type,
+    element: type.child,
     tms,
     id,
     imageId,
     filename
   })
-  console.log(`About to fetch color information for ${type} image ${id}, id: ${imageId} for ${tms}`)
-  console.log(perfectFile.remote.images[imageId])
+  console.log(`About to fetch color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`)
+
   cloudinary.api.resource(perfectFile.remote.images[imageId].public_id,
     function (result) {
       if ('error' in result) {
-        // const endTime = new Date().getTime()
-        /*
-        tmsLogger.object(`Failed valid cloudinary color check for object ${id} for ${stub}`, {
-          action: 'error',
-          id: id,
-          stub: stub,
-          ms: endTime - startTime,
-          error: result
+        const endTime = new Date().getTime()
+        tmsLogger.object(`Failed to fecth color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
+          action: 'finished colorImage',
+          status: 'error',
+          element: type.child,
+          tms,
+          id,
+          imageId,
+          ms: endTime - startTime
         })
-        */
-        console.log(result.error)
         return
       }
-
-      // const esclient = new elasticsearch.Client(elasticsearchConfig)
       const colors = {}
       if ('colors' in result) {
         result.colors.forEach((color) => {
@@ -385,12 +386,9 @@ const colorImage = (type, tms, id, imageId) => {
           })
         }
       }
-      console.log(newColors)
-      console.log(predominant)
+
       //  Upsert the item
-      // const index = 'objects_wcma'
-      // const type = 'object'
-      /*
+      const index = `${type.parent}_${tms}`.toLowerCase()
       const upsertItem = {
         id: parseInt(id, 10),
         color: {
@@ -398,11 +396,11 @@ const colorImage = (type, tms, id, imageId) => {
           search: predominant
         }
       }
-      */
-      /*
+      const esclient = new elasticsearch.Client(elasticsearchConfig)
+
       esclient.update({
         index,
-        type,
+        type: type.child.toLowerCase(),
         id,
         body: {
           doc: upsertItem,
@@ -410,7 +408,7 @@ const colorImage = (type, tms, id, imageId) => {
         }
       }).then(() => {
         //  Write out the file
-        perfectFile.color = {
+        perfectFile.remote.colors = {
           predominant: newColors,
           search: predominant
         }
@@ -418,25 +416,30 @@ const colorImage = (type, tms, id, imageId) => {
         fs.writeFileSync(filename, perfectFileJSONPretty, 'utf-8')
 
         const endTime = new Date().getTime()
-        tmsLogger.object(`Uploaded color information for object ${id} for ${stub}`, {
-          action: 'coloredImage',
-          id: id,
-          stub: stub,
+        tmsLogger.object(`Upserted color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
+          action: 'finished colorImage',
+          status: 'ok',
+          element: type.child,
+          tms,
+          id,
+          imageId,
           ms: endTime - startTime
         })
       }).catch((err) => {
         console.error(err)
 
         const endTime = new Date().getTime()
-        tmsLogger.object(`Failed coloring image for object ${id} for ${stub}`, {
-          action: 'error',
-          id: id,
-          stub: stub,
-          ms: endTime - startTime,
-          error: result
+        tmsLogger.object(`Failed upserted color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
+          action: 'finished colorImage',
+          status: 'error',
+          element: type.child,
+          tms,
+          id,
+          imageId,
+          error: err,
+          ms: endTime - startTime
         })
       })
-      */
     }, {
       colors: true
     })
@@ -527,7 +530,7 @@ const checkImagesColor = () => {
               const image = imageArr[1]
               if (image.primaryDisplay === true && image.status && image.status === 'ok') {
                 foundImageToColor = true
-                colorImage(element.parent, tms.stub, file.split('.')[0], imageArr[0])
+                colorImage(element, tms.stub, file.split('.')[0], imageArr[0])
               }
             })
           })
