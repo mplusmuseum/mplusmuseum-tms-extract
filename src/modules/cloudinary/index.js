@@ -17,6 +17,15 @@ const elasticsearch = require('elasticsearch')
  */
 const uploadImage = (stub, type, id) => {
   const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`starting uploading ${type} ${id} for ${stub}`, {
+    action: 'start uploadImage',
+    status: 'info',
+    type: type,
+    tms: stub,
+    id
+  })
 
   //  Check to see that we have cloudinary configured
   const config = new Config()
@@ -24,6 +33,14 @@ const uploadImage = (stub, type, id) => {
   //  If there's no cloudinary configured then we don't bother
   //  to do anything
   if (cloudinaryConfig === null) {
+    tmsLogger.object(`No cloudinary found`, {
+      action: 'finished uploadImage',
+      status: 'warning',
+      type: type,
+      tms: stub,
+      id,
+      ms: new Date().getTime() - startTime
+    })
     return
   }
 
@@ -31,7 +48,15 @@ const uploadImage = (stub, type, id) => {
   const subFolder = String(Math.floor(id / 1000) * 1000)
   const perfectFilename = path.join(rootDir, 'imports', type, stub, 'perfect', subFolder, `${id}.json`)
   if (!fs.existsSync(perfectFilename)) {
-    console.log('Perfect file not found')
+    tmsLogger.object(`No perfectFilename found, ${type} ${id} for ${stub}`, {
+      action: 'finished uploadImage',
+      status: 'error',
+      type: type,
+      tms: stub,
+      id,
+      filename: perfectFilename,
+      ms: new Date().getTime() - startTime
+    })
     return
   }
   const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
@@ -59,7 +84,6 @@ const uploadImage = (stub, type, id) => {
 
   // If the file is missing then we mark it as missing
   if (!fs.existsSync(fullImagePath)) {
-    console.log('File not found: ', fullImagePath)
     perfectFileJSON.remote.images[imageSrc].status = 'missing'
     const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
     fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
@@ -69,7 +93,6 @@ const uploadImage = (stub, type, id) => {
   //  Set up cloudinary
   cloudinary.config(cloudinaryConfig)
 
-  const startTime = new Date().getTime()
   tmsLogger.object(`Uploading image for ${type} ${id} for ${stub}`, {
     action: 'uploadImage',
     id,
@@ -79,23 +102,30 @@ const uploadImage = (stub, type, id) => {
   })
 
   if (global.uploading && global.uploading === true) {
-    console.log('Already uploading image ', id)
+    tmsLogger.object(`already uploading image, ${type} ${id} for ${stub}`, {
+      action: 'finished uploadImage',
+      status: 'warning',
+      type: type,
+      tms: stub,
+      id,
+      ms: new Date().getTime() - startTime
+    })
     return
   }
   global.uploading = true
-  console.log(`about to upload image for ${id}`)
+
   cloudinary.uploader.upload(fullImagePath, (result) => {
     //  Check to see if we had an error, if so we add that to the perfect file
     //  instead, so maybe we can go back and retry them
     const endTime = new Date().getTime()
-    console.log(`Uploaded id: ${id} in ${endTime - startTime}ms`)
     global.uploading = false
     if ('error' in result) {
       perfectFileJSON.remote.images[imageSrc].status = 'error'
       perfectFileJSON.remote.images[imageSrc].status = result.error.message
       perfectFileJSON.remote.images[imageSrc].status = result.error.https_code
       tmsLogger.object(`Failed uploading image for ${type} ${id} for ${stub}`, {
-        action: 'error',
+        action: 'finished upsertTheItem',
+        status: 'error',
         id,
         stub,
         type,
@@ -104,8 +134,9 @@ const uploadImage = (stub, type, id) => {
         error: result
       })
     } else {
-      tmsLogger.object(`Uploaded image for ${type} ${id} for ${stub}`, {
-        action: 'uploadedImage',
+      tmsLogger.object(`Finished uploading image for ${type} ${id} for ${stub}`, {
+        action: 'finished upsertTheItem',
+        status: 'ok',
         id,
         stub,
         type,
@@ -346,7 +377,6 @@ const colorImage = (type, tms, id, imageId) => {
     imageId,
     filename
   })
-  console.log(`About to fetch color information for ${type.parent} image ${id}, id: ${imageId} for ${tms}`)
 
   cloudinary.api.resource(perfectFile.remote.images[imageId].public_id,
     function (result) {
