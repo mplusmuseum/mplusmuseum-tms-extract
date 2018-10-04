@@ -43,30 +43,30 @@ console.log(`server.js exists in this directory: ${rootDir}`.help)
  */
 const prompt = require('prompt-sync')()
 const argOptionDefinitions = [{
-  name: 'port',
-  alias: 'p',
-  type: Number
-},
-{
-  name: 'host',
-  alias: 'h',
-  type: String
-},
-{
-  name: 'env',
-  alias: 'e',
-  type: String
-},
-{
-  name: 'skipBuild',
-  alias: 's',
-  type: Boolean,
-  defaultOption: false
-},
-{
-  name: 'skipOpen',
-  type: Boolean
-}
+    name: 'port',
+    alias: 'p',
+    type: Number
+  },
+  {
+    name: 'host',
+    alias: 'h',
+    type: String
+  },
+  {
+    name: 'env',
+    alias: 'e',
+    type: String
+  },
+  {
+    name: 'skipBuild',
+    alias: 's',
+    type: Boolean,
+    defaultOption: false
+  },
+  {
+    name: 'skipOpen',
+    type: Boolean
+  }
 ]
 const commandLineArgs = require('command-line-args')
 const argOptions = commandLineArgs(argOptionDefinitions)
@@ -343,11 +343,11 @@ const auth0 = config.get('auth0')
 if (auth0 !== null) {
   // Configure Passport to use Auth0
   const strategy = new Auth0Strategy({
-    domain: auth0.AUTH0_DOMAIN,
-    clientID: auth0.AUTH0_CLIENT_ID,
-    clientSecret: auth0.AUTH0_SECRET,
-    callbackURL: auth0.AUTH0_CALLBACK_URL
-  },
+      domain: auth0.AUTH0_DOMAIN,
+      clientID: auth0.AUTH0_CLIENT_ID,
+      clientSecret: auth0.AUTH0_SECRET,
+      callbackURL: auth0.AUTH0_CALLBACK_URL
+    },
     (accessToken, refreshToken, extraParams, profile, done) => {
       return done(null, profile)
     }
@@ -465,14 +465,6 @@ const pingtools = require('./app/modules/pingtools')
 pingtools.startPingingGraphQL()
 pingtools.startPingingES()
 
-//  This starts off checking for images to upload to cloudinary
-//  and getting colour information
-/*
-const cloudinary = require('./app/modules/cloudinary')
-cloudinary.startUploading()
-cloudinary.startColoring()
-*/
-
 //  This starts making objects perfect
 const perfectObjects = require('./app/modules/processingFiles/objects')
 perfectObjects.startMakingPerfect()
@@ -497,6 +489,7 @@ auth0Users.startGettingAllUserTokens()
 //  This starts checking for images to upload
 const cloudinary = require('./app/modules/cloudinary')
 cloudinary.startUploading()
+cloudinary.startColoring()
 
 console.log('')
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
