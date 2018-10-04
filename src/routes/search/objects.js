@@ -55,7 +55,7 @@ exports.index = async (req, res) => {
 
   //  Do colour stuff here
   const predominant = []
-  let backgroundColor = null
+  let backgroundColor = 'CCC'
 
   if (perfectJSON !== null && perfectJSON.remote && perfectJSON.remote.colors && perfectJSON.remote.colors.predominant) {
     let total = 0.0
@@ -76,12 +76,9 @@ exports.index = async (req, res) => {
         nicePercent: parseFloat(entry[1])
       })
     })
-    if (backgroundColor === null) {
-      backgroundColor = 'CCC'
-    }
-    req.templateValues.backgroundColor = backgroundColor
     req.templateValues.predominant = predominant
   }
+  req.templateValues.backgroundColor = backgroundColor
 
   const cloudinary = []
   if (perfectJSON !== null && perfectJSON.remote && perfectJSON.remote.colors && perfectJSON.remote.colors.search && perfectJSON.remote.colors.search.cloudinary) {
