@@ -20,7 +20,7 @@ These are all the cool parse functions to get the data into the right format
 const parseItem = item => {
   const newItem = {
     conceptID: parseInt(item.ConceptID, 10),
-    conceptUse: 'ConceptUse' in item ? item.conceptUse : null,
+    conceptUse: 'ConceptUse' in item ? item.ConceptUse : null,
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
     timeline: 'Timeline' in item ? item.Timeline : null,
     title: {},
