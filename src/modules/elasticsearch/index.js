@@ -165,9 +165,6 @@ const checkItems = async () => {
   }
 
   const types = [{
-    parent: 'Objects',
-    child: 'Object'
-  }, {
     parent: 'Constituents',
     child: 'Constituent'
   }, {
@@ -182,6 +179,9 @@ const checkItems = async () => {
   }, {
     parent: 'Concepts',
     child: 'Concept'
+  }, {
+    parent: 'Objects',
+    child: 'Object'
   }]
   const tmsses = config.get('tms')
   if (!tmsses) return
