@@ -319,6 +319,7 @@ class Queries {
     this.concepts = `query {
   concepts {
     id
+    conceptUse
     publicAccess
     title
     timeline
@@ -332,6 +333,7 @@ class Queries {
     this.conceptNoObjects = `query {
   concept[[]] {
     id
+    conceptUse
     publicAccess
     title
     timeline
@@ -345,6 +347,7 @@ class Queries {
     this.conceptWithObjects = `query {
   concept[[]] {
     id
+    conceptUse
     publicAccess
     title
     timeline
@@ -365,6 +368,7 @@ class Queries {
     title
     concepts {
       id
+      conceptUse
       publicAccess
       title
       timeline
@@ -405,6 +409,7 @@ class Queries {
     }
     concepts {
       id
+      conceptUse
       publicAccess
       title
       timeline

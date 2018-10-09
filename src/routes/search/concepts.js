@@ -79,7 +79,7 @@ exports.index = async (req, res) => {
   //  Grab the query used to ask for an concepts
   const queries = new Queries()
   const searchFilter = `(id: ${id})`
-  const query = queries.get('conceptLarge', searchFilter)
+  const query = queries.get('conceptNoObjects', searchFilter)
 
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
