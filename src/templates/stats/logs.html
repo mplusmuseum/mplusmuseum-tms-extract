@@ -34,7 +34,7 @@
         </li>
         {{#each last100Upserted}}
           <li>
-            <a href="#objects">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
+            <a href="#last{{@key}}">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
           </li>
         {{/each}}
       </ul>
@@ -115,7 +115,7 @@
         <hr>
 
         <h1 class="title">
-          <a name="objects" class="hidename">Last 100 {{@key}} upserted (Average ms: {{prettyNumber
+          <a name="last{{@key}}" class="hidename">Last 100 {{@key}} upserted (Average ms: {{prettyNumber
           averageUpsertedms}}ms)</a>
         </h1>
         <p>
