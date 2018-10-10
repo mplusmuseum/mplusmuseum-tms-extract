@@ -196,6 +196,50 @@ class Queries {
       altText
       mediaUse
     }
+    color {
+      predominant {
+        color
+        value
+      }
+      search {
+        google {
+          color
+          value
+        }
+        cloudinary {
+          color
+          value
+        }
+      }
+    }
+  }
+}`
+
+    this.objectsColor = `query {
+  objects[[]] {
+    id
+    title
+    images {
+      public_id
+      version
+      format
+    }
+    color {
+      predominant {
+        color
+        value
+      }
+      search {
+        google {
+          color
+          value
+        }
+        cloudinary {
+          color
+          value
+        }
+      }
+    }
   }
 }`
 

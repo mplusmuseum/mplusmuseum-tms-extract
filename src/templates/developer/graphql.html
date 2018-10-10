@@ -86,6 +86,9 @@
                   <li>
                     <a href="#fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
                   </li>
+                  <li>
+                    <a href="#filteringbycolor">Filtering/Searching by Color</a>
+                  </li>
                 </ul>
               </li>
               <li>
@@ -336,6 +339,82 @@
       <p class="subtitle is-5 no-bottom"> {{i18n.documentation.nodejs}}
       </p>
       <pre class="query language-javascript">{{{nodeQuery queries.objectsMedium '(ids:[1, 4, 6, 7])' config.graphql.host user.apitoken}}}</pre>
+
+      <hr />
+
+      <h3 class="title is-4">
+        <a class="hidename" name="filteringbycolor">Filtering/Searching by Color</a>
+      </h3>
+
+      <p>
+        If you wish to search for objects by colour, you can do that with the following filters:
+        <code class="red">color</code>,
+        <code class="red">color_threshold</code> &amp;
+        <code class="red">color_source</code>,
+      </p>
+
+      <p>
+        There are two sources:
+        <code>google</code> and
+        <code>cloudinary</code>, the default is google and these are the following valid colours.
+      </p>
+      <p>
+        <code>gray</code>,
+        <code>black</code>,
+        <code>orange</code>,
+        <code>brown</code>,
+        <code>white</code>,
+        <code>yellow</code>,
+        <code>teal</code>,
+        <code>blue</code>,
+        <code>green</code>,
+        <code>red</code>,
+        <code>pink</code> &amp;
+        <code>purple</code>.
+      </p>
+
+      <p>
+        Cloudinary decided that the following were
+        <em>slightly</em> more useful, if you do too then specify
+        <code>cloudinary</code> as your
+        <code class="red">color_source</code>.
+      </p>
+      <p>
+        <code>gray</code>,
+        <code>black</code>,
+        <code>orange</code>,
+        <code>brown</code>,
+        <code>white</code>,
+        <code>yellow</code>,
+        <code>teal</code>,
+        <code>blue</code>,
+        <code>green</code>,
+        <code>red</code>,
+        <code>pink</code>,
+        <code>purple</code>,
+        <code>lightblue</code>,
+        <code>olive</code>,
+        <code>lime</code> &amp;
+        <code>cyan</code>.
+      </p>
+
+      <p>Finally you can specify the
+        <code class="red">color_threshold</code> if you want a value different to the default of 75.0. Valid values are
+        floats between 0.0
+        and 100.0, the higher the threshold the fewer the results.
+      </p>
+      <p>
+        You can also ask for
+        <code>predominant</code> colors in the results, which will return you hex values of the predominant colours :)
+        See the
+        example below.
+      </p>
+
+      <p class="runinexplore">
+        <a href='{{exploreQuery queries.objectsColor "(color: \"orange\", color_threshold: 70.0, color_source: \"google\")" config.graphql.host}}'>Run
+          in the playground</a>
+      </p>
+      <pre class="query">{{{graphQLQuery queries.objectsColor '(color: "orange", color_threshold: 70.0, color_source: "google")'}}}</pre>
 
       <hr />
 
