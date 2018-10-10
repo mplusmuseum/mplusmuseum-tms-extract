@@ -238,6 +238,14 @@ const parseItem = item => {
   if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
   if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
   if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
+
+  if (Object.entries(newItem.title).length === 0) newItem.title = null
+  if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
+  if (Object.entries(newItem.displayDate).length === 0) newItem.displayDate = null
+  if (Object.entries(newItem.dimension).length === 0) newItem.dimension = null
+  if (Object.entries(newItem.medium).length === 0) newItem.medium = null
+  if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
+
   return newItem
 }
 

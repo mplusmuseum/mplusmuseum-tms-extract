@@ -109,6 +109,18 @@ const parseItem = item => {
   if ('ExhibitionBiography' in item) newItem.exhibitions.purpose['en'] = getBiographyPurpose(item.ExhibitionBiography)
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.biographies['zh-hant'] = getBiography(item.ExhibitionBiographyTC)
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.purpose['zh-hant'] = getBiographyPurpose(item.ExhibitionBiographyTC)
+
+  if (Object.entries(newItem.name).length === 0) newItem.name = null
+  if (Object.entries(newItem.gender).length === 0) newItem.gender = null
+  if (Object.entries(newItem.displayBio).length === 0) newItem.displayBio = null
+  if (Object.entries(newItem.nationality).length === 0) newItem.nationality = null
+  if (Object.entries(newItem.region).length === 0) newItem.region = null
+  if (Object.entries(newItem.activeCity).length === 0) newItem.activeCity = null
+  if (Object.entries(newItem.birthCity).length === 0) newItem.birthCity = null
+  if (Object.entries(newItem.deathCity).length === 0) newItem.deathCity = null
+  if (Object.entries(newItem.exhibitions.biographies).length === 0) newItem.exhibitions.biographies = null
+  if (Object.entries(newItem.exhibitions.purpose).length === 0) newItem.exhibitions.purpose = null
+
   return newItem
 }
 
