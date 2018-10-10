@@ -31,7 +31,7 @@ const parseItem = item => {
     id: parseInt(item.ConceptID, 10)
   }
 
-  if ('BeginDate' in item) {
+  if ('DateBegSearch' in item) {
     const newBeginDate = parseInt(item.DateBegSearch, 10)
     if (!isNaN(newBeginDate) && newBeginDate !== 0) newItem.beginDate = newBeginDate
   }
