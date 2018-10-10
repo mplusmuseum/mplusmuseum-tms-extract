@@ -71,6 +71,8 @@ const parseItem = item => {
   if ('ExhTitle' in item) newItem.title['en'] = item.ExhTitle
   if ('ExhTitleTC' in item) newItem.title['zh-hant'] = item.ExhTitleTC
 
+  if (Object.entries(newItem.title).length === 0) newItem.title = null
+
   return newItem
 }
 

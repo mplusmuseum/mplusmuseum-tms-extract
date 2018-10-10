@@ -46,6 +46,9 @@ const parseItem = item => {
   if ('ConceptDescription' in item) newItem.description['en'] = item.ConceptDescription
   if ('ConceptDescriptionTC' in item) newItem.description['zh-hant'] = item.ConceptDescriptionTC
 
+  if (Object.entries(newItem.title).length === 0) newItem.title = null
+  if (Object.entries(newItem.description).length === 0) newItem.description = null
+
   return newItem
 }
 
