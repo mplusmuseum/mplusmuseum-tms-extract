@@ -181,6 +181,34 @@ const getMedia = medias => {
   }).filter(Boolean)
 }
 
+const getObjectRights = objectRights => {
+  if (objectRights === undefined || objectRights === null) return null
+  if (Array.isArray(objectRights)) objectRights = objectRights[0]
+  const objectRightsObj = {
+    type: objectRights.ObjRightsType,
+    copyright: objectRights.CopyRight,
+    concatRights: objectRights.ConcatRights,
+    concatRemark: objectRights.ConcatRightsRemark,
+    currentStatus: null,
+    rights: null
+  }
+  if (objectRights.ObjectRights) {
+    if (!Array.isArray(objectRights.ObjectRights)) objectRights.ObjectRights = [objectRights.ObjectRights]
+    objectRightsObj.rights = []
+    objectRights.ObjectRights.forEach((right) => {
+      if (right.RightsGroup === 'Current status') {
+        objectRightsObj.currentStatus = right._
+      } else {
+        objectRightsObj.rights.push({
+          title: right._,
+          group: right.RightsGroup
+        })
+      }
+    })
+  }
+  return objectRightsObj
+}
+
 const forceIDArray = ids => {
   if (ids === undefined || ids === null) return null
   if (!Array.isArray(ids)) ids = [ids]
@@ -221,6 +249,7 @@ const parseItem = item => {
     medium: {},
     creditLine: {},
     images: getMedia(item.Media),
+    objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
   }
   //  Now drop in all the languages
