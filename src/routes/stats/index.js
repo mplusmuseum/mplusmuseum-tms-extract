@@ -1,7 +1,6 @@
 const Config = require('../../classes/config')
 const fs = require('fs')
 const path = require('path')
-const LineByLineReader = require('line-by-line')
 const elasticsearch = require('elasticsearch')
 
 exports.index = async (req, res) => {
@@ -253,12 +252,112 @@ exports.index = async (req, res) => {
   return res.render('stats/index', req.templateValues)
 }
 
-exports.logs = (req, res) => {
+exports.logs = async (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
     return res.redirect('/')
   }
 
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = 'logs_mplus_tmsextract'
+  const type = 'log'
+  const basebody = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'desc'
+      }
+    }]
+  }
+
+  const records = await esclient.search({
+    index,
+    type,
+    body: basebody
+  })
+  req.templateValues.last100Lines = null
+  if (records && records.hits && records.hits.hits) {
+    req.templateValues.last100Lines = records.hits.hits.map((record) => record._source)
+  }
+
+  req.templateValues.last100Upserted = {}
+
+  const upsertBody = JSON.parse(JSON.stringify(basebody))
+  upsertBody.query = {
+    bool: {
+      must: [{
+        term: {
+          'action.keyword': 'finished upsertTheItem'
+        }
+      }]
+    }
+  }
+
+  const types = [{
+    parent: 'Objects',
+    child: 'Object'
+  }, {
+    parent: 'Constituents',
+    child: 'Constituent'
+  }, {
+    parent: 'Exhibitions',
+    child: 'Exhibition'
+  }, {
+    parent: 'BibiolographicData',
+    child: 'Bibiolography'
+  }, {
+    parent: 'Events',
+    child: 'Event'
+  }, {
+    parent: 'Concepts',
+    child: 'Concept'
+  }]
+  req.templateValues.last100Upserted = {}
+
+  for (const type of types) {
+    const upsertTypeBody = JSON.parse(JSON.stringify(upsertBody))
+    upsertTypeBody.query.bool.must.push({
+      match: {
+        'type': type.child
+      }
+    })
+    const upsertsRecords = await esclient.search({
+      index,
+      type: 'log',
+      body: upsertTypeBody
+    })
+    req.templateValues.last100Upserted[type.parent] = {}
+    if (upsertsRecords && upsertsRecords.hits && upsertsRecords.hits.hits) {
+      req.templateValues.last100Upserted[type.parent].items = upsertsRecords.hits.hits.map((record) => record._source)
+      const msArray = req.templateValues.last100Upserted[type.parent].items.map((record) => record.ms).filter(Boolean)
+      req.templateValues.last100Upserted[type.parent].averageUpsertedms = Math.floor(msArray.reduce((p, c) => p + c, 0) / msArray.length)
+      if (isNaN(req.templateValues.last100Upserted[type.parent].averageUpsertedms)) req.templateValues.last100Upserted[type.parent].averageUpsertedms = 0
+    }
+  }
+
+  req.templateValues.processingMainXML = null
+  const processingBody = JSON.parse(JSON.stringify(basebody))
+  processingBody.query = {
+    bool: {
+      must: [{
+        term: {
+          'action.keyword': 'finished processJsonFile'
+        }
+      }]
+    }
+  }
+  const processingRecords = await esclient.search({
+    index,
+    type,
+    body: processingBody
+  })
+  if (processingRecords && processingRecords.hits && processingRecords.hits.hits) {
+    req.templateValues.processingMainXML = processingRecords.hits.hits.map((record) => record._source)
+  }
+
   //  Check to see if we have log files
+  /*
   const rootDir = path.join(__dirname, '../../../logs/tms')
   if (!fs.existsSync(rootDir)) {
     return res.render('stats/logs', req.templateValues)
@@ -357,4 +456,6 @@ exports.logs = (req, res) => {
 
     return res.render('stats/logs', req.templateValues)
   })
+  */
+  return res.render('stats/logs', req.templateValues)
 }
