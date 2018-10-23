@@ -69,11 +69,12 @@ class ESLogger {
     data.name = name
     data.datetime = new Date()
     data.timestamp = data.datetime.getTime()
+    const id = `${data.timestamp}.${Math.random()}`
 
     esclient.update({
       index,
       type: 'log',
-      id: data.timestamp,
+      id,
       body: {
         doc: data,
         doc_as_upsert: true
