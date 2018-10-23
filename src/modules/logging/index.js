@@ -2,7 +2,9 @@
  * This module sets up all the config for the various logging we have and allows
  * us to create an instance of whichever one we need, currently just a tmsLogger
  */
+const Config = require('../../classes/config')
 const path = require('path')
+const elasticsearch = require('elasticsearch')
 
 const rootDir = __dirname
 
@@ -54,6 +56,31 @@ const tmsLogger = winston.createLogger({
   ]
 })
 
+class ESLogger {
+  object (name, data) {
+    const config = new Config()
+    const elasticsearchConfig = config.get('elasticsearch')
+    if (elasticsearchConfig === null) {
+      return
+    }
+    const esclient = new elasticsearch.Client(elasticsearchConfig)
+    const index = 'logs_mplus_tmsextract'
+
+    data.name = name
+    data.datetime = new Date()
+    data.timestamp = data.datetime.getTime()
+
+    esclient.update({
+      index,
+      type: 'log',
+      id: data.timestamp,
+      body: {
+        doc: data,
+        doc_as_upsert: true
+      }
+    })
+  }
+}
 /**
  * Gets us access to the TMS logger, which has 4 levels of logging;
  * page, pre, post and fail
@@ -64,12 +91,41 @@ const tmsLogger = winston.createLogger({
  * tmsLogger.object('fetched', {id: 1234, ms: 24})
  */
 exports.getTMSLogger = () => {
-  return tmsLogger
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null) {
+    return tmsLogger
+  }
+  return new ESLogger()
 }
 
-/* Use this to load and use the logger
-const logging = require('./app/modules/logging')
-const tmsLogger = logging.getTMSLogger()
-tmsLogger.object('fetched', {id: 1234, ms: 24})
-tmsLogger.fail('something bad happened', {id: 1234})
-*/
+exports.createIndex = async () => {
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null) {
+    return
+  }
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = 'logs_mplus_tmsextract'
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists === false) {
+    await esclient.indices.create({
+      index
+    })
+  }
+}
+
+const cullLogs = () => {
+  console.log('culling logs')
+}
+
+exports.startCulling = () => {
+  //  Remove the old interval timer
+  clearInterval(global.cullLogs)
+  global.elasticsearchTmr = setInterval(() => {
+    cullLogs()
+  }, 1000 * 60 * 60 * 24) // Once a day, cull the old logs
+  cullLogs()
+}

@@ -22,20 +22,9 @@ const pingGraphQL = async () => {
   //  If we got an array back, it means we had an error
   //  and we should count that as a miss, otherwise assume
   //  all is good
-  const tmsLogger = logging.getTMSLogger()
   if (Array.isArray(results)) {
-    tmsLogger.object(`Pinging GraphQL failed`, {
-      action: 'pinging GraphQL',
-      status: 'warning',
-      ms: endms - startms
-    })
     ping.valid = false
   } else {
-    tmsLogger.object(`Pinging GraphQL succeeded`, {
-      action: 'pinging GraphQL',
-      status: 'ok',
-      ms: endms - startms
-    })
     ping.valid = true
   }
 
