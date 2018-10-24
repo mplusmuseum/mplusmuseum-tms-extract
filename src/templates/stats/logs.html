@@ -164,6 +164,7 @@
               <th>Token</th>
               <th>Vendor</th>
               <th>Args</th>
+              <th>Records</th>
               <th>ms</th>
             </tr>
           </thead>
@@ -177,6 +178,7 @@
                 <td>
                   <pre class="query language-json" style="margin-bottom: 0 !important; padding: 4px; font-size: 120%">{{argsNice}}</pre>
                 </td>
+                <td>{{records}}</td>
                 <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
               </tr>
             {{/each}}
