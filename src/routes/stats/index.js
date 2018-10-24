@@ -90,39 +90,6 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].waitingToBeProcessed += jsonFiles.length
-
-            // Get all the image details
-            /*
-            jsonFiles.forEach((file) => {
-              const filename = path.join(processDir, subFolder, file)
-              if (fs.existsSync(filename)) {
-                const fileRaw = fs.readFileSync(filename, 'utf-8')
-                const fileJSON = JSON.parse(fileRaw)
-                if (fileJSON.images && fileJSON.images !== null) {
-                  let missingImage = true
-                  fileJSON.images.forEach((img) => {
-                    if (img.src) {
-                      const imgPath = path.join(imagePath, img.src)
-                      if (fs.existsSync(imgPath)) {
-                        missingImage = false
-                      }
-                    }
-                  })
-                  if (missingImage) images.all.missingImage += 1
-                  images.all.hasImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    if (missingImage) images.sigg.missingImage += 1
-                    images.sigg.hasImage += 1
-                  }
-                } else {
-                  images.all.noImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    images.sigg.noImage += 1
-                  }
-                }
-              }
-            })
-            */
           })
         }
         processingData[type.parent].timeToUpsert = processingData[type.parent].waitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
@@ -144,40 +111,6 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].itemsProcessed += jsonFiles.length
-
-            // Get all the image details
-            /*
-            jsonFiles.forEach((file) => {
-              const filename = path.join(processedDir, subFolder, file)
-              if (fs.existsSync(filename)) {
-                const fileRaw = fs.readFileSync(filename, 'utf-8')
-                const fileJSON = JSON.parse(fileRaw)
-                if (fileJSON.images && fileJSON.images !== null) {
-                  let missingImage = true
-                  fileJSON.images.forEach((img) => {
-                    if (img.src) {
-                      const imgPath = path.join(imagePath, img.src)
-                      if (fs.existsSync(imgPath)) {
-                        missingImage = false
-                        console.log(imgPath)
-                      }
-                    }
-                  })
-                  if (missingImage) images.all.missingImage += 1
-                  images.all.hasImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    if (missingImage) images.sigg.missingImage += 1
-                    images.sigg.hasImage += 1
-                  }
-                } else {
-                  images.all.noImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    images.sigg.noImage += 1
-                  }
-                }
-              }
-            })
-            */
           })
         }
       })
@@ -356,106 +289,37 @@ exports.logs = async (req, res) => {
     req.templateValues.processingMainXML = processingRecords.hits.hits.map((record) => record._source)
   }
 
-  //  Check to see if we have log files
   /*
-  const rootDir = path.join(__dirname, '../../../logs/tms')
-  if (!fs.existsSync(rootDir)) {
-    return res.render('stats/logs', req.templateValues)
-  }
-  const logs = fs.readdirSync(rootDir).filter((file) => {
-    const fileSplit = file.split('.')
-    if (fileSplit.length !== 2) return false
-    if (fileSplit[1] !== 'log') return false
-    return true
-  })
-  const lastLog = logs.pop()
-
-  //  Now we want to get the 100 most recent
-  const last100Lines = []
-  const last100Upserted = {}
-
-  const types = [{
-    parent: 'Objects',
-    child: 'Object'
-  }, {
-    parent: 'Constituents',
-    child: 'Constituent'
-  }, {
-    parent: 'Exhibitions',
-    child: 'Exhibition'
-  }, {
-    parent: 'BibiolographicData',
-    child: 'Bibiolography'
-  }, {
-    parent: 'Events',
-    child: 'Event'
-  }, {
-    parent: 'Concepts',
-    child: 'Concept'
-  }]
-
-  const processingMainXML = []
-
-  const lr = new LineByLineReader(path.join(rootDir, lastLog))
-
-  lr.on('line', function (line) {
-    //  Split the line and get the data
-    const lineSplit = line.split(' [object]: ')
-    const timestamp = new Date(lineSplit[0])
-    const data = JSON.parse(lineSplit[1])
-    const logEntry = {
-      timestamp: timestamp,
-      data: data
-    }
-
-    //  we record all the entries here
-    last100Lines.push(logEntry)
-    if (last100Lines.length > 100) {
-      last100Lines.shift()
-    }
-    //  And the upserted items
-    types.forEach((type) => {
-      if (!last100Upserted[type.child]) {
-        last100Upserted[type.child] = {
-          items: [],
-          averageUpsertedms: 0
-        }
-      }
-      if (data.action && data.type && data.action === 'finished upsertTheItem' && data.type === type.child) {
-        last100Upserted[type.child].items.push(logEntry)
-        if (last100Upserted[type.child].items.length > 100) {
-          last100Upserted[type.child].items.shift()
-        }
-      }
-    })
-
-    if (data.action && data.action === 'finished processJsonFile') {
-      processingMainXML.push(logEntry)
-      if (processingMainXML.length > 100) {
-        processingMainXML.shift()
-      }
-    }
-  })
-
-  lr.on('end', function () {
-    req.templateValues.last100Lines = last100Lines.reverse()
-
-    //  Get the total ms spent uploading the images
-    types.forEach((type) => {
-      const objectsUpsertedms = last100Upserted[type.child].items.map((record) => {
-        return parseInt(record.data.ms, 10)
-      })
-      //  Get the average time to upsert an object
-      if (objectsUpsertedms.length > 0) {
-        last100Upserted[type.child].averageUpsertedms = Math.floor(objectsUpsertedms.reduce((p, c) => p + c, 0) / objectsUpsertedms.length)
-      }
-      last100Upserted[type.child].items = last100Upserted[type.child].items.reverse()
-    })
-    req.templateValues.processingMainXML = processingMainXML.reverse()
-    req.templateValues.last100Upserted = last100Upserted
-
-    return res.render('stats/logs', req.templateValues)
-  })
+  Now get the most recent graphQL logs
   */
+  const body = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'desc'
+      }
+    }],
+    query: {
+      bool: {
+        must: [{
+          match: {
+            initialCall: true
+          }
+        }]
+      }
+    }
+  }
+  const graphQLRecords = await esclient.search({
+    index: 'logs_mplus_graphql',
+    type,
+    body
+  })
+
+  if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.hits) {
+    req.templateValues.graphQLRecords = graphQLRecords.hits.hits.map((record) => record._source).map((record) => {
+      record.argsNice = JSON.stringify(record.args, null, 4)
+      return record
+    })
+  }
   return res.render('stats/logs', req.templateValues)
 }

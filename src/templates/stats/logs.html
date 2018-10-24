@@ -37,6 +37,10 @@
             <a href="#last{{@key}}">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
           </li>
         {{/each}}
+        <li>
+          <a href="#graphql">Last 100 GraphQL queries</a>
+        </li>
+
       </ul>
 
       <hr>
@@ -146,6 +150,39 @@
         </p>
       {{/each}}
 
+      <hr />
+
+      <h1 class="title">
+        <a name="graphql" class="hidename">Last 100 GraphQL queries</a>
+      </h1>
+      <p>
+        <table class="table is-striped is-fullwidth">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Method</th>
+              <th>Token</th>
+              <th>Vendor</th>
+              <th>Args</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each graphQLRecords}}
+              <tr {{#ifgt ms 200}} class="has-background-warning" {{/ifgt}}>
+                <td>{{timeAgo timestamp}}</td>
+                <td>{{method}}</td>
+                <td>{{context.token}}</td>
+                <td>{{context.isVendor}}</td>
+                <td>
+                  <pre class="query language-json" style="margin-bottom: 0 !important; padding: 4px; font-size: 120%">{{argsNice}}</pre>
+                </td>
+                <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
 
     </div>
   </section>
