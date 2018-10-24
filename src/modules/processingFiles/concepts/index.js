@@ -99,13 +99,6 @@ const processJsonFile = (tms, parentNode, childNode) => {
     //  See if the files exists in processed, if it doesn't then it's a new file
     let needToUpload = false
     if (!fs.existsSync(filename)) {
-      tmsLogger.object(`Creating process file for ${childNode} ${id} for ${tms}`, {
-        action: 'New file',
-        status: 'info',
-        type: childNode,
-        id,
-        tms
-      })
       newItems += 1
       needToUpload = true
     } else {
@@ -118,13 +111,6 @@ const processJsonFile = (tms, parentNode, childNode) => {
       if (thisItem !== processedFile) {
         //  Remove it from the processed fold, to force us to reupload it
         fs.unlinkSync(filename)
-        tmsLogger.object(`Removing old processed file for ${childNode} ${id} for ${tms}`, {
-          action: 'Modified item',
-          status: 'info',
-          type: childNode,
-          id,
-          tms
-        })
         modifiedItems += 1
         needToUpload = true
       }
@@ -149,13 +135,6 @@ const processJsonFile = (tms, parentNode, childNode) => {
       }
       const newFilename = path.join(rootDir, 'imports', parentNode, tms, 'process', subFolder, `${id}.json`)
       const processedFileJSONPretty = JSON.stringify(item, null, 4)
-      tmsLogger.object(`Creating new process file for ${childNode} ${id} for ${tms}`, {
-        action: 'Creating file',
-        status: 'info',
-        type: childNode,
-        id,
-        tms
-      })
       fs.writeFileSync(newFilename, processedFileJSONPretty, 'utf-8')
     }
   })

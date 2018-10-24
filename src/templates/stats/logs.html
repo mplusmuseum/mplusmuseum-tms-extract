@@ -37,6 +37,10 @@
             <a href="#last{{@key}}">Last 100 {{@key}} upserted (Average ms: {{prettyNumber averageUpsertedms}}ms)</a>
           </li>
         {{/each}}
+        <li>
+          <a href="#graphql">Last 100 GraphQL queries</a>
+        </li>
+
       </ul>
 
       <hr>
@@ -58,15 +62,15 @@
           </thead>
           <tbody>
             {{#each last100Lines}}
-              <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
-                {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
-                {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+              <tr {{#ifEqual status 'warning'}} class="has-background-warning" {{/ifEqual}} {{#ifEqual status 'ok'}}
+                class="has-background-success" {{/ifEqual}} {{#ifEqual status 'error'}} class="has-background-danger"
+                {{/ifEqual}}>
                 <td>{{timeAgo timestamp}}</td>
-                <td>{{data.action}}</td>
-                <td>{{data.status}}</td>
-                <td>{{data.type}}</td>
-                <td>{{data.message}}</td>
-                <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+                <td>{{action}}</td>
+                <td>{{status}}</td>
+                <td>{{type}}</td>
+                <td>{{#if message}}{{message}}{{else}}{{name}}{{/if}}</td>
+                <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
               </tr>
             {{/each}}
           </tbody>
@@ -94,17 +98,17 @@
           </thead>
           <tbody>
             {{#each processingMainXML}}
-              <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
-                {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
-                {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+              <tr {{#ifEqual status 'warning'}} class="has-background-warning" {{/ifEqual}} {{#ifEqual status 'ok'}}
+                class="has-background-success" {{/ifEqual}} {{#ifEqual status 'error'}} class="has-background-danger"
+                {{/ifEqual}}>
                 <td>{{timeAgo timestamp}}</td>
-                <td>{{data.action}}</td>
-                <td>{{data.status}}</td>
-                <td>{{data.type}}</td>
-                <td>{{data.newItems}}</td>
-                <td>{{data.modifiedItems}}</td>
-                <td>{{data.totalItems}}</td>
-                <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+                <td>{{action}}</td>
+                <td>{{status}}</td>
+                <td>{{type}}</td>
+                <td>{{newItems}}</td>
+                <td>{{modifiedItems}}</td>
+                <td>{{totalItems}}</td>
+                <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
               </tr>
             {{/each}}
           </tbody>
@@ -131,14 +135,14 @@
             </thead>
             <tbody>
               {{#each items}}
-                <tr {{#ifEqual data.status 'warning'}} class="has-background-warning" {{/ifEqual}}
-                  {{#ifEqual data.status 'ok'}} class="has-background-success" {{/ifEqual}}
-                  {{#ifEqual data.status 'error'}} class="has-background-danger" {{/ifEqual}}>
+                <tr {{#ifEqual status 'warning'}} class="has-background-warning" {{/ifEqual}} {{#ifEqual status 'ok'}}
+                  class="has-background-success" {{/ifEqual}} {{#ifEqual status 'error'}} class="has-background-danger"
+                  {{/ifEqual}}>
                   <td>{{timeAgo timestamp}}</td>
-                  <td>{{data.action}}</td>
-                  <td>{{data.status}}</td>
-                  <td>{{data.message}}</td>
-                  <td style="text-align: right">{{#if data.ms}}{{prettyNumber data.ms}}ms{{else}}&nbsp;{{/if}}</td>
+                  <td>{{action}}</td>
+                  <td>{{status}}</td>
+                  <td>{{message}}</td>
+                  <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
                 </tr>
               {{/each}}
             </tbody>
@@ -146,6 +150,39 @@
         </p>
       {{/each}}
 
+      <hr />
+
+      <h1 class="title">
+        <a name="graphql" class="hidename">Last 100 GraphQL queries</a>
+      </h1>
+      <p>
+        <table class="table is-striped is-fullwidth">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Method</th>
+              <th>Token</th>
+              <th>Vendor</th>
+              <th>Args</th>
+              <th>ms</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each graphQLRecords}}
+              <tr {{#ifgt ms 200}} class="has-background-warning" {{/ifgt}}>
+                <td>{{timeAgo timestamp}}</td>
+                <td>{{method}}</td>
+                <td>{{context.token}}</td>
+                <td>{{context.isVendor}}</td>
+                <td>
+                  <pre class="query language-json" style="margin-bottom: 0 !important; padding: 4px; font-size: 120%">{{argsNice}}</pre>
+                </td>
+                <td style="text-align: right">{{#if ms}}{{prettyNumber ms}}ms{{else}}&nbsp;{{/if}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </p>
 
     </div>
   </section>

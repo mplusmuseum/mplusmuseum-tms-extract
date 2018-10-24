@@ -1,7 +1,6 @@
 const Config = require('../../classes/config')
 const fs = require('fs')
 const path = require('path')
-const LineByLineReader = require('line-by-line')
 const elasticsearch = require('elasticsearch')
 
 exports.index = async (req, res) => {
@@ -91,39 +90,6 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].waitingToBeProcessed += jsonFiles.length
-
-            // Get all the image details
-            /*
-            jsonFiles.forEach((file) => {
-              const filename = path.join(processDir, subFolder, file)
-              if (fs.existsSync(filename)) {
-                const fileRaw = fs.readFileSync(filename, 'utf-8')
-                const fileJSON = JSON.parse(fileRaw)
-                if (fileJSON.images && fileJSON.images !== null) {
-                  let missingImage = true
-                  fileJSON.images.forEach((img) => {
-                    if (img.src) {
-                      const imgPath = path.join(imagePath, img.src)
-                      if (fs.existsSync(imgPath)) {
-                        missingImage = false
-                      }
-                    }
-                  })
-                  if (missingImage) images.all.missingImage += 1
-                  images.all.hasImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    if (missingImage) images.sigg.missingImage += 1
-                    images.sigg.hasImage += 1
-                  }
-                } else {
-                  images.all.noImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    images.sigg.noImage += 1
-                  }
-                }
-              }
-            })
-            */
           })
         }
         processingData[type.parent].timeToUpsert = processingData[type.parent].waitingToBeProcessed * 20000 // (20,000 ms is the default time between uploading)
@@ -145,40 +111,6 @@ exports.index = async (req, res) => {
               return true
             })
             processingData[type.parent].itemsProcessed += jsonFiles.length
-
-            // Get all the image details
-            /*
-            jsonFiles.forEach((file) => {
-              const filename = path.join(processedDir, subFolder, file)
-              if (fs.existsSync(filename)) {
-                const fileRaw = fs.readFileSync(filename, 'utf-8')
-                const fileJSON = JSON.parse(fileRaw)
-                if (fileJSON.images && fileJSON.images !== null) {
-                  let missingImage = true
-                  fileJSON.images.forEach((img) => {
-                    if (img.src) {
-                      const imgPath = path.join(imagePath, img.src)
-                      if (fs.existsSync(imgPath)) {
-                        missingImage = false
-                        console.log(imgPath)
-                      }
-                    }
-                  })
-                  if (missingImage) images.all.missingImage += 1
-                  images.all.hasImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    if (missingImage) images.sigg.missingImage += 1
-                    images.sigg.hasImage += 1
-                  }
-                } else {
-                  images.all.noImage += 1
-                  if (fileJSON.exhibition && fileJSON.exhibition.ids && fileJSON.exhibition.ids.includes(95)) {
-                    images.sigg.noImage += 1
-                  }
-                }
-              }
-            })
-            */
           })
         }
       })
@@ -253,27 +185,47 @@ exports.index = async (req, res) => {
   return res.render('stats/index', req.templateValues)
 }
 
-exports.logs = (req, res) => {
+exports.logs = async (req, res) => {
   if (req.user.roles.isAdmin !== true && req.user.roles.isStaff !== true) {
     return res.redirect('/')
   }
 
-  //  Check to see if we have log files
-  const rootDir = path.join(__dirname, '../../../logs/tms')
-  if (!fs.existsSync(rootDir)) {
-    return res.render('stats/logs', req.templateValues)
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = 'logs_mplus_tmsextract'
+  const type = 'log'
+  const basebody = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'desc'
+      }
+    }]
   }
-  const logs = fs.readdirSync(rootDir).filter((file) => {
-    const fileSplit = file.split('.')
-    if (fileSplit.length !== 2) return false
-    if (fileSplit[1] !== 'log') return false
-    return true
-  })
-  const lastLog = logs.pop()
 
-  //  Now we want to get the 100 most recent
-  const last100Lines = []
-  const last100Upserted = {}
+  const records = await esclient.search({
+    index,
+    type,
+    body: basebody
+  })
+  req.templateValues.last100Lines = null
+  if (records && records.hits && records.hits.hits) {
+    req.templateValues.last100Lines = records.hits.hits.map((record) => record._source)
+  }
+
+  req.templateValues.last100Upserted = {}
+
+  const upsertBody = JSON.parse(JSON.stringify(basebody))
+  upsertBody.query = {
+    bool: {
+      must: [{
+        term: {
+          'action.keyword': 'finished upsertTheItem'
+        }
+      }]
+    }
+  }
 
   const types = [{
     parent: 'Objects',
@@ -294,67 +246,80 @@ exports.logs = (req, res) => {
     parent: 'Concepts',
     child: 'Concept'
   }]
+  req.templateValues.last100Upserted = {}
 
-  const processingMainXML = []
-
-  const lr = new LineByLineReader(path.join(rootDir, lastLog))
-
-  lr.on('line', function (line) {
-    //  Split the line and get the data
-    const lineSplit = line.split(' [object]: ')
-    const timestamp = new Date(lineSplit[0])
-    const data = JSON.parse(lineSplit[1])
-    const logEntry = {
-      timestamp: timestamp,
-      data: data
-    }
-
-    //  we record all the entries here
-    last100Lines.push(logEntry)
-    if (last100Lines.length > 100) {
-      last100Lines.shift()
-    }
-    //  And the upserted items
-    types.forEach((type) => {
-      if (!last100Upserted[type.child]) {
-        last100Upserted[type.child] = {
-          items: [],
-          averageUpsertedms: 0
-        }
-      }
-      if (data.action && data.type && data.action === 'finished upsertTheItem' && data.type === type.child) {
-        last100Upserted[type.child].items.push(logEntry)
-        if (last100Upserted[type.child].items.length > 100) {
-          last100Upserted[type.child].items.shift()
-        }
+  for (const type of types) {
+    const upsertTypeBody = JSON.parse(JSON.stringify(upsertBody))
+    upsertTypeBody.query.bool.must.push({
+      match: {
+        'type': type.child
       }
     })
+    const upsertsRecords = await esclient.search({
+      index,
+      type: 'log',
+      body: upsertTypeBody
+    })
+    req.templateValues.last100Upserted[type.parent] = {}
+    if (upsertsRecords && upsertsRecords.hits && upsertsRecords.hits.hits) {
+      req.templateValues.last100Upserted[type.parent].items = upsertsRecords.hits.hits.map((record) => record._source)
+      const msArray = req.templateValues.last100Upserted[type.parent].items.map((record) => record.ms).filter(Boolean)
+      req.templateValues.last100Upserted[type.parent].averageUpsertedms = Math.floor(msArray.reduce((p, c) => p + c, 0) / msArray.length)
+      if (isNaN(req.templateValues.last100Upserted[type.parent].averageUpsertedms)) req.templateValues.last100Upserted[type.parent].averageUpsertedms = 0
+    }
+  }
 
-    if (data.action && data.action === 'finished processJsonFile') {
-      processingMainXML.push(logEntry)
-      if (processingMainXML.length > 100) {
-        processingMainXML.shift()
+  req.templateValues.processingMainXML = null
+  const processingBody = JSON.parse(JSON.stringify(basebody))
+  processingBody.query = {
+    bool: {
+      must: [{
+        term: {
+          'action.keyword': 'finished processJsonFile'
+        }
+      }]
+    }
+  }
+  const processingRecords = await esclient.search({
+    index,
+    type,
+    body: processingBody
+  })
+  if (processingRecords && processingRecords.hits && processingRecords.hits.hits) {
+    req.templateValues.processingMainXML = processingRecords.hits.hits.map((record) => record._source)
+  }
+
+  /*
+  Now get the most recent graphQL logs
+  */
+  const body = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'desc'
+      }
+    }],
+    query: {
+      bool: {
+        must: [{
+          match: {
+            initialCall: true
+          }
+        }]
       }
     }
+  }
+  const graphQLRecords = await esclient.search({
+    index: 'logs_mplus_graphql',
+    type,
+    body
   })
 
-  lr.on('end', function () {
-    req.templateValues.last100Lines = last100Lines.reverse()
-
-    //  Get the total ms spent uploading the images
-    types.forEach((type) => {
-      const objectsUpsertedms = last100Upserted[type.child].items.map((record) => {
-        return parseInt(record.data.ms, 10)
-      })
-      //  Get the average time to upsert an object
-      if (objectsUpsertedms.length > 0) {
-        last100Upserted[type.child].averageUpsertedms = Math.floor(objectsUpsertedms.reduce((p, c) => p + c, 0) / objectsUpsertedms.length)
-      }
-      last100Upserted[type.child].items = last100Upserted[type.child].items.reverse()
+  if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.hits) {
+    req.templateValues.graphQLRecords = graphQLRecords.hits.hits.map((record) => record._source).map((record) => {
+      record.argsNice = JSON.stringify(record.args, null, 4)
+      return record
     })
-    req.templateValues.processingMainXML = processingMainXML.reverse()
-    req.templateValues.last100Upserted = last100Upserted
-
-    return res.render('stats/logs', req.templateValues)
-  })
+  }
+  return res.render('stats/logs', req.templateValues)
 }

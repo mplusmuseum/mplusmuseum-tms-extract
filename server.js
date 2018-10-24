@@ -97,6 +97,12 @@ if ('skipBuild' in argOptions && argOptions.skipBuild === true) {
   skipBuild = true
 }
 
+let buildOnly = false
+if ('buildOnly' in argOptions && argOptions.buildOnly === true) {
+  buildOnly = true
+  skipBuild = false
+}
+
 /*
  * Check to see if the `.env` file exists, if not we need ask the user questions
  * to create it
@@ -418,6 +424,29 @@ if ('skipOpen' in argOptions && argOptions.skipOpen === true) {
   skipOpen = true
 }
 
+process.on('uncaughtException', err => {
+  if (err.errno === 'EADDRINUSE') {
+    console.log('')
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('')
+    console.log('                 DON\'T PANIC'.bold)
+    console.log('')
+    console.log('The server did not shut down properly last time'.warn)
+    console.log('  please try starting it up again, everything'.warn)
+    console.log('      sould be cleaned up now, thank you.'.warn)
+    console.log('')
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+    console.log('')
+  }
+  process.exit()
+})
+
+if (buildOnly === false) {
+  http.createServer(app).listen(process.env.PORT)
+}
+
 //  If we are on the dev server and we aren't restarting with a
 //  build skip, then start up a browser to get the user going.
 //  If we don't have any Auth0 stuff in place yet we also need
@@ -459,105 +488,60 @@ if (process.env.NODE_ENV === 'development') {
   }
 }
 
-process.on('uncaughtException', err => {
-  if (err.errno === 'EADDRINUSE') {
-    console.log('')
-    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-    console.log('')
-    console.log('                 DON\'T PANIC'.bold)
-    console.log('')
-    console.log('The server did not shut down properly last time'.warn)
-    console.log('  please try starting it up again, everything'.warn)
-    console.log('      sould be cleaned up now, thank you.'.warn)
-    console.log('')
-    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-    console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-    console.log('')
-  }
+if (buildOnly === false) {
+  //  Now we kick off the regular tasks that do things periodically
+  //  kinda like cron jobs
+  const pingtools = require('./app/modules/pingtools')
+  pingtools.startPingingGraphQL()
+  pingtools.startPingingES()
+  const logging = require('./app/modules/logging')
+  logging.startCulling()
+  logging.createIndex()
+
+  //  This starts making objects perfect
+  const perfectObjects = require('./app/modules/processingFiles/objects')
+  perfectObjects.startMakingPerfect()
+  const perfectConstituents = require('./app/modules/processingFiles/constituents')
+  perfectConstituents.startMakingPerfect()
+  const perfectExhibitions = require('./app/modules/processingFiles/exhibitions')
+  perfectExhibitions.startMakingPerfect()
+  const perfectConcepts = require('./app/modules/processingFiles/concepts')
+  perfectConcepts.startMakingPerfect()
+
+  const processAll = require('./app/modules/processingFiles')
+  processAll.startProcessingMainXml()
+
+  //  This starts off checking for items to upload to elastic search
+  const elasticsearch = require('./app/modules/elasticsearch')
+  elasticsearch.startUpserting()
+
+  //  This starts off checking for images to upload to elastic search
+  const auth0Users = require('./app/modules/auth0')
+  auth0Users.startGettingAllUserTokens()
+
+  //  This starts checking for images to upload
+  const cloudinary = require('./app/modules/cloudinary')
+  cloudinary.startUploading()
+  cloudinary.startColoring()
+
+  console.log('')
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+  console.log('')
+  console.log('                 SERVER STARTED'.bold)
+  console.log('')
+  console.log('           Everything is up and running'.info)
+  console.log('')
+  console.log(`    The process id for the server is ${process.pid}, use`.info)
+  console.log(`                 'kill -9 ${process.pid}'`.bold)
+  console.log('         should you wish to force stop it'.info)
+  console.log('')
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+  console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
+  console.log('')
+
+  fs.writeFileSync(pidFile, process.pid, 'utf-8')
+} else {
+  console.log('All built')
   process.exit()
-})
-
-http.createServer(app).listen(process.env.PORT)
-
-//  Now we kick off the regular tasks that do things periodically
-//  kinda like cron jobs
-const pingtools = require('./app/modules/pingtools')
-pingtools.startPingingGraphQL()
-pingtools.startPingingES()
-
-//  This starts making objects perfect
-const perfectObjects = require('./app/modules/processingFiles/objects')
-perfectObjects.startMakingPerfect()
-const perfectConstituents = require('./app/modules/processingFiles/constituents')
-perfectConstituents.startMakingPerfect()
-const perfectExhibitions = require('./app/modules/processingFiles/exhibitions')
-perfectExhibitions.startMakingPerfect()
-const perfectConcepts = require('./app/modules/processingFiles/concepts')
-perfectConcepts.startMakingPerfect()
-
-const processAll = require('./app/modules/processingFiles')
-processAll.startProcessingMainXml()
-
-//  This starts off checking for items to upload to elastic search
-const elasticsearch = require('./app/modules/elasticsearch')
-elasticsearch.startUpserting()
-
-//  This starts off checking for images to upload to elastic search
-const auth0Users = require('./app/modules/auth0')
-auth0Users.startGettingAllUserTokens()
-
-//  This starts checking for images to upload
-const cloudinary = require('./app/modules/cloudinary')
-cloudinary.startUploading()
-cloudinary.startColoring()
-
-console.log('')
-console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-console.log('')
-console.log('                 SERVER STARTED'.bold)
-console.log('')
-console.log('           Everything is up and running'.info)
-console.log('')
-console.log(`    The process id for the server is ${process.pid}, use`.info)
-console.log(`                 'kill -9 ${process.pid}'`.bold)
-console.log('         should you wish to force stop it'.info)
-console.log('')
-console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
-console.log('')
-
-fs.writeFileSync(pidFile, process.pid, 'utf-8')
-
-//  Now we kick off the regular tasks that do things periodically
-//  kinda like cron jobs
-/*
-const tools = require('./app/modules/tools')
-const tmsxml2json = require('./app/cli/tmsxml2json')
-const getjsonfields = require('./app/cli/getjsonfields')
-
-//  This is where we are going to do some extra checking
-tools.startPinging()
-
-setInterval(() => {
-  tmsxml2json.start()
-}, 1000 * 60 * 60 * 4) // Check every fours hours, starts after four hours.
-
-//  And we are going to kick off the field checking too
-if (process.env.NODE_ENV !== 'DEV') {
-  const checkFields = async function () {
-    const config = tools.getConfig()
-    if ('xml' in config) {
-      config.xml.forEach(xml => {
-        getjsonfields.start(xml.index, true)
-      })
-    }
-    return true
-  }
-  setInterval(() => {
-    tmsxml2json.checkFields()
-  }, 1000 * 60 * 60 * 24) // Check every fours hours, starts after four hours.
-  checkFields()
 }
-*/
