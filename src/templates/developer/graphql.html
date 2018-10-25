@@ -139,6 +139,20 @@
             <ul class="toc">
               <li>
                 <a href="#sigg-online">How to get started with Exhibitions and so on</a>
+                <ul>
+                  <li>
+                    <a href="#sigg-online-rights">Object Rights</a>
+                  </li>
+                  <li>
+                    <a href="#sigg-online-concepts">Concepts</a>
+                  </li>
+                  <li>
+                    <a href="#sigg-online-exhibitions">Exhibitions</a>
+                  </li>
+                  <li>
+                    <a href="#sigg-online-timeline">Timeline</a>
+                  </li>
+                </ul>
               </li>
             </ul>
 
@@ -772,7 +786,7 @@
       </p>
 
       <p>Image urls use the following format
-        <code>http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v[version]/[public_id].[format]</code>
+        <code>http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v[version]/[public_id].jpg</code>
       </p>
 
       <p>
@@ -814,7 +828,18 @@
           concepts which are Artists and Artist Groups, and Exhibitions.
         </p>
 
-        <h3 class="title is-5">Concepts</h3>
+        <h3 class="title is-5"><a class="hidename" name="sigg-online-rights">Object Rights</a></h3>
+
+        <p>As a vendor you have access to an extra field on the object that tells you the rights for displaying that
+          object based on who you are. In the future you access to the objects will be filtered by the server, but for
+          now you will have to check the rights here.</p>
+
+        <p class="runinexplore no-bottom">
+          <a href='{{exploreQuery queries.objectsRights "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
+        </p>
+        <pre class="query language-graphql">{{{graphQLQuery queries.objectsRights ''}}}</pre>
+
+        <h3 class="title is-5"><a class="hidename" name="sigg-online-concepts">Concepts</a></h3>
 
         <p>To get all concepts you used a query such as</p>
 
@@ -857,7 +882,7 @@
         </p>
         <pre class="query language-graphql">{{{graphQLQuery queries.objectsMediumWithConcepts '(concept: 5, per_page:2, page:0)'}}}</pre>
 
-        <h3 class="title is-5">Exhibitions</h3>
+        <h3 class="title is-5"><a class="hidename" name="sigg-online-exhibitions">Exhibitions</a></h3>
         <p>
           Exhibitions work the same way, you can get all exhibitions...
         </p>
@@ -892,7 +917,7 @@
           match the labels and bios with the exhibition using the "purpose" label.
         </p>
 
-        <h3 class="title is-4">Timeline</h3>
+        <h3 class="title is-4"><a class="hidename" name="sigg-online-timeline">Timeline</a></h3>
 
         <p>
           There is a single call you can make to fetch the timeline related to Sigg. You can filter the language by

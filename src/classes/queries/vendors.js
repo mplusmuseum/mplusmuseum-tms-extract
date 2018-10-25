@@ -268,6 +268,24 @@ class Queries {
   }
 }`
 
+    this.objectsRights = `query {
+  objects[[]] {
+    id
+    objectNumber
+    title
+    objectRights {
+      type
+      copyright
+      concatRights
+      concatRemark
+      currentStatus
+      rights {
+        title
+        group
+      }
+    }
+  }
+}`
     this.objectsConstituentMini = `query {
   objects[[]] {
     id
