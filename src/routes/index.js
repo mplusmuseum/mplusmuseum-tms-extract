@@ -263,5 +263,6 @@ router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.inde
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)
+router.post('/api/ping', api.ping)
 
 module.exports = router
