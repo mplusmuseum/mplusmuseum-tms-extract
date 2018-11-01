@@ -32,11 +32,12 @@
             <th>Contact</th>
             <th>Login Count</th>
             <th>Last Login</th>
-            <th>Developer</th>
-            <th>Vendor</th>
-            <th>Staff</th>
-            <th>Admin</th>
+            <th>D</th>
+            <th>V</th>
+            <th>S</th>
+            <th>A</th>
             <th>Created</th>
+            <th>Token</th>
           </tr>
         </thead>
         <tbody>
@@ -100,6 +101,9 @@
               <td>
                 {{timeAgo created_at}}
               </td>
+              <td>
+                {{user_metadata.apitoken}}
+              </td>
             </tr>
           {{/each}}
         </tbody>
@@ -110,14 +114,21 @@
             <th>Contact</th>
             <th>Login Count</th>
             <th>Last Login</th>
-            <th>Developer</th>
-            <th>Vendor</th>
-            <th>Staff</th>
-            <th>Admin</th>
+            <th>D</th>
+            <th>V</th>
+            <th>S</th>
+            <th>A</th>
             <th>Created</th>
+            <th>Token</th>
           </tr>
         </tfoot>
       </table>
+    </div>
+    <div class="container documentation">
+      D = Developer<br />
+      V = Vendor<br />
+      S = Staff<br />
+      A = Admin<br />
     </div>
   </section>
 
