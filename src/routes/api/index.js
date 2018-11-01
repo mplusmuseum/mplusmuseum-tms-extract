@@ -188,3 +188,19 @@ exports.checkToken = async (req, res) => {
   res.setHeader('Content-Type', 'application/json')
   res.send(JSON.stringify(rtnJSON))
 }
+
+exports.ping = async (req, res) => {
+  //  Check to see if we have a valid call
+  const isValid = await validate(req, res)
+
+  if (isValid === false) {
+    return
+  }
+
+  const rtnJSON = {
+    status: 'ok',
+    msg: `ping`
+  }
+  res.setHeader('Content-Type', 'application/json')
+  res.send(JSON.stringify(rtnJSON))
+}
