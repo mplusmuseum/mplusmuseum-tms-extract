@@ -524,6 +524,10 @@ if (buildOnly === false) {
   cloudinary.startUploading()
   cloudinary.startColoring()
 
+  //  Make the lookup tables we'll need
+  const makeLookups = require('./app/modules/makeLookups')
+  makeLookups.constituentRoles.startFindConstituentRoles()
+
   console.log('')
   console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
   console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
