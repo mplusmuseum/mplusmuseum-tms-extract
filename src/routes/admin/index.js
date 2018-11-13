@@ -8,6 +8,7 @@ const processingFiles = require('../../modules/processingFiles')
 const elasticsearch = require('elasticsearch')
 const myElasticsearch = require('../../modules/elasticsearch')
 const rootDir = path.join(__dirname, '../../../data')
+const constituentMakers = require('../../modules/makeLookups/constituentMakers')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
@@ -171,6 +172,12 @@ exports.isMakers = async (req, res) => {
         type,
         body: bulkThisArray
       })
+      // Note that we want to rebuld the constituents
+      setTimeout(() => {
+        constituentMakers.updateConstituentsAsMakers(tms)
+      }, 5000)
+      //  And redirect back to this page
+      return res.redirect('/admin/isMakers')
     }
   }
 
@@ -190,7 +197,11 @@ exports.isMakers = async (req, res) => {
   }
   if (records !== null && records.hits && records.hits.hits) {
     const dbMakers = records.hits.hits.map((record) => record._source)
-    console.log(dbMakers)
+    records = {}
+    dbMakers.forEach((maker) => {
+      records[maker.id] = false
+      if (maker.value === 'true') records[maker.id] = true
+    })
   } else {
     records = {}
   }
@@ -220,7 +231,7 @@ exports.isMakers = async (req, res) => {
                 if (!(thisRole in makers)) {
                   makers[thisRole] = false
                 }
-                if (thisRole in records && records.thisRole === true) {
+                if (thisRole in records && records[thisRole] === true) {
                   makers[thisRole] = true
                 }
               })
@@ -230,6 +241,8 @@ exports.isMakers = async (req, res) => {
       })
     })
   }
+
+  //  Convert the makers into a form that's easier for the template to handle
   req.templateValues.isMakers = []
   Object.entries(makers).forEach((maker) => {
     req.templateValues.isMakers.push({
