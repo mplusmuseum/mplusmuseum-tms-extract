@@ -102,7 +102,6 @@ const findConstituentRoles = async (tms) => {
     const id = parseInt(roleRecord[0], 10)
     const record = roleRecord[1]
     Object.entries(record.role).forEach((langRole) => {
-      console.log(langRole)
       const lang = langRole[0]
       const roles = langRole[1]
       Object.entries(roles).forEach((roleCount) => {
@@ -148,7 +147,6 @@ const findConstituentRoles = async (tms) => {
       ms: new Date().getTime() - startTime
     })
   })
-  console.log(roleNames)
 }
 exports.findConstituentRoles = findConstituentRoles
 

@@ -1,3 +1,5 @@
+const fs = require('fs')
+const path = require('path')
 const User = require('../../classes/user')
 const Users = require('../../classes/users')
 const Config = require('../../classes/config')
@@ -5,6 +7,7 @@ const logging = require('../../modules/logging')
 const processingFiles = require('../../modules/processingFiles')
 const elasticsearch = require('elasticsearch')
 const myElasticsearch = require('../../modules/elasticsearch')
+const rootDir = path.join(__dirname, '../../../data')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
@@ -99,4 +102,141 @@ exports.blowaway = async (req, res) => {
 exports.aggrigateObjects = async (req, res) => {
   myElasticsearch.aggregateObjects(req.params.tms)
   return res.redirect('/admin')
+}
+
+exports.isMakers = async (req, res) => {
+  //  TODO: remove this hardcoded TMS system and get it dynamically
+  const tms = 'mplus'
+
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  //  Start the logger
+  const tmsLogger = logging.getTMSLogger()
+
+  tmsLogger.object(`starting admin.isMakers`, {
+    action: 'start admin.isMakers',
+    status: 'info'
+  })
+
+  const startTime = new Date().getTime()
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  if (elasticsearchConfig === null) {
+    tmsLogger.object(`No elasticsearch configured`, {
+      action: 'finished admin.isMakers',
+      status: 'info',
+      tms,
+      ms: new Date().getTime() - startTime
+    })
+    return res.render('admin/isMakers', req.templateValues)
+  }
+
+  //  Now go and fetch all the isMakers data
+  const index = `config_ismakers_${tms}`
+  const type = `config_isMaker`
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists !== true) {
+    await esclient.indices.create({
+      index
+    })
+  }
+
+  //  Now see if we've been passed new maker data to go and update
+  if (req.body.action) {
+    const bulkThisArray = []
+    Object.entries(req.body).forEach((record) => {
+      const recordSplit = record[0].split('_')
+      if (recordSplit.length !== 2 || recordSplit[0] !== 'maker') return
+      const maker = recordSplit[1]
+      const value = record[1]
+      bulkThisArray.push({
+        index: {
+          _id: maker
+        }
+      })
+      bulkThisArray.push({
+        id: maker,
+        value
+      })
+    })
+    if (bulkThisArray.length > 0) {
+      await esclient.bulk({
+        index,
+        type,
+        body: bulkThisArray
+      })
+    }
+  }
+
+  //  Go and get the data we've previous stored about what is a "maker" and what isn't
+  const body = {
+    size: 100
+  }
+  let records = null
+  try {
+    records = await esclient.search({
+      index,
+      type,
+      body
+    })
+  } catch (er) {
+    records = null
+  }
+  if (records !== null && records.hits && records.hits.hits) {
+    const dbMakers = records.hits.hits.map((record) => record._source)
+    console.log(dbMakers)
+  } else {
+    records = {}
+  }
+
+  //  Now loop through all the objects getting all the different type
+  //  of makers
+  const makers = {}
+  const tmsProcessedDir = path.join(rootDir, 'imports', 'Objects', tms, 'processed')
+  if (fs.existsSync(tmsProcessedDir)) {
+    const subFolders = fs.readdirSync(tmsProcessedDir)
+    subFolders.forEach((subFolder) => {
+      const files = fs.readdirSync(path.join(tmsProcessedDir, subFolder)).filter(file => {
+        const fileFragments = file.split('.')
+        if (fileFragments.length !== 2) return false
+        if (fileFragments[1] !== 'json') return false
+        return true
+      })
+      files.forEach((file) => {
+        const objectRaw = fs.readFileSync(path.join(tmsProcessedDir, subFolder, file), 'utf-8')
+        const objectJSON = JSON.parse(objectRaw)
+        if (objectJSON.consituents && objectJSON.consituents.idsToRoleRank) {
+          const objectsRoles = JSON.parse(objectJSON.consituents.idsToRoleRank)
+          objectsRoles.forEach((role) => {
+            if (role.roles) {
+              Object.entries(role.roles).forEach((langRole) => {
+                const thisRole = langRole[1]
+                if (!(thisRole in makers)) {
+                  makers[thisRole] = false
+                }
+                if (thisRole in records && records.thisRole === true) {
+                  makers[thisRole] = true
+                }
+              })
+            }
+          })
+        }
+      })
+    })
+  }
+  req.templateValues.isMakers = []
+  Object.entries(makers).forEach((maker) => {
+    req.templateValues.isMakers.push({
+      maker: maker[0],
+      value: maker[1]
+    })
+  })
+
+  return res.render('admin/isMakers', req.templateValues)
 }

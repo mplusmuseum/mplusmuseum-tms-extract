@@ -247,6 +247,8 @@ router.post('/:lang/admin/aggregate/:tms', ensureLoggedIn, admin.aggrigateObject
 router.get('/:lang/admin/users', ensureLoggedIn, admin.users)
 router.get('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
 router.post('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
+router.get('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
+router.post('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.get('/:lang/developer', ensureLoggedIn, developer.index)
 router.get('/:lang/developer/graphql', ensureLoggedIn, developer.graphql)
 router.get('/:lang/developer/terms', developer.terms)
