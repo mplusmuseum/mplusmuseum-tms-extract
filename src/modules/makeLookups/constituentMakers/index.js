@@ -120,21 +120,22 @@ exports.updateConstituentsAsMakers = async (tms) => {
     const id = constituent[0]
     const data = constituent[1]
     bulkThisArray.push({
-      index: {
+      update: {
         _id: id
       }
     })
     bulkThisArray.push({
-      id: id,
-      isMaker: data.isMaker,
-      objectCount: data.objectCount
+      doc: {
+        isMaker: data.isMaker,
+        objectCount: data.objectCount
+      }
     })
-    if (bulkThisArray.length > 0) {
-      esclient.bulk({
-        index: `constituents_${tms}`,
-        type: 'constituent',
-        body: bulkThisArray
-      })
-    }
   })
+  if (bulkThisArray.length > 0) {
+    esclient.bulk({
+      index: `constituents_${tms}`,
+      type: 'constituent',
+      body: bulkThisArray
+    })
+  }
 }
