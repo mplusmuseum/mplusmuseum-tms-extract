@@ -23,13 +23,13 @@
   </section>
 
   {{#if notification}}
-  <section class="section">
-    <div class="container">
-      <div class="notification is-{{notification.type}}">
-        {{notification.msg}}
+    <section class="section">
+      <div class="container">
+        <div class="notification is-{{notification.type}}">
+          {{notification.msg}}
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
   {{/if}}
 
   <section class="section">
@@ -37,6 +37,9 @@
       <ul>
         <li>
           <a href="/admin/users">Users</a>
+        </li>
+        <li>
+          <a href="/admin/isMakers">isMakers</a>
         </li>
       </ul>
 
@@ -51,12 +54,12 @@
 
       <ul>
         {{#each config.tms}}
-        <li>
-          <form method="POST" action="/{{../selectedLang}}/admin">
-            <input type="hidden" name="tms" value="{{stub}}" />
-            <button class="button is-primary" type="submit" name="action" value="reimport">Reimport {{stub}} XML file</button>
-          </form>
-        </li>
+          <li>
+            <form method="POST" action="/{{../selectedLang}}/admin">
+              <input type="hidden" name="tms" value="{{stub}}" />
+              <button class="button is-primary" type="submit" name="action" value="reimport">Reimport {{stub}} XML file</button>
+            </form>
+          </li>
         {{/each}}
       </ul>
       <hr />

@@ -102,7 +102,6 @@ const findConstituentRoles = async (tms) => {
     const id = parseInt(roleRecord[0], 10)
     const record = roleRecord[1]
     Object.entries(record.role).forEach((langRole) => {
-      console.log(langRole)
       const lang = langRole[0]
       const roles = langRole[1]
       Object.entries(roles).forEach((roleCount) => {
@@ -148,7 +147,6 @@ const findConstituentRoles = async (tms) => {
       ms: new Date().getTime() - startTime
     })
   })
-  console.log(roleNames)
 }
 exports.findConstituentRoles = findConstituentRoles
 
@@ -177,29 +175,3 @@ exports.startFindConstituentRoles = () => {
     status: 'info'
   })
 }
-
-/*
-Artist: 6005
-Architectural Firm: 1327
-Architect: 1271
-Designer: 922
-Publisher: 467
-Manufacturer: 431
-Maker: 270
-Subject: 270
-Photographer: 268
-Commissioned by: 180
-Archive Creator: 160
-Design Firm: 157
-Author: 148
-Art Director: 21
-Filmmaker: 19
-Designer/Producer: 9
-Printer: 7
-Production Company: 7
-Developer: 7
-Translator: 1
-Producer: 1
-Engineer: 1
-Organiser: 1
-*/

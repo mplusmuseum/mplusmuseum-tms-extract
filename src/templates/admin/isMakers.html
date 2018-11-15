@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Admin - isMakers
+        </h1>
+        <h2 class="subtitle is-3">
+          Here we mark what counts and doesn't count as a "maker" for the constituents
+        </h2>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section">
+    <div class="container documentation">
+      <h2 class="title">Which of these things are actual makers?</h2>
+      <form method="POST">
+        {{#each isMakers}}
+          <div class="control columns">
+            <div class="column is-one-quarter">
+              {{maker}} - {{value}}
+            </div>
+            <div class="column">
+              <label class="radio">
+                <input type="radio" name="maker_{{maker}}" value=true {{#if value}} checked{{/if}}> Yes </label> <label
+                  class="radio">
+                <input type="radio" name="maker_{{maker}}" value=false {{#unless value}} checked{{/unless}}> No </label>
+                  </div> </div> {{/each}} <div class="control">
+                <button class="button is-primary" name="action" value="updateMakers">Update makers</button>
+            </div>
+      </form>
+      <hr />
+    </div>
+  </section>
+
+  {{> tail}}
+</body>
+
+</html>
