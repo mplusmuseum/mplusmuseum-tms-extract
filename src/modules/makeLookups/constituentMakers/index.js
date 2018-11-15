@@ -96,7 +96,8 @@ exports.updateConstituentsAsMakers = async (tms) => {
             if (!(role.id in constituents)) {
               constituents[role.id] = {
                 isMaker: false,
-                objectCount: 0
+                objectCount: 0,
+                roles: []
               }
             }
             constituents[role.id].objectCount++ // Tally up the number of objects "made" by this constituent
@@ -106,6 +107,10 @@ exports.updateConstituentsAsMakers = async (tms) => {
                 const thisRole = langRole[1]
                 if (thisRole in records && records[thisRole] === true) {
                   constituents[role.id].isMaker = true // Mark the constituent as a "maker"
+                }
+                //  If this role isn't in the list of roles yet, then add it
+                if (!constituents[role.id].roles.includes(thisRole)) {
+                  constituents[role.id].roles.push(thisRole)
                 }
               })
             }
@@ -127,7 +132,8 @@ exports.updateConstituentsAsMakers = async (tms) => {
     bulkThisArray.push({
       doc: {
         isMaker: data.isMaker,
-        objectCount: data.objectCount
+        objectCount: data.objectCount,
+        roles: data.roles
       }
     })
   })
