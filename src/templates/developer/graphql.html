@@ -115,10 +115,16 @@
                   <li>
                     <a href="#constituents-fetchingbyids">{{i18n.documentation.fetchingbyids}}</a>
                   </li>
+                  <li>
+                    <a href="#constituents-fetchingbyroles">Fetching by roles example</a>
+                  </li>
                 </ul>
               </li>
               <li>
                 <a href="#constituent">{{i18n.documentation.constituent}}</a>
+              </li>
+              <li>
+                <a href="#constituentRoles">Constituent Roles</a>
               </li>
               <li>
                 <a href="#nesting">{{i18n.documentation.nesting}}</a>
@@ -675,6 +681,54 @@
       <p class="subtitle is-5 no-bottom"> {{i18n.documentation.nodejs}}
       </p>
       <pre class="query language-javascript">{{{nodeQuery queries.constituents '(ids:[238, 382, 459, 608], lang: "zh-hant")' config.graphql.host user.apitoken}}}</pre>
+
+      <hr />
+
+      <h3 class="title is-4">
+        <a class="hidename" name="constituents-fetchingbyroles">Fetching by roles example</a>
+      </h3>
+
+      <p>
+        If you wanted to find all the "Artists" constituents ordered by the ones who had the most objects in the <em>whole</em>
+        system, then you can do it with the following query.
+      </p>
+
+      <p class="runinexplore no-bottom">
+        <a href='{{exploreQuery queries.constituents "(role:\"Artist\", isMaker:true, sort_field: \"objectCount\", sort:\"desc\")" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
+      </p>
+      <pre class="query language-graphql">{{{graphQLQuery queries.constituents '(role:"Artist", isMaker:true, sort_field: "objectCount", sort:"desc")'}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.curl}}
+      </p>
+      <pre class="query language-bash">{{{curlQuery queries.constituents '(role:\\\"Artist\\\", isMaker:true, sort_field: \\\"objectCount\\\", sort:\\\"desc\\\")' config.graphql.host user.apitoken}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.nodejs}}
+      </p>
+      <pre class="query language-javascript">{{{nodeQuery queries.constituents '(role:"Artist", isMaker:true, sort_field: "objectCount", sort:"desc")' config.graphql.host user.apitoken}}}</pre>
+
+      <hr />
+
+      <h3 class="title is-4">
+        <a class="hidename" name="constituentRoles">Constituent Roles</a>
+      </h3>
+
+      <p>
+        You can get a list of all the "Types" of constituent using the following query. Note, this allows you to filter
+        constituents by a single type
+      </p>
+
+      <p class="runinexplore no-bottom">
+        <a href='{{exploreQuery queries.constituentTypes "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
+      </p>
+      <pre class="query language-graphql">{{{graphQLQuery queries.constituentTypes ''}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.curl}}
+      </p>
+      <pre class="query language-bash">{{{curlQuery queries.constituentTypes '' config.graphql.host user.apitoken}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.nodejs}}
+      </p>
+      <pre class="query language-javascript">{{{nodeQuery queries.constituentTypes '' config.graphql.host user.apitoken}}}</pre>
 
       <hr />
 
