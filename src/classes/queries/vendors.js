@@ -315,6 +315,9 @@ class Queries {
     beginDate
     nationality
     type
+    roles
+    isMaker
+    objectCount
   }
 }`
     this.constituent = `query {
@@ -339,6 +342,12 @@ class Queries {
         category
       }
     }
+  }
+}`
+
+    this.constituentTypes = `query {
+  makertypes[[]] {
+    title
   }
 }`
 
