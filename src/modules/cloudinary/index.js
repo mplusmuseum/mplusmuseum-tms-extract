@@ -7,6 +7,54 @@ const cloudinary = require('cloudinary')
 const logging = require('../logging')
 const elasticsearch = require('elasticsearch')
 
+const hexToRgb = (hex) => {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null
+}
+
+const rgbToHsl = (rgb) => {
+  const r = rgb.r / 255
+  const g = rgb.g / 255
+  const b = rgb.b / 255
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h
+  let s
+  const l = (max + min) / 2
+
+  if (max === min) {
+    h = s = 0 // achromatic
+  } else {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0)
+        break
+      case g:
+        h = (b - r) / d + 2
+        break
+      case b:
+        h = (r - g) / d + 4
+        break
+    }
+
+    h /= 6
+  }
+
+  return [h, s, l]
+}
+
+const hexToHsl = (hex) => {
+  return rgbToHsl(hexToRgb(hex))
+}
+
 /**
  * This method tries to grab a record of an object that has an image that needs
  * uploading and has a go at uploading, if it manages it then it puts the resulting
@@ -280,12 +328,8 @@ const checkImages = () => {
 }
 
 /**
- * This method tries to grab a record of an object that has an image that needs
- * uploading and has a go at uploading, if it manages it then it puts the resulting
- * information back into the perfect file, otherwise it needs to mark it as failed
- * somehow
- * @param {String} stub The name of the TMS folder we are going to look in
- * @param {String} id The id of the object we want to upload
+ * This method tries to find images that have been uploaded and then grab the colour
+ * information
  */
 const colorImage = (type, tms, id, imageId) => {
   const config = new Config()
@@ -586,6 +630,123 @@ const checkImagesColor = () => {
   })
 }
 
+/**
+ * This function looks for images that have colour information but don't
+ * have HSL data yet
+ */
+const checkImagesHSL = () => {
+  const config = new Config()
+  const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`Looking for images to HBL convert`, {
+    action: 'started checkImagesHSL',
+    status: 'info'
+  })
+
+  const elements = [{
+    parent: 'Objects',
+    child: 'Object'
+  }]
+
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null || elasticsearchConfig === undefined) {
+    tmsLogger.object(`No elasticsearch defined`, {
+      action: 'finished checkImagesHSL',
+      status: 'info',
+      ms: new Date().getTime() - startTime
+    })
+    return
+  }
+
+  elements.forEach((element) => {
+    //  Only carry on if we have a data and tms directory
+    const itemPath = path.join(rootDir, 'imports', element.parent)
+    if (!fs.existsSync(itemPath)) {
+      tmsLogger.object(`looking for: ${element.parent}`, {
+        action: 'finished checkImagesHSL',
+        status: 'error',
+        element: element.parent,
+        itemPath,
+        ms: new Date().getTime() - startTime
+      })
+      return
+    }
+    let foundImageToHSL = false
+    const tmsses = config.tms
+    tmsses.forEach((tms) => {
+      if (foundImageToHSL === true) return
+      //  Check to see if a 'perfect' directory exists
+      const tmsDir = path.join(itemPath, tms.stub, 'perfect')
+      if (fs.existsSync(tmsDir)) {
+        if (foundImageToHSL === true) return
+        const subFolders = fs.readdirSync(tmsDir)
+        //  Loop through the subFolders
+        subFolders.forEach((subFolder) => {
+          if (foundImageToHSL === true) return
+          const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
+            const fileFragments = file.split('.')
+            if (fileFragments.length !== 2) return false
+            if (fileFragments[1] !== 'json') return false
+            return true
+          })
+          //  Loop through the files
+          files.forEach((file) => {
+            if (foundImageToHSL === true) return
+            const perfectFilename = path.join(tmsDir, subFolder, file)
+            const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
+            const perfectFileJSON = JSON.parse(perfectFileRaw)
+            //  If we have a perfect file with color info but not HSL then we need to
+            //  do the conversion
+            if (perfectFileJSON.remote && perfectFileJSON.remote.colors && perfectFileJSON.remote.colors.predominant && !perfectFileJSON.remote.colors.hsl) {
+              foundImageToHSL = true
+              //  Grab the predominant colours
+              const predoms = JSON.parse(perfectFileJSON.remote.colors.predominant)
+              //  Grab the first one
+              const firstColour = Object.entries(predoms)[0][0]
+              //  Convert it to HSB
+              const hsl = hexToHsl(firstColour)
+              //  Put it back into the JSON
+              perfectFileJSON.remote.colors.hsl = {
+                h: hsl[0],
+                s: hsl[1],
+                l: hsl[2]
+              }
+              //  Write the perfect file back out
+              const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+              fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+              //  Create an upsert object so we can update the database
+              const id = parseInt(file.split('.')[0], 10)
+              const index = `${element.parent}_${tms.stub}`.toLowerCase()
+              const upsertItem = {
+                id,
+                colorHSL: {
+                  h: hsl[0],
+                  s: hsl[1],
+                  l: hsl[2]
+                }
+              }
+
+              //  But the data back into the database
+              const esclient = new elasticsearch.Client(elasticsearchConfig)
+              esclient.update({
+                index,
+                type: element.child.toLowerCase(),
+                id,
+                body: {
+                  doc: upsertItem,
+                  doc_as_upsert: true
+                }
+              })
+            }
+          })
+        })
+      }
+    })
+  })
+}
+exports.checkImagesHSL = checkImagesHSL
+
 exports.startUploading = () => {
   //  Remove the old interval timer
   clearInterval(global.cloudinaryTmr)
@@ -620,6 +781,8 @@ exports.startColoring = () => {
   }
   global.cloudinaryColoringTmr = setInterval(() => {
     checkImagesColor()
+    checkImagesHSL()
   }, interval)
   checkImagesColor()
+  checkImagesHSL()
 }
