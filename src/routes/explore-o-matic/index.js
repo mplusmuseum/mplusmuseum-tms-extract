@@ -61,7 +61,7 @@ exports.constituents = async (req, res) => {
 
   //  Grab the query used to ask for an object
   const queries = new Queries()
-  const searchFilter = `(per_page: 5000, isMaker: true, sort_field:"alphaSortName")`
+  const searchFilter = `(per_page: 5000, sort_field:"alphaSortName")`
   const query = queries.get('constituentList', searchFilter)
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
