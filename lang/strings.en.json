@@ -9,7 +9,8 @@
     "logs": "logs",
     "login": "login",
     "logout": "logout",
-    "apiterms": "API Terms"
+    "apiterms": "API Terms",
+    "exploreomatic": "Explore-O-Matic"
   },
   "stats": {
     "stats": "stats",
