@@ -132,6 +132,12 @@ body {
       background: blue !important;
       color: white;
     }
+
+    &.selected {
+      background: blue !important;
+      color: white;
+    }
+
   }
 
   a.hidename {

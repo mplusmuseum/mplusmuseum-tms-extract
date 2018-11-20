@@ -35,6 +35,12 @@ class Queries {
         alphaSortName
       }
     }`
+
+    this.makertypes = `query {
+      makertypes {
+        title
+      }
+    }`
   }
 
   /**

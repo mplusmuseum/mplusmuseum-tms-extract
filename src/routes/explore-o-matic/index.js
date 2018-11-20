@@ -59,12 +59,35 @@ exports.constituents = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
 
-  //  Grab the query used to ask for an object
   const queries = new Queries()
-  const searchFilter = `(per_page: 5000, sort_field:"alphaSortName")`
-  const query = queries.get('constituentList', searchFilter)
-  //  Now we need to actually run the query
   const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"alphaSortName")`
+
+  //  Grab all the different maker types
+  const makertypesQuery = queries.get('makertypes')
+  const makertypesPayload = {
+    query: makertypesQuery
+  }
+  const makertypesResults = await graphQL.fetch(makertypesPayload)
+  if (makertypesResults.data && makertypesResults.data.makertypes) {
+    req.templateValues.makertypes = makertypesResults.data.makertypes.map((type) => {
+      //  TODO: make this replace *all* not just the first one
+      type.stub = type.title.replace(' ', '-').replace('/', '_')
+      return type
+    })
+  }
+
+  if ('makerStub' in req.params) {
+    //  TODO: make this replace *all* not just the first one
+    const makerType = req.params.makerStub.replace('_', '/').replace('-', ' ')
+    searchFilter = `(per_page: 5000, sort_field:"alphaSortName", role:"${makerType}")`
+    req.templateValues.thisMakerType = req.params.makerStub
+  }
+
+  //  Grab the query used to ask for an object
+  const query = queries.get('constituentList', searchFilter)
   const payload = {
     query
   }
@@ -105,6 +128,16 @@ exports.constituents = async (req, res) => {
       }
     })
   }
+
+  //  Build up a list of elements we want to delete
+  const deleteKey = []
+  Object.entries(alphaSorted).forEach((element) => {
+    if (element[1].length === 0) deleteKey.push(element[0])
+  })
+  //  Now delete the elements
+  deleteKey.forEach((key) => {
+    delete alphaSorted[key]
+  })
 
   req.templateValues.alphaSorted = alphaSorted
   req.templateValues.mode = 'constituents'
