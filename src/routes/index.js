@@ -15,6 +15,7 @@ const admin = require('./admin')
 const api = require('./api')
 const config = require('./config')
 const developer = require('./developer')
+const exploreomatic = require('./explore-o-matic')
 const main = require('./main')
 const search = require('./search')
 const stats = require('./stats')
@@ -262,6 +263,8 @@ router.get('/:lang/search/concepts/:tms/:id', ensureLoggedIn, search.concepts.in
 router.get('/:lang/search/constituents/:tms/:id', ensureLoggedIn, search.constituents.index)
 router.get('/:lang/search/exhibitions/:tms/:id', ensureLoggedIn, search.exhibitions.index)
 router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
+
+router.get('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)
