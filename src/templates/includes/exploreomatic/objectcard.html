@@ -1,0 +1,21 @@
+{{#ifStartRow @index 3}}
+  <div class="tile is-ancestor">
+{{/ifStartRow}}
+<div class="tile is-parent">
+  <article class="tile is-child box" style="color: {{predominant.foreground}}; background:{{predominant.background}}">
+    {{#if mainImage}}
+      <figure class="image">
+        <img src="http://res.cloudinary.com/mplusdandev/image/upload/v{{mainImage.version}}/{{mainImage.public_id}}.jpg">
+      </figure>
+      <br />
+    {{/if}}
+    <p>
+      {{#each constituents}}
+        <a href="/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
+      {{/each}}
+    </p>
+    <h1 class="title" style="color: inherit">{{title}}{{#if displayDate}}, {{displayDate}}{{/if}}</h1>
+  </article>
+</div>
+{{#ifEndRow @index 3}}
+  </div>{{/ifEndRow}}

@@ -18,6 +18,21 @@ exports.ifIndexNotDivisibleBy = (index, divisor, options) => {
   return options.inverse(this)
 }
 
+exports.ifStartRow = (index, divisor, options) => {
+  index = index + divisor - 1
+  if ((index + 1) % divisor === 0 && index > 0) {
+    return options.fn(this)
+  }
+  return options.inverse(this)
+}
+
+exports.ifEndRow = (index, divisor, options) => {
+  if ((index + 1) % divisor === 0 && index > 0) {
+    return options.fn(this)
+  }
+  return options.inverse(this)
+}
+
 exports.indexOf = (context, ndx, options) => options.fn(context[ndx])
 
 exports.ifEven = (n, options) => {

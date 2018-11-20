@@ -265,6 +265,7 @@ router.get('/:lang/search/exhibitions/:tms/:id', ensureLoggedIn, search.exhibiti
 router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
 router.get('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
+router.get('/:lang/explore-o-matic/constituents', ensureLoggedIn, exploreomatic.constituents)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)

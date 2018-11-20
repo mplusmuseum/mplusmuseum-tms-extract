@@ -5,55 +5,8 @@ const path = require('path')
 const rootDir = path.join(__dirname, '../../../data')
 const cloudinary = require('cloudinary')
 const logging = require('../logging')
+const utils = require('../utils')
 const elasticsearch = require('elasticsearch')
-
-const hexToRgb = (hex) => {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : null
-}
-
-const rgbToHsl = (rgb) => {
-  const r = rgb.r / 255
-  const g = rgb.g / 255
-  const b = rgb.b / 255
-
-  const max = Math.max(r, g, b)
-  const min = Math.min(r, g, b)
-  let h
-  let s
-  const l = (max + min) / 2
-
-  if (max === min) {
-    h = s = 0 // achromatic
-  } else {
-    const d = max - min
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
-
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0)
-        break
-      case g:
-        h = (b - r) / d + 2
-        break
-      case b:
-        h = (r - g) / d + 4
-        break
-    }
-
-    h /= 6
-  }
-
-  return [h, s, l]
-}
-
-const hexToHsl = (hex) => {
-  return rgbToHsl(hexToRgb(hex))
-}
 
 /**
  * This method tries to grab a record of an object that has an image that needs
@@ -705,7 +658,7 @@ const checkImagesHSL = () => {
               //  Grab the first one
               const firstColour = Object.entries(predoms)[0][0]
               //  Convert it to HSB
-              const hsl = hexToHsl(firstColour)
+              const hsl = utils.hexToHsl(firstColour)
               //  Put it back into the JSON
               perfectFileJSON.remote.colors.hsl = {
                 h: hsl[0],

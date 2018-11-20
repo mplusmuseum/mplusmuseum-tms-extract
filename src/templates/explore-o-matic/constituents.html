@@ -26,9 +26,15 @@
 
   <section class="section">
     <div class="container">
-      {{#each objects}}
-        {{> exploreomatic/objectcard @this}}
-      {{/each}} </div>
+      {{#each alphaSorted}}
+        <div>
+          <span class="title capitalise">{{@key}}</span>
+          {{#each @this}}
+            <a href="/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
+          {{/each}}
+        </div>
+      {{/each}}
+    </div>
   </section>
 
   {{> tail}}
