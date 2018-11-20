@@ -209,6 +209,20 @@ class Queries {
   }
 }`
 
+    this.objectsRandom = `query {
+  randomobjects {
+    id
+    objectNumber
+    title
+    displayDate
+    medium
+    classification {
+      area
+      category
+    }
+  }
+}`
+
     this.objectsLarge = `query {
   objects[[]] {
     id

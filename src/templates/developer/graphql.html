@@ -92,6 +92,9 @@
                 </ul>
               </li>
               <li>
+                <a href="#randomobjects">{{i18n.documentation.randomobjects}}</a>
+              </li>
+              <li>
                 <a href="#object">{{i18n.documentation.object}}</a>
               </li>
               <li>
@@ -435,6 +438,33 @@
           in the playground</a>
       </p>
       <pre class="query">{{{graphQLQuery queries.objectsColor '(color: "orange", color_threshold: 70.0, color_source: "google")'}}}</pre>
+
+      <hr />
+
+      <h3 class="title is-4">
+        <a class="hidename" name="randomobjects">{{i18n.documentation.randomobjects}}</a>
+      </h3>
+
+      <p>
+        You can get a selection of random objects. These are <em>not</em> random each time you run the query, but
+        rather a random selection of 30 objects generated daily. If you want a single
+        object then run the query and just select the number of objects you need randomly from the list. There are no
+        optional parameters or filters to be passed to this query.
+      </p>
+      <hr />
+
+      <p class="runinexplore no-bottom">
+        <a href='{{exploreQuery queries.objectsRandom "" config.graphql.host user.apitoken}}'>{{i18n.documentation.run-in-playground}}</a>
+      </p>
+      <pre class="query language-graphql">{{{graphQLQuery queries.objectsRandom ''}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.curl}}
+      </p>
+      <pre class="query language-bash">{{{curlQuery queries.objectsRandom '' config.graphql.host user.apitoken}}}</pre>
+
+      <p class="subtitle is-5 no-bottom"> {{i18n.documentation.nodejs}}
+      </p>
+      <pre class="query language-javascript">{{{nodeQuery queries.objectsRandom '' config.graphql.host user.apitoken}}}</pre>
 
       <hr />
 
