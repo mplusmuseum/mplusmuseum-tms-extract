@@ -27,7 +27,7 @@
   <section class="section">
     <div class="container">
       {{#each objects}}
-        {{> exploreomatic/objectcard @this}}
+        {{> exploreomatic/objectcard @this cloudname=../config.cloudinary.cloud_name}}
       {{/each}} </div>
   </section>
 

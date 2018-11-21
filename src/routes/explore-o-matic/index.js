@@ -48,7 +48,6 @@ exports.index = async (req, res) => {
     query
   }
   const results = await graphQL.fetch(payload)
-  console.log(results)
   if (results.data && results.data.randomobjects) {
     req.templateValues.objects = contrastColors(results.data.randomobjects)
   }
