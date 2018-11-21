@@ -1,0 +1,42 @@
+<section class="section">
+  <div class="container">
+    <nav class="level">
+      <div class="level-left">
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic" {{#ifEqual mode 'random'}} class="has-text-weight-bold" {{/ifEqual}}>Current
+              random objects</a>,
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic/constituents" {{#ifEqual mode 'constituents'}} class="has-text-weight-bold"
+              {{/ifEqual}} {{#ifEqual mode 'constituent'}} class="has-text-weight-bold" {{/ifEqual}}>Constituents</a>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic/areas" {{#ifEqual mode 'areas'}} class="has-text-weight-bold" {{/ifEqual}}>Areas</a>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic/categories" {{#ifEqual mode 'categories'}} class="has-text-weight-bold"
+              {{/ifEqual}}>Categories</a>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic/mediums" {{#ifEqual mode 'mediums'}} class="has-text-weight-bold" {{/ifEqual}}>Mediums</a>
+          </div>
+        </div>
+        <div class="level-item has-text-centered">
+          <div>
+            <a href="/explore-o-matic/exhibitions" {{#ifEqual mode 'exhibitions'}} class="has-text-weight-bold"
+              {{/ifEqual}}>Exhibitions</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</section>

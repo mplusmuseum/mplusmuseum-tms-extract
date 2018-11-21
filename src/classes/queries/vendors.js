@@ -600,6 +600,7 @@ class Queries {
    */
   get (query, filter) {
     if (!(query in this)) return null
+    if (!filter) filter = ''
     return this[query].replace('[[]]', filter)
   }
 }

@@ -122,6 +122,24 @@ body {
     }
   }
 
+  .cardButton {
+    background: white;
+    border: 1px solid blue;
+    color: blue;
+    margin-bottom: 5px;
+
+    &:hover {
+      background: blue !important;
+      color: white;
+    }
+
+    &.selected {
+      background: blue !important;
+      color: white;
+    }
+
+  }
+
   a.hidename {
     color: inherit;
     cursor: default;
