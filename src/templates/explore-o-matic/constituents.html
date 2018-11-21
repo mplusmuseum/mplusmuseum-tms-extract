@@ -13,10 +13,10 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title capitalise is-1">
-          Explore-o-matic
+          Explore-o-matic - Constituents
         </h1>
         <h2 class="subtitle is-3">
-          The place where we can see the results of various API calls
+          Here are all the constituents, you can filter them further by role type.
         </h2>
       </div>
     </div>
@@ -45,7 +45,7 @@
         <div>
           <span class="title capitalise">{{@key}}</span>
           {{#each @this}}
-            <a href="/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
+            <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
           {{/each}}
         </div>
       {{/each}}

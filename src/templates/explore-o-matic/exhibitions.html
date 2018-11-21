@@ -1,0 +1,40 @@
+<html>
+
+<head>
+  <title>Dashboard - explore-o-matic</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Explore-o-matic - Exhibitions
+        </h1>
+        <h2 class="subtitle is-3">
+          Here are all the different "Exhibitions" connected to objects.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  {{> exploreomatic/nav}}
+
+  {{#if exhibitions}}
+    <section class="section">
+      <div class="container">
+        {{#each exhibitions}}
+          <a href="/explore-o-matic/exhibition/{{id}}" class="button cardButton">{{title}}</a>
+        {{/each}}
+      </div>
+    </section>
+  {{/if}}
+
+  {{> tail}}
+</body>
+
+</html>

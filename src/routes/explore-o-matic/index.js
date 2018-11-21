@@ -48,6 +48,7 @@ exports.index = async (req, res) => {
     query
   }
   const results = await graphQL.fetch(payload)
+  console.log(results)
   if (results.data && results.data.randomobjects) {
     req.templateValues.objects = contrastColors(results.data.randomobjects)
   }
@@ -74,14 +75,13 @@ exports.constituents = async (req, res) => {
   if (makertypesResults.data && makertypesResults.data.makertypes) {
     req.templateValues.makertypes = makertypesResults.data.makertypes.map((type) => {
       //  TODO: make this replace *all* not just the first one
-      type.stub = type.title.replace(' ', '-').replace('/', '_')
+      type.stub = type.title.replace(/\//g, '_')
       return type
     })
   }
 
   if ('makerStub' in req.params) {
-    //  TODO: make this replace *all* not just the first one
-    const makerType = req.params.makerStub.replace('_', '/').replace('-', ' ')
+    const makerType = req.params.makerStub.replace(/_/g, '/')
     searchFilter = `(per_page: 5000, sort_field:"alphaSortName", role:"${makerType}")`
     req.templateValues.thisMakerType = req.params.makerStub
   }
@@ -142,4 +142,180 @@ exports.constituents = async (req, res) => {
   req.templateValues.alphaSorted = alphaSorted
   req.templateValues.mode = 'constituents'
   return res.render('explore-o-matic/constituents', req.templateValues)
+}
+
+exports.areas = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('areas', searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.areas) {
+    req.templateValues.areas = results.data.areas.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'areas'
+  return res.render('explore-o-matic/areas', req.templateValues)
+}
+
+exports.categories = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('categories', searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.categories) {
+    req.templateValues.categories = results.data.categories.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'categories'
+  return res.render('explore-o-matic/categories', req.templateValues)
+}
+
+exports.exhibitions = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('exhibitions', searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.exhibitions) {
+    req.templateValues.exhibitions = results.data.exhibitions.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'exhibitions'
+  return res.render('explore-o-matic/exhibitions', req.templateValues)
+}
+
+exports.mediums = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('mediums', searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.mediums) {
+    req.templateValues.mediums = results.data.mediums.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'mediums'
+  return res.render('explore-o-matic/mediums', req.templateValues)
+}
+
+exports.getObjectsByThing = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = ''
+  let thisQuery = 'objects'
+  const perPage = 60
+  const page = 0
+
+  const newFilter = req.params.filter.replace(/_/g, '/')
+
+  if (req.params.thing === 'category') {
+    req.templateValues.mode = 'categories'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, category: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'medium') {
+    req.templateValues.mode = 'mediums'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, medium: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'area') {
+    req.templateValues.mode = 'areas'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, area: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'constituent') {
+    req.templateValues.mode = 'constituent'
+    thisQuery = 'constituent'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
+  }
+
+  if (req.params.thing === 'exhibition') {
+    req.templateValues.mode = 'exhibition'
+    thisQuery = 'exhibition'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
+  }
+
+  //  Grab all the different maker types
+  const query = queries.get(thisQuery, searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data[thisQuery]) {
+    if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
+      if (thisQuery === 'constituent') {
+        const constituent = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(constituent.objects)
+        req.templateValues.constituent = constituent
+      }
+      if (thisQuery === 'exhibition') {
+        const exhibition = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(exhibition.objects)
+        req.templateValues.exhibition = exhibition
+      }
+    } else {
+      req.templateValues.objects = contrastColors(results.data[thisQuery])
+    }
+  }
+
+  return res.render('explore-o-matic/objects', req.templateValues)
 }

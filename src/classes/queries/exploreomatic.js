@@ -5,7 +5,68 @@ class Queries {
    */
   constructor () {
     this.objectsRandom = `query {
-      randomobjects {
+      randomobjects[[]] {
+        id
+        title
+        displayDate
+        color {
+          predominant {
+            color
+            value
+          }
+        }
+        images {
+          primaryDisplay
+          status
+          version
+          public_id
+        }
+        constituents {
+          id
+          name
+        }
+      }
+    }`
+
+    this.constituent = `query {
+      constituent[[]] {
+        id
+        name
+        alphaSortName
+        displayBio
+        gender
+        beginDate
+        nationality
+        roles
+        type
+        objects {
+          id
+          title
+          displayDate
+          color {
+            predominant {
+              color
+              value
+            }
+          }
+          images {
+            primaryDisplay
+            status
+            version
+            public_id
+          }
+          constituents {
+            id
+            name
+            rank
+            role
+          }
+        }
+      }
+    }`
+
+    this.objects = `query {
+      objects[[]] {
         id
         title
         displayDate
@@ -41,6 +102,69 @@ class Queries {
         title
       }
     }`
+
+    this.areas = `query {
+      areas[[]] {
+        title
+      }
+    }`
+
+    this.categories = `query {
+      categories[[]] {
+        title
+      }
+    }`
+
+    this.mediums = `query {
+      mediums[[]] {
+        title
+      }
+    }`
+
+    this.exhibitions = `query {
+      exhibitions {
+        id
+        title
+      }
+    }`
+
+    this.exhibition = `query {
+      exhibition[[]] {
+        id
+        title
+        type
+        beginDate
+        endDate
+        venues {
+          title
+          beginDate
+          endDate
+        }
+        objects {
+          id
+          title
+          displayDate
+          color {
+            predominant {
+              color
+              value
+            }
+          }
+          images {
+            primaryDisplay
+            status
+            version
+            public_id
+          }
+          constituents {
+            id
+            name
+            rank
+            role
+          }
+        }
+      }
+    }`
   }
 
   /**
@@ -51,6 +175,7 @@ class Queries {
    */
   get (query, filter) {
     if (!(query in this)) return null
+    if (!filter) filter = ''
     return this[query].replace('[[]]', filter)
   }
 }

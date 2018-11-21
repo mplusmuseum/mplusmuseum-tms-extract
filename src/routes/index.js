@@ -267,6 +267,11 @@ router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.inde
 router.get('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
 router.get('/:lang/explore-o-matic/constituents', ensureLoggedIn, exploreomatic.constituents)
 router.get('/:lang/explore-o-matic/constituents/:makerStub', ensureLoggedIn, exploreomatic.constituents)
+router.get('/:lang/explore-o-matic/areas', ensureLoggedIn, exploreomatic.areas)
+router.get('/:lang/explore-o-matic/categories', ensureLoggedIn, exploreomatic.categories)
+router.get('/:lang/explore-o-matic/mediums', ensureLoggedIn, exploreomatic.mediums)
+router.get('/:lang/explore-o-matic/exhibitions', ensureLoggedIn, exploreomatic.exhibitions)
+router.get('/:lang/explore-o-matic/:thing/:filter', ensureLoggedIn, exploreomatic.getObjectsByThing)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)
