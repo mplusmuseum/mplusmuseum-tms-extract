@@ -1,0 +1,92 @@
+<section class="section">
+  <div class="container">
+    <nav class="panel">
+      <div class="panel-heading">
+        <h1 class="title">{{constituent.name}}</h1>
+      </div>
+      <div class="panel-block">
+        <table class="table is-hoverable is-fullwidth is-striped">
+          <tr>
+            <td class="has-text-weight-bold">alphaSortName</td>
+            <td>{{constituent.alphaSortName}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">displayBio</td>
+            <td>{{constituent.displayBio}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">gender</td>
+            <td>{{constituent.gender}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">beginDate</td>
+            <td>{{constituent.beginDate}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">endDate</td>
+            <td>{{constituent.endDate}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">nationality</td>
+            <td>{{constituent.nationality}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">roles</td>
+            <td>
+              {{#if constituent.roles}}
+                {{#each constituent.roles}}
+                  <a href="/explore-o-matic/constituents/{{stub}}" class="button cardButton">{{title}}</a>
+                {{/each}}
+              {{/if}}
+            </td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">publicAccess</td>
+            <td>{{constituent.publicAccess}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">isMaker</td>
+            <td>{{constituent.isMaker}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">activeCity</td>
+            <td>{{constituent.activeCity}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">artInt</td>
+            <td>{{constituent.artInt}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">birthCity</td>
+            <td>{{constituent.birthCity}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">deathCity</td>
+            <td>{{constituent.deathCity}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">objectCount</td>
+            <td>{{constituent.objectCount}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">region</td>
+            <td>{{constituent.region}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">exhibitionBios</td>
+            <td>
+              {{#if constituent.exhibitionBios}}
+                <dl>
+                  {{#each constituent.exhibitionBios}}
+                    <dt class="title is-5">{{purpose}}</dt>
+                    <dd class="subtitle is-5">{{text}}</dd>
+                  {{/each}}
+                </dl>
+              {{/if}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </nav>
+  </div>
+</section>

@@ -299,11 +299,20 @@ exports.getObjectsByThing = async (req, res) => {
     query
   }
   const results = await graphQL.fetch(payload)
+  console.log(results)
   if (results.data && results.data[thisQuery]) {
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
       if (thisQuery === 'constituent') {
         const constituent = results.data[thisQuery]
         req.templateValues.objects = contrastColors(constituent.objects)
+        delete constituent.objects
+        //  Convert the roles into an array we can deal with
+        constituent.roles = constituent.roles.map((role) => {
+          return {
+            title: role,
+            stub: role.replace(/\//g, '_')
+          }
+        })
         req.templateValues.constituent = constituent
       }
       if (thisQuery === 'exhibition') {
