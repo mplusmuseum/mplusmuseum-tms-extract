@@ -36,9 +36,20 @@ class Queries {
         displayBio
         gender
         beginDate
+        endDate
         nationality
         roles
         type
+        publicAccess
+        rank
+        isMaker
+        roles
+        activeCity
+        artInt
+        birthCity
+        deathCity
+        objectCount
+        region
         objects {
           id
           title
@@ -61,6 +72,10 @@ class Queries {
             rank
             role
           }
+        }
+        exhibitionBios {
+          purpose
+          text
         }
       }
     }`
