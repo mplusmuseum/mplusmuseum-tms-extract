@@ -1,0 +1,50 @@
+<section class="section">
+  <div class="container">
+    <nav class="panel">
+      <div class="panel-heading">
+        <h1 class="title">{{exhibition.title}}</h1>
+      </div>
+      <div class="panel-block">
+        <table class="table is-hoverable is-fullwidth is-striped">
+          <tr>
+            <td class="has-text-weight-bold">type</td>
+            <td>{{exhibition.type}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">beginDate</td>
+            <td>{{exhibition.beginDate}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">endDate</td>
+            <td>{{exhibition.endDate}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">artInt</td>
+            <td>{{exhibition.artInt}}</td>
+          </tr>
+          <tr>
+            <td class="has-text-weight-bold">venues</td>
+            <td>
+              {{#if exhibition.venues}}
+                {{#each exhibition.venues}}
+                  <h2 class="title is-5">{{title}}</h2>
+                  <table class="table is-hoverable is-fullwidth is-striped">
+                    <tr>
+                      <td class="has-text-weight-bold">beginDate</td>
+                      <td>{{beginDate}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">endDate</td>
+                      <td>{{endDate}}</td>
+                    </tr>
+                  </table>
+
+                {{/each}}
+              {{/if}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </nav>
+  </div>
+</section>
