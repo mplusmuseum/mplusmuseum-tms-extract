@@ -5,7 +5,7 @@
   <article class="tile is-child box" style="color: {{predominant.foreground}}; background:{{predominant.background}}">
     {{#if mainImage}}
       <figure class="image">
-        <img src="http://res.cloudinary.com/{{cloudname}}/image/upload/v{{mainImage.version}}/{{mainImage.public_id}}.jpg">
+        <a href="/explore-o-matic/object/{{id}}"><img src="http://res.cloudinary.com/{{cloudname}}/image/upload/v{{mainImage.version}}/{{mainImage.public_id}}.jpg"></a>
       </figure>
       <br />
     {{/if}}
@@ -14,7 +14,8 @@
         <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
       {{/each}}
     </p>
-    <h1 class="title" style="color: inherit">{{title}}{{#if displayDate}}, {{displayDate}}{{/if}}</h1>
+    <h1 class="title" style="color: inherit"><a href="/explore-o-matic/object/{{id}}" style="color: inherit">{{title}}{{#if displayDate}},
+          {{displayDate}}{{/if}}</a></h1>
   </article>
 </div>
 {{#ifEndRow @index 3}}

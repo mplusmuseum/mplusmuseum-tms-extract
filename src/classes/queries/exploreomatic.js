@@ -4,6 +4,124 @@ class Queries {
    * Create a collection of queries
    */
   constructor () {
+    this.object = `query {
+      object[[]] {
+        id
+        publicAccess
+        objectNumber
+        sortNumber
+        title
+        displayDate
+        beginDate
+        endDate
+        dimension
+        creditLine
+        medium
+        constituents {
+          id
+          name
+          alphaSortName
+          displayBio
+          gender
+          beginDate
+          endDate
+          nationality
+          roles
+          type
+          publicAccess
+          rank
+          isMaker
+          role
+          activeCity
+          artInt
+          birthCity
+          deathCity
+          objectCount
+          region
+          exhibitionBios {
+            purpose
+            text
+          }
+        }
+        exhibitions {
+          exhibitions {
+            id
+            title
+            type
+            beginDate
+            endDate
+            venues {
+              title
+              beginDate
+              endDate
+            }
+            section
+          }
+          labels {
+            purpose
+            text
+          }
+        }
+        concepts {
+          id
+          publicAccess
+          timeline
+          title
+          description
+          displayDate
+          beginDate
+          endDate
+          conceptUse        
+        }
+        objectRights {
+          type
+          copyright
+          concatRights
+          concatRemark
+          currentStatus
+          rights {
+            title
+            group
+          }     
+        }
+        classification {
+          area
+          category
+        }
+        images {
+          rank
+          primaryDisplay
+          publicAccess
+          public_id
+          status
+          version
+          signature
+          width
+          height
+          format
+          altText
+          mediaUse
+        }
+        color {
+          predominant {
+            color
+            value
+          }
+          search {
+            google {
+              color
+              value
+            }
+            cloudinary {
+              color
+              value
+            }
+          }
+        }
+
+      }
+    }`
+
     this.objectsRandom = `query {
       randomobjects[[]] {
         id

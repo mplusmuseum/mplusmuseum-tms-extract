@@ -12,7 +12,7 @@ const contrastColors = (objects) => {
     if (object.color && object.color.predominant && object.color.predominant.length > 0) {
       const hsl = utils.hexToHsl(object.color.predominant[0].color)
       object.predominant = {
-        background: object.color.predominant[0].color,
+        background: `hsl(${hsl[0] * 360}, ${hsl[1] * 66}%, ${((hsl[2] * 66) + 34)}%)`,
         foreground: 'black',
         hsl: {
           h: hsl[0] * 360,
@@ -21,6 +21,22 @@ const contrastColors = (objects) => {
         }
       }
       if (hsl[2] < 0.3) object.predominant.foreground = 'white'
+    }
+
+    //  Also add nice percents to the predominant colours
+    if (object.color && object.color.predominant && object.color.predominant.length > 0) {
+      let total = 0.0
+      object.color.predominant.forEach((pred) => {
+        total += pred.value
+      })
+      object.color.predominant = object.color.predominant.map((pred) => {
+        pred = {
+          color: pred.color,
+          percent: pred.value / total * 100,
+          nicePercent: pred.value
+        }
+        return pred
+      })
     }
 
     //  Get the main image
@@ -299,7 +315,7 @@ exports.getObjectsByThing = async (req, res) => {
     query
   }
   const results = await graphQL.fetch(payload)
-  console.log(results)
+
   if (results.data && results.data[thisQuery]) {
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
       if (thisQuery === 'constituent') {
@@ -327,4 +343,77 @@ exports.getObjectsByThing = async (req, res) => {
   }
 
   return res.render('explore-o-matic/objects', req.templateValues)
+}
+
+exports.getObject = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let thisQuery = 'object'
+  const newFilter = parseInt(req.params.filter, 10)
+  let searchFilter = `(id: ${newFilter})`
+
+  //  Grab all the different maker types
+  const query = queries.get(thisQuery, searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data[thisQuery]) {
+    const object = contrastColors([results.data[thisQuery]])[0]
+    //  Convert the medium to title and stub
+    if (object.medium) {
+      object.medium = {
+        title: object.medium,
+        stub: object.medium.replace(/\//g, '_')
+      }
+    }
+    //  Convert the classifications to title and stub
+    if (object.classification) {
+      if (object.classification.area) {
+        object.classification.area = {
+          title: object.classification.area,
+          stub: object.classification.area.replace(/\//g, '_')
+        }
+      }
+      if (object.classification.category) {
+        object.classification.category = {
+          title: object.classification.category,
+          stub: object.classification.category.replace(/\//g, '_')
+        }
+      }
+    }
+
+    req.templateValues.object = object
+    /*
+    if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
+      if (thisQuery === 'constituent') {
+        const constituent = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(constituent.objects)
+        delete constituent.objects
+        //  Convert the roles into an array we can deal with
+        constituent.roles = constituent.roles.map((role) => {
+          return {
+            title: role,
+            stub: role.replace(/\//g, '_')
+          }
+        })
+        req.templateValues.constituent = constituent
+      }
+      if (thisQuery === 'exhibition') {
+        const exhibition = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(exhibition.objects)
+        req.templateValues.exhibition = exhibition
+      }
+    } else {
+      req.templateValues.objects = contrastColors(results.data[thisQuery])
+    }
+    */
+  }
+
+  return res.render('explore-o-matic/object', req.templateValues)
 }

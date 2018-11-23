@@ -345,6 +345,12 @@ exports.displayFields = (fields, index) => {
   return html
 }
 
+exports.deSlashRSlashN = (text) => {
+  if (!text) return ''
+  const newText = text.replace(/\r\r\n/g, '<br />')
+  return newText
+}
+
 const showQuery = (query, filter) => {
   if (filter === null || filter === undefined || filter === '') {
     return query.replace('[[]]', '')

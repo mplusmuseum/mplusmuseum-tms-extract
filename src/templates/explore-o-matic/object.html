@@ -1,0 +1,247 @@
+<html>
+
+<head>
+  <title>Dashboard - explore-o-matic</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Explore-o-matic - Object
+        </h1>
+        <h2 class="subtitle is-3">
+          Here is an object.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  {{> exploreomatic/nav}}
+
+  <section class="section">
+    <div class="container">
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <article class="tile is-child box" style="color: {{object.predominant.foreground}}; background:{{object.predominant.background}}">
+            <h1 class="title" style="color: inherit">{{object.title}}</h1>
+            {{#if object.mainImage}}
+              <figure class="image">
+                <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v{{object.mainImage.version}}/{{object.mainImage.public_id}}.jpg">
+              </figure>
+              <br />
+            {{/if}}
+            <p>
+              {{#each object.constituents}}
+                <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}
+                  ({{role}})</a>
+              {{/each}}
+            </p>
+            <table class="table is-hoverable is-fullwidth is-striped">
+              <tr>
+                <td class="has-text-weight-bold" style="width: 25%">id</td>
+                <td>{{object.id}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">objectNumber</td>
+                <td>{{object.objectNumber}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">sortNumber</td>
+                <td>{{object.sortNumber}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">displayDate</td>
+                <td>{{object.displayDate}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">beginDate</td>
+                <td>{{object.beginDate}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">endDate</td>
+                <td>{{object.endDate}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">dimension</td>
+                <td>{{object.dimension}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">creditLine</td>
+                <td>{{object.creditLine}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">medium</td>
+                <td><a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a></td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">area</td>
+                <td>{{#if object.classification.area}}<a href="/explore-o-matic/area/{{object.classification.area.stub}}"
+                      class="button cardButton">{{object.classification.area.title}}</a>{{/if}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">category</td>
+                <td>{{#if object.classification.category}}<a href="/explore-o-matic/category/{{object.classification.category.stub}}"
+                      class="button cardButton">{{object.classification.category.title}}</a>{{/if}}</td>
+              </tr>
+            </table>
+
+            {{#if object.color.predominant}}
+              <hr />
+              <h2 class="title" style="color: inherit">Predominant Colours</h2>
+              <div class="swatch" style="border: 2px solid {{object.predominant.foreground}}">
+                {{#each object.color.predominant}}
+                  <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>
+                {{/each}}
+              </div>
+            {{/if}}
+
+            {{#if object.concepts}}
+              <hr />
+              <h2 class="title" style="color: inherit">Concepts</h2>
+              {{#each object.concepts}}
+                <table class="table is-hoverable is-fullwidth is-striped">
+                  <tr>
+                    <td class="has-text-weight-bold" style="width: 25%">title</td>
+                    <td class="has-text-weight-bold">{{title}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">id</td>
+                    <td>{{id}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">displayDate</td>
+                    <td>{{displayDate}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">beginDate</td>
+                    <td>{{beginDate}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">endDate</td>
+                    <td>{{endDate}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">timeline</td>
+                    <td>{{timeline}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">description</td>
+                    <td>{{{deSlashRSlashN description}}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">conceptUse</td>
+                    <td class="has-text-weight-bold">{{conceptUse}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold">publicAccess</td>
+                    <td>{{publicAccess}}</td>
+                  </tr>
+                </table>
+              {{/each}}
+            {{/if}}
+
+            {{#if object.exhibitions}}
+              <hr />
+              <h2 class="title" style="color: inherit">Exhibitions</h2>
+              {{#if object.exhibitions.exhibitions}}
+                {{#each object.exhibitions.exhibitions}}
+                  <table class="table is-hoverable is-fullwidth is-striped">
+                    <tr>
+                      <td class="has-text-weight-bold" style="width: 25%">title</td>
+                      <td><a href="/explore-o-matic/exhibition/{{id}}" class="button cardButton">{{title}}</a></td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">id</td>
+                      <td>{{id}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">type</td>
+                      <td>{{type}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">beginDate</td>
+                      <td>{{beginDate}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">endDate</td>
+                      <td>{{endDate}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">venues</td>
+                      <td>
+                        {{#if venues}}
+                          {{#each venues}}
+                            <h2 class="title is-5">{{title}}</h2>
+                            <table class="table is-hoverable is-fullwidth is-striped">
+                              <tr>
+                                <td class="has-text-weight-bold">beginDate</td>
+                                <td>{{beginDate}}</td>
+                              </tr>
+                              <tr>
+                                <td class="has-text-weight-bold">endDate</td>
+                                <td>{{endDate}}</td>
+                              </tr>
+                            </table>
+
+                          {{/each}}
+                        {{/if}}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">section</td>
+                      <td>{{section}}</td>
+                    </tr>
+                  </table>
+                {{/each}}
+              {{/if}}
+            {{/if}}
+
+            {{#if object.objectRights}}
+              <hr />
+              <h2 class="title" style="color: inherit">Object Rights</h2>
+              <table class="table is-hoverable is-fullwidth is-striped">
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">type</td>
+                  <td>{{object.objectRights.type}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">copyright</td>
+                  <td>{{object.objectRights.copyright}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">currentStatus</td>
+                  <td>{{object.objectRights.currentStatus}}</td>
+                </tr>
+                {{#if object.objectRights.rights}}
+                  <tr>
+                    <td class="has-text-weight-bold" style="width: 25%">rights</td>
+                    <td>
+                      <table class="table is-hoverable is-fullwidth is-striped">
+                        {{#each object.objectRights.rights}}
+                          <tr>
+                            <td class="has-text-weight-bold">{{group}}</td>
+                            <td>{{title}}</td>
+                          </tr>
+                        {{/each}}
+                      </table>
+                    </td>
+                  </tr>
+                {{/if}}
+              </table>
+            {{/if}}
+
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  {{> tail}}
+</body>
+
+</html>
