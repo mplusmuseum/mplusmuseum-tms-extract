@@ -299,7 +299,7 @@ exports.getObjectsByThing = async (req, res) => {
     query
   }
   const results = await graphQL.fetch(payload)
-  console.log(results)
+
   if (results.data && results.data[thisQuery]) {
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
       if (thisQuery === 'constituent') {
@@ -326,4 +326,55 @@ exports.getObjectsByThing = async (req, res) => {
   }
 
   return res.render('explore-o-matic/objects', req.templateValues)
+}
+
+exports.getObject = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let thisQuery = 'object'
+  const newFilter = parseInt(req.params.filter, 10)
+  let searchFilter = `(id: ${newFilter})`
+
+  //  Grab all the different maker types
+  const query = queries.get(thisQuery, searchFilter)
+  const payload = {
+    query
+  }
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data[thisQuery]) {
+    const object = contrastColors([results.data[thisQuery]])[0]
+    console.log(object)
+    req.templateValues.object = object
+    /*
+    if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
+      if (thisQuery === 'constituent') {
+        const constituent = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(constituent.objects)
+        delete constituent.objects
+        //  Convert the roles into an array we can deal with
+        constituent.roles = constituent.roles.map((role) => {
+          return {
+            title: role,
+            stub: role.replace(/\//g, '_')
+          }
+        })
+        req.templateValues.constituent = constituent
+      }
+      if (thisQuery === 'exhibition') {
+        const exhibition = results.data[thisQuery]
+        req.templateValues.objects = contrastColors(exhibition.objects)
+        req.templateValues.exhibition = exhibition
+      }
+    } else {
+      req.templateValues.objects = contrastColors(results.data[thisQuery])
+    }
+    */
+  }
+
+  return res.render('explore-o-matic/object', req.templateValues)
 }

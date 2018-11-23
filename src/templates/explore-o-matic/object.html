@@ -1,0 +1,52 @@
+<html>
+
+<head>
+  <title>Dashboard - explore-o-matic</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Explore-o-matic - Object
+        </h1>
+        <h2 class="subtitle is-3">
+          Here is an object.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  {{> exploreomatic/nav}}
+
+  <section class="section">
+    <div class="container">
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <article class="tile is-child box" style="color: {{object.predominant.foreground}}; background:{{object.predominant.background}}">
+            {{#if object.mainImage}}
+              <figure class="image">
+                <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v{{object.mainImage.version}}/{{object.mainImage.public_id}}.jpg">
+              </figure>
+              <br />
+            {{/if}}
+            <p>
+              {{#each constituents}}
+                <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
+              {{/each}}
+            </p>
+            <h1 class="title" style="color: inherit">{{object.title}}{{#if object.displayDate}}, {{object.displayDate}}{{/if}}</h1>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  {{> tail}}
+</body>
+
+</html>

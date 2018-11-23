@@ -4,6 +4,30 @@ class Queries {
    * Create a collection of queries
    */
   constructor () {
+    this.object = `query {
+      object[[]] {
+        id
+        title
+        displayDate
+        color {
+          predominant {
+            color
+            value
+          }
+        }
+        images {
+          primaryDisplay
+          status
+          version
+          public_id
+        }
+        constituents {
+          id
+          name
+        }
+      }
+    }`
+
     this.objectsRandom = `query {
       randomobjects[[]] {
         id
