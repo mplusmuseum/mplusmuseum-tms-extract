@@ -12,7 +12,7 @@ const contrastColors = (objects) => {
     if (object.color && object.color.predominant && object.color.predominant.length > 0) {
       const hsl = utils.hexToHsl(object.color.predominant[0].color)
       object.predominant = {
-        background: object.color.predominant[0].color,
+        background: `hsl(${hsl[0] * 360}, ${hsl[1] * 66}%, ${((hsl[2] * 66) + 34)}%)`,
         foreground: 'black',
         hsl: {
           h: hsl[0] * 360,
@@ -21,6 +21,22 @@ const contrastColors = (objects) => {
         }
       }
       if (hsl[2] < 0.3) object.predominant.foreground = 'white'
+    }
+
+    //  Also add nice percents to the predominant colours
+    if (object.color && object.color.predominant && object.color.predominant.length > 0) {
+      let total = 0.0
+      object.color.predominant.forEach((pred) => {
+        total += pred.value
+      })
+      object.color.predominant = object.color.predominant.map((pred) => {
+        pred = {
+          color: pred.color,
+          percent: pred.value / total * 100,
+          nicePercent: pred.value
+        }
+        return pred
+      })
     }
 
     //  Get the main image
@@ -349,7 +365,29 @@ exports.getObject = async (req, res) => {
   const results = await graphQL.fetch(payload)
   if (results.data && results.data[thisQuery]) {
     const object = contrastColors([results.data[thisQuery]])[0]
-    console.log(object)
+    //  Convert the medium to title and stub
+    if (object.medium) {
+      object.medium = {
+        title: object.medium,
+        stub: object.medium.replace(/\//g, '_')
+      }
+    }
+    //  Convert the classifications to title and stub
+    if (object.classification) {
+      if (object.classification.area) {
+        object.classification.area = {
+          title: object.classification.area,
+          stub: object.classification.area.replace(/\//g, '_')
+        }
+      }
+      if (object.classification.category) {
+        object.classification.category = {
+          title: object.classification.category,
+          stub: object.classification.category.replace(/\//g, '_')
+        }
+      }
+    }
+
     req.templateValues.object = object
     /*
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
