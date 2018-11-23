@@ -318,6 +318,7 @@ exports.getObjectsByThing = async (req, res) => {
       if (thisQuery === 'exhibition') {
         const exhibition = results.data[thisQuery]
         req.templateValues.objects = contrastColors(exhibition.objects)
+        delete exhibition.objects
         req.templateValues.exhibition = exhibition
       }
     } else {
