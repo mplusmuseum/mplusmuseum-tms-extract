@@ -174,6 +174,7 @@ class Queries {
         type
         beginDate
         endDate
+        artInt
         venues {
           title
           beginDate
