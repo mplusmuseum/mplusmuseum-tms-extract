@@ -93,7 +93,7 @@
 
             {{#if object.color.predominant}}
               <hr />
-              <h2 class="title" style="color: inherit">Predominant Colours</h2>
+              <h2 class="title" style="color: inherit">Predominant Colours, hsl({{object.predominant.hsl.h}},{{object.predominant.hsl.s}}%,{{object.predominant.hsl.l}}%)</h2>
               <div class="swatch" style="border: 2px solid {{object.predominant.foreground}}">
                 {{#each object.color.predominant}}
                   <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>

@@ -15,9 +15,9 @@ const contrastColors = (objects) => {
         background: `hsl(${hsl[0] * 360}, ${hsl[1] * 66}%, ${((hsl[2] * 66) + 34)}%)`,
         foreground: 'black',
         hsl: {
-          h: hsl[0] * 360,
-          s: hsl[1] * 100,
-          l: hsl[2] * 100
+          h: parseInt(hsl[0] * 360, 10),
+          s: parseInt(hsl[1] * 100, 10),
+          l: parseInt(hsl[2] * 100, 10)
         }
       }
       if (hsl[2] < 0.3) object.predominant.foreground = 'white'
@@ -345,6 +345,13 @@ exports.getObjectsByThing = async (req, res) => {
   return res.render('explore-o-matic/objects', req.templateValues)
 }
 
+exports.getColor = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  req.templateValues.mode = 'color'
+  return res.render('explore-o-matic/colour', req.templateValues)
+}
+
 exports.getObject = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
@@ -389,30 +396,6 @@ exports.getObject = async (req, res) => {
     }
 
     req.templateValues.object = object
-    /*
-    if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
-      if (thisQuery === 'constituent') {
-        const constituent = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(constituent.objects)
-        delete constituent.objects
-        //  Convert the roles into an array we can deal with
-        constituent.roles = constituent.roles.map((role) => {
-          return {
-            title: role,
-            stub: role.replace(/\//g, '_')
-          }
-        })
-        req.templateValues.constituent = constituent
-      }
-      if (thisQuery === 'exhibition') {
-        const exhibition = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(exhibition.objects)
-        req.templateValues.exhibition = exhibition
-      }
-    } else {
-      req.templateValues.objects = contrastColors(results.data[thisQuery])
-    }
-    */
   }
 
   return res.render('explore-o-matic/object', req.templateValues)
