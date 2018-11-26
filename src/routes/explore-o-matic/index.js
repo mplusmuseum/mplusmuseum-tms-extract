@@ -15,9 +15,9 @@ const contrastColors = (objects) => {
         background: `hsl(${hsl[0] * 360}, ${hsl[1] * 66}%, ${((hsl[2] * 66) + 34)}%)`,
         foreground: 'black',
         hsl: {
-          h: hsl[0] * 360,
-          s: hsl[1] * 100,
-          l: hsl[2] * 100
+          h: parseInt(hsl[0] * 360, 10),
+          s: parseInt(hsl[1] * 100, 10),
+          l: parseInt(hsl[2] * 100, 10)
         }
       }
       if (hsl[2] < 0.3) object.predominant.foreground = 'white'
@@ -63,6 +63,8 @@ exports.index = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.randomobjects) {
     req.templateValues.objects = contrastColors(results.data.randomobjects)
@@ -106,6 +108,8 @@ exports.constituents = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   const alphaSorted = {}
   if (results.data && results.data.constituents) {
@@ -174,6 +178,8 @@ exports.areas = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.areas) {
     req.templateValues.areas = results.data.areas.map((type) => {
@@ -201,6 +207,8 @@ exports.categories = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.categories) {
     req.templateValues.categories = results.data.categories.map((type) => {
@@ -228,6 +236,8 @@ exports.exhibitions = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.exhibitions) {
     req.templateValues.exhibitions = results.data.exhibitions.map((type) => {
@@ -255,6 +265,8 @@ exports.mediums = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.mediums) {
     req.templateValues.mediums = results.data.mediums.map((type) => {
@@ -314,6 +326,7 @@ exports.getObjectsByThing = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
   const results = await graphQL.fetch(payload)
 
   if (results.data && results.data[thisQuery]) {
@@ -345,6 +358,58 @@ exports.getObjectsByThing = async (req, res) => {
   return res.render('explore-o-matic/objects', req.templateValues)
 }
 
+exports.getColor = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  //  This is a bit of an odd way to load in the script, as really
+  //  markup should be in the template. BUT, in this case we're
+  //  going to generate the script here
+  req.templateValues.pickedScript = `<script>
+  document.addEventListener("DOMContentLoaded", function (event) {
+    var thisPalette = new palette();
+    thisPalette.draw();
+  });
+  </script>`
+
+  //  If we have been passed some HSL values then we need to grab
+  //  them so we can do the object search *AND* pass them over
+  //  so we can put them on the picker
+  if (req.params.hsl) {
+    const hsl = req.params.hsl.split(',')
+    const h = parseInt(hsl[0], 10)
+    const l = parseInt(hsl[2], 10) * 2
+
+    req.templateValues.pickedScript = `<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      var thisPalette = new palette();
+      thisPalette.draw({x: ${h}, y: ${l}});
+    });
+    </script>`
+
+    const queries = new Queries()
+    const graphQL = new GraphQL()
+
+    //  This is the initial search query we are going to use to grab all the constituents
+    const perPage = 60
+    const page = 0
+    const searchFilter = `(per_page: ${perPage}, page: ${page}, hue: ${h}, luminosity: ${l / 2})`
+    const thisQuery = 'objects'
+    const query = queries.get(thisQuery, searchFilter)
+    const payload = {
+      query
+    }
+    req.templateValues.query = query
+    const results = await graphQL.fetch(payload)
+    if (results.data && results.data[thisQuery]) {
+      req.templateValues.objects = contrastColors(results.data[thisQuery])
+    }
+  }
+
+  req.templateValues.mode = 'color'
+  return res.render('explore-o-matic/colour', req.templateValues)
+}
+
 exports.getObject = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
@@ -362,6 +427,8 @@ exports.getObject = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data[thisQuery]) {
     const object = contrastColors([results.data[thisQuery]])[0]
@@ -389,30 +456,6 @@ exports.getObject = async (req, res) => {
     }
 
     req.templateValues.object = object
-    /*
-    if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
-      if (thisQuery === 'constituent') {
-        const constituent = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(constituent.objects)
-        delete constituent.objects
-        //  Convert the roles into an array we can deal with
-        constituent.roles = constituent.roles.map((role) => {
-          return {
-            title: role,
-            stub: role.replace(/\//g, '_')
-          }
-        })
-        req.templateValues.constituent = constituent
-      }
-      if (thisQuery === 'exhibition') {
-        const exhibition = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(exhibition.objects)
-        req.templateValues.exhibition = exhibition
-      }
-    } else {
-      req.templateValues.objects = contrastColors(results.data[thisQuery])
-    }
-    */
   }
 
   return res.render('explore-o-matic/object', req.templateValues)
