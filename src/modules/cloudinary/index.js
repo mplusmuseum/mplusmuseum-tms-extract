@@ -651,7 +651,7 @@ const checkImagesHSL = () => {
             const perfectFileJSON = JSON.parse(perfectFileRaw)
             //  If we have a perfect file with color info but not HSL then we need to
             //  do the conversion
-            if (perfectFileJSON.remote && perfectFileJSON.remote.colors && perfectFileJSON.remote.colors.predominant && !perfectFileJSON.remote.colors.hsl) {
+            if (perfectFileJSON.remote && perfectFileJSON.remote.colors && perfectFileJSON.remote.colors.predominant && !perfectFileJSON.remote.colors.hslInt) {
               foundImageToHSL = true
               //  Grab the predominant colours
               const predoms = JSON.parse(perfectFileJSON.remote.colors.predominant)
@@ -660,10 +660,10 @@ const checkImagesHSL = () => {
               //  Convert it to HSB
               const hsl = utils.hexToHsl(firstColour)
               //  Put it back into the JSON
-              perfectFileJSON.remote.colors.hsl = {
-                h: hsl[0],
-                s: hsl[1],
-                l: hsl[2]
+              perfectFileJSON.remote.colors.hslInt = {
+                h: parseInt(hsl[0] * 360, 10),
+                s: parseInt(hsl[1] * 100, 10),
+                l: parseInt(hsl[2] * 100, 10)
               }
               //  Write the perfect file back out
               const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
@@ -673,10 +673,10 @@ const checkImagesHSL = () => {
               const index = `${element.parent}_${tms.stub}`.toLowerCase()
               const upsertItem = {
                 id,
-                colorHSL: {
-                  h: hsl[0],
-                  s: hsl[1],
-                  l: hsl[2]
+                colorHSLInt: {
+                  h: parseInt(hsl[0] * 360, 10),
+                  s: parseInt(hsl[1] * 100, 10),
+                  l: parseInt(hsl[2] * 100, 10)
                 }
               }
 
