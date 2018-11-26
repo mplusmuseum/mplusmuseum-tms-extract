@@ -63,6 +63,8 @@ exports.index = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.randomobjects) {
     req.templateValues.objects = contrastColors(results.data.randomobjects)
@@ -106,6 +108,8 @@ exports.constituents = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   const alphaSorted = {}
   if (results.data && results.data.constituents) {
@@ -174,6 +178,8 @@ exports.areas = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.areas) {
     req.templateValues.areas = results.data.areas.map((type) => {
@@ -201,6 +207,8 @@ exports.categories = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.categories) {
     req.templateValues.categories = results.data.categories.map((type) => {
@@ -228,6 +236,8 @@ exports.exhibitions = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.exhibitions) {
     req.templateValues.exhibitions = results.data.exhibitions.map((type) => {
@@ -255,6 +265,8 @@ exports.mediums = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.mediums) {
     req.templateValues.mediums = results.data.mediums.map((type) => {
@@ -314,6 +326,7 @@ exports.getObjectsByThing = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
   const results = await graphQL.fetch(payload)
 
   if (results.data && results.data[thisQuery]) {
@@ -386,8 +399,11 @@ exports.getColor = async (req, res) => {
     const payload = {
       query
     }
+    req.templateValues.query = query
     const results = await graphQL.fetch(payload)
-    console.log(results)
+    if (results.data && results.data[thisQuery]) {
+      req.templateValues.objects = contrastColors(results.data[thisQuery])
+    }
   }
 
   req.templateValues.mode = 'color'
@@ -411,6 +427,8 @@ exports.getObject = async (req, res) => {
   const payload = {
     query
   }
+  req.templateValues.query = query
+
   const results = await graphQL.fetch(payload)
   if (results.data && results.data[thisQuery]) {
     const object = contrastColors([results.data[thisQuery]])[0]

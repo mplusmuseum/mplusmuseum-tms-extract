@@ -3,6 +3,7 @@
 <head>
   <title>Dashboard - explore-o-matic</title>
   {{> head}}
+  <link href="/css/prism.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -32,10 +33,18 @@
 
   <section class="section">
     <div class="container">
-      Results go here
+      {{#each objects}}
+        {{> exploreomatic/objectcard @this cloudname=../config.cloudinary.cloud_name}}
+      {{/each}}
     </div>
   </section>
 
+  <section class="section">
+    <div class="container">
+      <hr />
+      <pre class="query language-graphql">{{{query}}}</pre>
+    </div>
+  </section>
 
   {{> tail}}
   <script src="/js/hslpalette.js"></script>
