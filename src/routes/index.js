@@ -273,7 +273,7 @@ router.get('/:lang/explore-o-matic/mediums', ensureLoggedIn, exploreomatic.mediu
 router.get('/:lang/explore-o-matic/exhibitions', ensureLoggedIn, exploreomatic.exhibitions)
 router.get('/:lang/explore-o-matic/object/:filter', ensureLoggedIn, exploreomatic.getObject)
 router.get('/:lang/explore-o-matic/colour', ensureLoggedIn, exploreomatic.getColor)
-router.get('/:lang/explore-o-matic/colour/:hsb', ensureLoggedIn, exploreomatic.getColor)
+router.get('/:lang/explore-o-matic/colour/:hsl', ensureLoggedIn, exploreomatic.getColor)
 router.get('/:lang/explore-o-matic/:thing/:filter', ensureLoggedIn, exploreomatic.getObjectsByThing)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)

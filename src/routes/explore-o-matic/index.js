@@ -348,6 +348,48 @@ exports.getObjectsByThing = async (req, res) => {
 exports.getColor = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redriect('/')
+
+  //  This is a bit of an odd way to load in the script, as really
+  //  markup should be in the template. BUT, in this case we're
+  //  going to generate the script here
+  req.templateValues.pickedScript = `<script>
+  document.addEventListener("DOMContentLoaded", function (event) {
+    var thisPalette = new palette();
+    thisPalette.draw();
+  });
+  </script>`
+
+  //  If we have been passed some HSL values then we need to grab
+  //  them so we can do the object search *AND* pass them over
+  //  so we can put them on the picker
+  if (req.params.hsl) {
+    const hsl = req.params.hsl.split(',')
+    const h = parseInt(hsl[0], 10)
+    const l = parseInt(hsl[2], 10) * 2
+
+    req.templateValues.pickedScript = `<script>
+    document.addEventListener("DOMContentLoaded", function (event) {
+      var thisPalette = new palette();
+      thisPalette.draw({x: ${h}, y: ${l}});
+    });
+    </script>`
+
+    const queries = new Queries()
+    const graphQL = new GraphQL()
+
+    //  This is the initial search query we are going to use to grab all the constituents
+    const perPage = 60
+    const page = 0
+    const searchFilter = `(per_page: ${perPage}, page: ${page}, hue: ${h}, luminosity: ${l / 2})`
+    const thisQuery = 'objects'
+    const query = queries.get(thisQuery, searchFilter)
+    const payload = {
+      query
+    }
+    const results = await graphQL.fetch(payload)
+    console.log(results)
+  }
+
   req.templateValues.mode = 'color'
   return res.render('explore-o-matic/colour', req.templateValues)
 }

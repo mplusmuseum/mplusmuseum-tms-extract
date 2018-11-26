@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 class palette {
-  hsv2rgb(hue, saturation, value) {
+  hsv2rgb (hue, saturation, value) {
     let chroma = value * saturation
     let hue1 = hue / 60
     let x = chroma * (1 - Math.abs((hue1 % 2) - 1))
@@ -28,7 +28,7 @@ class palette {
     return [255 * r, 255 * g, 255 * b]
   }
 
-  draw() {
+  draw (picked) {
     console.log('Drawing palette')
     var c = document.getElementById('palette_canvas')
     var ctx = c.getContext('2d')
@@ -44,13 +44,26 @@ class palette {
         ctx.fillRect(x, y, 1, 1)
       }
     }
+
+    //  Draw the range on, if we've picked a point
+    if (picked) {
+      ctx.beginPath()
+      ctx.arc(picked.x, 200 - picked.y, 30, 0, 2 * Math.PI)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(picked.x + 360, 200 - picked.y, 30, 0, 2 * Math.PI)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.arc(picked.x - 360, 200 - picked.y, 30, 0, 2 * Math.PI)
+      ctx.stroke()
+    }
+
     document.getElementById('palette_canvas').addEventListener('click', (evt) => {
       const pc = document.getElementById('palette_canvas')
       const h = parseInt(evt.offsetX / pc.offsetWidth * 360, 10)
       const y = evt.offsetY / pc.offsetHeight * 200
       let l = 1 - (y / 200)
-      console.log(`hsl(${h}, 100%, ${parseInt(l * 100, 10)}%)`)
-      document.body.style.backgroundColor = `hsl(${h}, 100%, ${parseInt(l * 100, 10)}%)`
+      document.location = `/explore-o-matic/colour/${h},100,${parseInt(l * 100, 10)}`
     })
   }
 }
