@@ -36,6 +36,7 @@
               </figure>
               <br />
             {{/if}}
+            <a name="record"></a>
             <p>
               {{#each object.constituents}}
                 <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}
@@ -88,6 +89,38 @@
                 <td class="has-text-weight-bold">category</td>
                 <td>{{#if object.classification.category}}<a href="/explore-o-matic/category/{{object.classification.category.stub}}"
                       class="button cardButton">{{object.classification.category.title}}</a>{{/if}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">popularCount</td>
+                <td>
+                  {{object.popularCount}}
+                  <p>
+                    <form method="POST">
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <button class="button is-primary" name="bumpPopular" value="8">+10</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-primary" name="bumpPopular" value="48">+50</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-primary" name="bumpPopular" value="98">+100</button>
+                        </div>
+                      </div>
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <button class="button is-warning" name="bumpPopular" value="-12">-10</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-warning" name="bumpPopular" value="-52">-50</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-warning" name="bumpPopular" value="-102">-100</button>
+                        </div>
+                      </div>
+                    </form>
+                  </p>
+                </td>
               </tr>
             </table>
 

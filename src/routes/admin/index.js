@@ -12,7 +12,7 @@ const constituentMakers = require('../../modules/makeLookups/constituentMakers')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   if ('action' in req.body) {
     if (req.body.action === 'reimport') {
@@ -31,7 +31,7 @@ exports.index = (req, res) => {
 
 exports.users = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
   const users = await new Users().get()
   req.templateValues.users = users.reverse()
   return res.render('admin/users', req.templateValues)
@@ -39,7 +39,7 @@ exports.users = async (req, res) => {
 
 exports.user = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
   const userObj = await new User()
 
   const selectedUser = await userObj.get(req.params.id)
@@ -63,7 +63,7 @@ exports.user = async (req, res) => {
 
 exports.blowaway = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const startTime = new Date().getTime()
 
@@ -110,7 +110,7 @@ exports.isMakers = async (req, res) => {
   const tms = 'mplus'
 
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   //  Start the logger
   const tmsLogger = logging.getTMSLogger()
