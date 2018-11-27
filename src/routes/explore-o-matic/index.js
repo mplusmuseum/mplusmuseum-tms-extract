@@ -323,6 +323,11 @@ exports.getObjectsByThing = async (req, res) => {
     searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
   }
 
+  if (req.params.filter === 'popular') {
+    req.templateValues.mode = 'popular'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc")`
+  }
+
   //  Grab all the different maker types
   const query = queries.get(thisQuery, searchFilter)
   const payload = {
