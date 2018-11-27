@@ -17,6 +17,7 @@ class Queries {
         dimension
         creditLine
         medium
+        popularCount
         constituents {
           id
           name

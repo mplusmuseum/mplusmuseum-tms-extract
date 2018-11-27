@@ -1,6 +1,8 @@
 const Queries = require('../../classes/queries/exploreomatic.js')
 const GraphQL = require('../../classes/graphQL')
 const utils = require('../../modules/utils')
+const elasticsearch = require('elasticsearch')
+const Config = require('../../classes/config')
 
 const contrastColors = (objects) => {
   return objects.map((object) => {
@@ -53,7 +55,7 @@ const contrastColors = (objects) => {
 
 exports.index = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   //  Grab the query used to ask for an object
   const queries = new Queries()
@@ -75,7 +77,7 @@ exports.index = async (req, res) => {
 
 exports.constituents = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -165,7 +167,7 @@ exports.constituents = async (req, res) => {
 
 exports.areas = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -194,7 +196,7 @@ exports.areas = async (req, res) => {
 
 exports.categories = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -223,7 +225,7 @@ exports.categories = async (req, res) => {
 
 exports.exhibitions = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -252,7 +254,7 @@ exports.exhibitions = async (req, res) => {
 
 exports.mediums = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -281,7 +283,7 @@ exports.mediums = async (req, res) => {
 
 exports.getObjectsByThing = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -319,6 +321,11 @@ exports.getObjectsByThing = async (req, res) => {
     req.templateValues.mode = 'exhibition'
     thisQuery = 'exhibition'
     searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
+  }
+
+  if (req.params.filter === 'popular') {
+    req.templateValues.mode = 'popular'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc")`
   }
 
   //  Grab all the different maker types
@@ -360,7 +367,7 @@ exports.getObjectsByThing = async (req, res) => {
 
 exports.getColor = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   //  This is a bit of an odd way to load in the script, as really
   //  markup should be in the template. BUT, in this case we're
@@ -412,7 +419,7 @@ exports.getColor = async (req, res) => {
 
 exports.getObject = async (req, res) => {
   //  Make sure we are an admin user
-  if (req.user.roles.isAdmin !== true) return res.redriect('/')
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
   const graphQL = new GraphQL()
@@ -455,6 +462,30 @@ exports.getObject = async (req, res) => {
       }
     }
 
+    //  See if we have been passed an bump action, if so we need to adjust the
+    //  popularCount
+    if (req.body.bumpPopular) {
+      let newPopularCount = parseInt(req.body.bumpPopular, 10)
+
+      const config = new Config()
+      const elasticsearchConfig = config.get('elasticsearch')
+      const esclient = new elasticsearch.Client(elasticsearchConfig)
+      const index = 'objects_mplus'
+      const type = 'object'
+
+      //  Update the database
+      await esclient.update({
+        index,
+        type,
+        id: object.id,
+        body: {
+          script: `ctx._source.popularCount += ${newPopularCount}`
+        }
+      })
+      return setTimeout(() => {
+        res.redirect(`/explore-o-matic/object/${object.id}#record`)
+      }, 3000)
+    }
     req.templateValues.object = object
   }
 
