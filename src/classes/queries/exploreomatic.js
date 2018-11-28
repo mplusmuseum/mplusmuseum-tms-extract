@@ -119,7 +119,14 @@ class Queries {
             }
           }
         }
-
+        _sys {
+          pagination {
+            page
+            perPage
+            total
+            maxPage
+          }
+        }
       }
     }`
 
@@ -143,6 +150,14 @@ class Queries {
         constituents {
           id
           name
+        }
+        _sys {
+          pagination {
+            page
+            perPage
+            total
+            maxPage
+          }
         }
       }
     }`
@@ -191,6 +206,14 @@ class Queries {
             rank
             role
           }
+          _sys {
+            pagination {
+              page
+              perPage
+              total
+              maxPage
+            }
+          }
         }
         exhibitionBios {
           purpose
@@ -219,6 +242,14 @@ class Queries {
         constituents {
           id
           name
+        }
+        _sys {
+          pagination {
+            page
+            perPage
+            total
+            maxPage
+          }
         }
       }
     }`
@@ -296,6 +327,14 @@ class Queries {
             name
             rank
             role
+          }
+          _sys {
+            pagination {
+              page
+              perPage
+              total
+              maxPage
+            }
           }
         }
       }
