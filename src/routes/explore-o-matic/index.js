@@ -291,8 +291,11 @@ exports.getObjectsByThing = async (req, res) => {
   //  This is the initial search query we are going to use to grab all the constituents
   let searchFilter = ''
   let thisQuery = 'objects'
-  const perPage = 60
-  const page = 0
+  const perPage = 30
+  let page = 0
+  if (req.params.page) page = parseInt(req.params.page, 10) - 1
+  if (isNaN(page)) page = 0
+  if (page < 0) page = 0
 
   const newFilter = req.params.filter.replace(/_/g, '/')
 
@@ -335,12 +338,14 @@ exports.getObjectsByThing = async (req, res) => {
   }
   req.templateValues.query = query
   const results = await graphQL.fetch(payload)
+  let pagination = null
 
   if (results.data && results.data[thisQuery]) {
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
       if (thisQuery === 'constituent') {
         const constituent = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(constituent.objects)
+        const objects = contrastColors(constituent.objects)
+        req.templateValues.objects = objects
         delete constituent.objects
         //  Convert the roles into an array we can deal with
         constituent.roles = constituent.roles.map((role) => {
@@ -350,18 +355,83 @@ exports.getObjectsByThing = async (req, res) => {
           }
         })
         req.templateValues.constituent = constituent
+        //  Grab the pagination if we can
+        if (objects.length > 0 && objects[0]._sys && objects[0]._sys.pagination) {
+          pagination = objects[0]._sys.pagination
+        }
       }
       if (thisQuery === 'exhibition') {
         const exhibition = results.data[thisQuery]
-        req.templateValues.objects = contrastColors(exhibition.objects)
+        const objects = contrastColors(exhibition.objects)
+        req.templateValues.objects = objects
         delete exhibition.objects
         req.templateValues.exhibition = exhibition
+        //  Grab the pagination if we can
+        if (objects.length > 0 && objects[0]._sys && objects[0]._sys.pagination) {
+          pagination = objects[0]._sys.pagination
+        }
       }
     } else {
-      req.templateValues.objects = contrastColors(results.data[thisQuery])
+      const objects = contrastColors(results.data[thisQuery])
+      req.templateValues.objects = objects
+      //  Grab the pagination if we can
+      if (objects.length > 0 && objects[0]._sys && objects[0]._sys.pagination) {
+        pagination = objects[0]._sys.pagination
+      }
     }
   }
 
+  //  Now a long way of doing pagination. If this was used in more places
+  //  I'd probably turn it into a helper and an include on the templates
+  //  But for the moment, here's a long form way of making this as easy
+  //  as possible for the template to work out what to do.
+  if (pagination) {
+    const range = 2
+
+    pagination.showStartEllipses = false
+    pagination.showEndEllipses = false
+    pagination.showEllipses = false
+    pagination.showPrevious = true
+    pagination.showNext = true
+
+    pagination.page += 1
+    pagination.maxPage += 1
+
+    if (pagination.page - range - 1 <= 1) {
+      pagination.startPage = 1
+    } else {
+      pagination.startPage = pagination.page - range
+      pagination.showStartEllipses = true
+      pagination.showEllipses = true
+    }
+
+    if (pagination.page + range + 1 >= pagination.maxPage) {
+      pagination.endPage = pagination.maxPage
+    } else {
+      pagination.endPage = pagination.page + range
+      pagination.showEndEllipses = true
+      pagination.showEllipses = true
+    }
+
+    if (pagination.page <= 1) pagination.showPrevious = false
+    if (pagination.page >= pagination.maxPage) pagination.showNext = false
+    pagination.pageLoop = Array.from(Array(pagination.endPage - pagination.startPage + 1), (_, x) => x + pagination.startPage)
+    pagination.previousPage = pagination.page - 1
+    pagination.nextPage = pagination.page + 1
+  } else {
+    pagination = {}
+    pagination.showStartEllipses = false
+    pagination.showEndEllipses = false
+    pagination.showEllipses = false
+    pagination.showPrevious = false
+    pagination.showNext = false
+    pagination.pageLoop = [1]
+  }
+
+  pagination.target = `/explore-o-matic/${req.params.thing}`
+  if (req.params.filter) pagination.target += `/${req.params.filter}`
+  pagination.target += `/page/`
+  req.templateValues.pagination = pagination
   return res.render('explore-o-matic/objects', req.templateValues)
 }
 
