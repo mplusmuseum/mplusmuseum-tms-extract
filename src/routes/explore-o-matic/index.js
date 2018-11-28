@@ -291,7 +291,7 @@ exports.getObjectsByThing = async (req, res) => {
   //  This is the initial search query we are going to use to grab all the constituents
   let searchFilter = ''
   let thisQuery = 'objects'
-  const perPage = 60
+  const perPage = 30
   let page = 0
   if (req.params.page) page = parseInt(req.params.page, 10) - 1
   if (isNaN(page)) page = 0
