@@ -269,6 +269,7 @@ const parseItem = item => {
     creditLine: {},
     inscription: {},
     objectName: {},
+    scopeNContent: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -292,6 +293,8 @@ const parseItem = item => {
   if ('InscriptionTC' in item) newItem.inscription['zh-hant'] = item.InscriptionTC
   if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
   if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
+  if ('ScopeNContent' in item) newItem.scopeNContent['en'] = item.ScopeNContent
+  if ('ScopeNContentTC' in item) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
