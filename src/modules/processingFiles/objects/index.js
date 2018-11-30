@@ -268,6 +268,7 @@ const parseItem = item => {
     medium: {},
     creditLine: {},
     inscription: {},
+    objectName: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -289,6 +290,8 @@ const parseItem = item => {
   if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
   if ('Inscription' in item) newItem.inscription['en'] = item.Inscription
   if ('InscriptionTC' in item) newItem.inscription['zh-hant'] = item.InscriptionTC
+  if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
+  if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
