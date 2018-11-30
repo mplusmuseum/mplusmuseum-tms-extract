@@ -54,6 +54,39 @@ const getConstituents = constituents => {
   return constituentsObj
 }
 
+const getRelatedObjects = objects => {
+  const relatedObjects = {
+    ids: [],
+    idsToRelationship: []
+  }
+  if (objects === null || objects === undefined) return null
+  if (!Array.isArray(objects)) objects = [objects]
+
+  objects.forEach((object) => {
+    const newObject = {}
+
+    const objectId = parseInt(object._, 10)
+    if (!relatedObjects.ids.includes(objectId)) relatedObjects.ids.push(objectId)
+
+    newObject.id = objectId
+    if ('RelatedType' in object) {
+      newObject.relatedType = object.RelatedType
+    }
+    if ('SelfType' in object) {
+      newObject.selfType = object.SelfType
+    }
+    relatedObjects.idsToRelationship.push(newObject)
+  })
+
+  //  To stop theElasticSearch trying to make a large number of fields
+  //  based on this nested data, we're going to store it as a string.
+  //  We don't need to ever search on it, we just need to be able to
+  //  unpack it again on the other side.
+  relatedObjects.idsToRelationship = JSON.stringify(relatedObjects.idsToRelationship)
+
+  return relatedObjects
+}
+
 const getSortnumber = objectNumber => {
   //  We have a sort number, if the objectNumber is numeric then we can use
   //  it for the sort number, if it's not then we just leave it null
@@ -302,6 +335,11 @@ const parseItem = item => {
   if (Object.entries(newItem.dimension).length === 0) newItem.dimension = null
   if (Object.entries(newItem.medium).length === 0) newItem.medium = null
   if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
+
+  //  Related objects
+  if (item.RelatedObjectID) {
+    newItem.relatedObjectIds = getRelatedObjects(item.RelatedObjectID)
+  }
 
   // Do the collection type
   if (item.ObjectNumber.length >= 2) {
