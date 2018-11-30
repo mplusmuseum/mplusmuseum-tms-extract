@@ -32,10 +32,15 @@ const getConstituents = constituents => {
       const rank = parseInt(constituent.Displayorder, 10)
       newConstituentObj.rank = rank
     }
+    if ('Role' in constituent || 'RoleTC' in constituent) {
+      newConstituentObj.roles = {}
+    }
+
     if ('Role' in constituent) {
-      newConstituentObj.roles = {
-        en: constituent.Role
-      }
+      newConstituentObj.roles['en'] = constituent.Role
+    }
+    if ('RoleTC' in constituent) {
+      newConstituentObj.roles['zh-hant'] = constituent.RoleTC
     }
     //  Add the object to the array of id/rank/roles
     constituentsObj.idsToRoleRank.push(newConstituentObj)
@@ -98,6 +103,20 @@ const getClassifications = classifications => {
         }
         if ('ClassificationTC' in cat) {
           classificationsObj.category.areacat['zh-hant'] = cat.ClassificationTC
+        }
+      }
+      //  If we have an category then put it there
+      if (catSplit === 'Archive-Level') {
+        classificationsObj.archiveLevel = {
+          rank: parseInt(cat.Displayorder, 10),
+          areacat: {}
+        }
+        //  Add the languages if we have them
+        if ('Classification' in cat) {
+          classificationsObj.archiveLevel.areacat['en'] = cat.Classification.replace('Archive-Level', '')
+        }
+        if ('ClassificationTC' in cat) {
+          classificationsObj.archiveLevel.areacat['zh-hant'] = cat.ClassificationTC
         }
       }
     }
