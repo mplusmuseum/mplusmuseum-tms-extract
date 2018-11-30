@@ -32,10 +32,15 @@ const getConstituents = constituents => {
       const rank = parseInt(constituent.Displayorder, 10)
       newConstituentObj.rank = rank
     }
+    if ('Role' in constituent || 'RoleTC' in constituent) {
+      newConstituentObj.roles = {}
+    }
+
     if ('Role' in constituent) {
-      newConstituentObj.roles = {
-        en: constituent.Role
-      }
+      newConstituentObj.roles['en'] = constituent.Role
+    }
+    if ('RoleTC' in constituent) {
+      newConstituentObj.roles['zh-hant'] = constituent.RoleTC
     }
     //  Add the object to the array of id/rank/roles
     constituentsObj.idsToRoleRank.push(newConstituentObj)
@@ -47,6 +52,39 @@ const getConstituents = constituents => {
   constituentsObj.idsToRoleRank = JSON.stringify(constituentsObj.idsToRoleRank)
 
   return constituentsObj
+}
+
+const getRelatedObjects = objects => {
+  const relatedObjects = {
+    ids: [],
+    idsToRelationship: []
+  }
+  if (objects === null || objects === undefined) return null
+  if (!Array.isArray(objects)) objects = [objects]
+
+  objects.forEach((object) => {
+    const newObject = {}
+
+    const objectId = parseInt(object._, 10)
+    if (!relatedObjects.ids.includes(objectId)) relatedObjects.ids.push(objectId)
+
+    newObject.id = objectId
+    if ('RelatedType' in object) {
+      newObject.relatedType = object.RelatedType
+    }
+    if ('SelfType' in object) {
+      newObject.selfType = object.SelfType
+    }
+    relatedObjects.idsToRelationship.push(newObject)
+  })
+
+  //  To stop theElasticSearch trying to make a large number of fields
+  //  based on this nested data, we're going to store it as a string.
+  //  We don't need to ever search on it, we just need to be able to
+  //  unpack it again on the other side.
+  relatedObjects.idsToRelationship = JSON.stringify(relatedObjects.idsToRelationship)
+
+  return relatedObjects
 }
 
 const getSortnumber = objectNumber => {
@@ -98,6 +136,20 @@ const getClassifications = classifications => {
         }
         if ('ClassificationTC' in cat) {
           classificationsObj.category.areacat['zh-hant'] = cat.ClassificationTC
+        }
+      }
+      //  If we have an category then put it there
+      if (catSplit === 'Archival Level') {
+        classificationsObj.archivalLevel = {
+          rank: parseInt(cat.Displayorder, 10),
+          areacat: {}
+        }
+        //  Add the languages if we have them
+        if ('Classification' in cat) {
+          classificationsObj.archivalLevel.areacat['en'] = cat.Classification.replace('Archival Level-', '')
+        }
+        if ('ClassificationTC' in cat) {
+          classificationsObj.archivalLevel.areacat['zh-hant'] = cat.ClassificationTC
         }
       }
     }
@@ -248,6 +300,9 @@ const parseItem = item => {
     dimension: {},
     medium: {},
     creditLine: {},
+    inscription: {},
+    objectName: {},
+    scopeNContent: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -267,6 +322,12 @@ const parseItem = item => {
   if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
   if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
   if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
+  if ('Inscription' in item) newItem.inscription['en'] = item.Inscription
+  if ('InscriptionTC' in item) newItem.inscription['zh-hant'] = item.InscriptionTC
+  if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
+  if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
+  if ('ScopeNContent' in item) newItem.scopeNContent['en'] = item.ScopeNContent
+  if ('ScopeNContentTC' in item) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
@@ -274,6 +335,19 @@ const parseItem = item => {
   if (Object.entries(newItem.dimension).length === 0) newItem.dimension = null
   if (Object.entries(newItem.medium).length === 0) newItem.medium = null
   if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
+
+  //  Related objects
+  if (item.RelatedObjectID) {
+    newItem.relatedObjectIds = getRelatedObjects(item.RelatedObjectID)
+  }
+
+  // Do the collection type
+  if (item.ObjectNumber.length >= 2) {
+    const possibleCollectionType = item.ObjectNumber.slice(0, 2)
+    if (possibleCollectionType === 'CA' || possibleCollectionType === 'CL') {
+      newItem.collectionType = possibleCollectionType
+    }
+  }
 
   return newItem
 }
