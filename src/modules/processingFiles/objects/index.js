@@ -303,6 +303,14 @@ const parseItem = item => {
   if (Object.entries(newItem.medium).length === 0) newItem.medium = null
   if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
 
+  // Do the collection type
+  if (item.ObjectNumber.length >= 2) {
+    const possibleCollectionType = item.ObjectNumber.slice(0, 2)
+    if (possibleCollectionType === 'CA' || possibleCollectionType === 'CL') {
+      newItem.collectionType = possibleCollectionType
+    }
+  }
+
   return newItem
 }
 
