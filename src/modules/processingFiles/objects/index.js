@@ -106,17 +106,17 @@ const getClassifications = classifications => {
         }
       }
       //  If we have an category then put it there
-      if (catSplit === 'Archive-Level') {
-        classificationsObj.archiveLevel = {
+      if (catSplit === 'Archival Level') {
+        classificationsObj.archivalLevel = {
           rank: parseInt(cat.Displayorder, 10),
           areacat: {}
         }
         //  Add the languages if we have them
         if ('Classification' in cat) {
-          classificationsObj.archiveLevel.areacat['en'] = cat.Classification.replace('Archive-Level', '')
+          classificationsObj.archivalLevel.areacat['en'] = cat.Classification.replace('Archival Level-', '')
         }
         if ('ClassificationTC' in cat) {
-          classificationsObj.archiveLevel.areacat['zh-hant'] = cat.ClassificationTC
+          classificationsObj.archivalLevel.areacat['zh-hant'] = cat.ClassificationTC
         }
       }
     }
