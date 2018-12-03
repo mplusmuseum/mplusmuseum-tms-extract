@@ -280,6 +280,12 @@ class Queries {
       }
     }`
 
+    this.archivalLevels = `query {
+      archivalLevels[[]] {
+        title
+      }
+    }`
+
     this.mediums = `query {
       mediums[[]] {
         title

@@ -223,6 +223,35 @@ exports.categories = async (req, res) => {
   return res.render('explore-o-matic/categories', req.templateValues)
 }
 
+exports.archivalLevels = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('archivalLevels', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.archivalLevels) {
+    req.templateValues.archivalLevels = results.data.archivalLevels.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'archivalLevels'
+  return res.render('explore-o-matic/archivalLevels', req.templateValues)
+}
+
 exports.exhibitions = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
@@ -312,6 +341,11 @@ exports.getObjectsByThing = async (req, res) => {
   if (req.params.thing === 'area') {
     req.templateValues.mode = 'areas'
     searchFilter = `(per_page: ${perPage}, page: ${page}, area: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'archivalLevel') {
+    req.templateValues.mode = 'archivalLevels'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, archivalLevel: "${newFilter}")`
   }
 
   if (req.params.thing === 'constituent') {

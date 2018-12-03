@@ -269,6 +269,7 @@ router.get('/:lang/explore-o-matic/constituents', ensureLoggedIn, exploreomatic.
 router.get('/:lang/explore-o-matic/constituents/:makerStub', ensureLoggedIn, exploreomatic.constituents)
 router.get('/:lang/explore-o-matic/areas', ensureLoggedIn, exploreomatic.areas)
 router.get('/:lang/explore-o-matic/categories', ensureLoggedIn, exploreomatic.categories)
+router.get('/:lang/explore-o-matic/archivalLevels', ensureLoggedIn, exploreomatic.archivalLevels)
 router.get('/:lang/explore-o-matic/mediums', ensureLoggedIn, exploreomatic.mediums)
 router.get('/:lang/explore-o-matic/exhibitions', ensureLoggedIn, exploreomatic.exhibitions)
 router.get('/:lang/explore-o-matic/object/:filter', ensureLoggedIn, exploreomatic.getObject)
