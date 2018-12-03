@@ -304,7 +304,7 @@ const parseItem = item => {
     archiveDescription: {},
     objectName: {},
     scopeNContent: {},
-    baselineDescriptionTC: {},
+    baselineDescription: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -332,8 +332,8 @@ const parseItem = item => {
   if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
   if ('ScopeNContent' in item) newItem.scopeNContent['en'] = item.ScopeNContent
   if ('ScopeNContentTC' in item) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
-  if ('BaselineDescription' in item) newItem.baselineDescriptionTC['en'] = item.BaselineDescription
-  if ('BaselineDescriptionTC' in item) newItem.baselineDescriptionTC['zh-hant'] = item.BaselineDescriptionTC
+  if ('BaselineDescription' in item) newItem.baselineDescription['en'] = item.BaselineDescription
+  if ('BaselineDescriptionTC' in item) newItem.baselineDescription['zh-hant'] = item.BaselineDescriptionTC
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
