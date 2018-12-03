@@ -18,6 +18,14 @@ class Queries {
         creditLine
         medium
         popularCount
+        objectStatus
+        inscription
+        archiveDescription
+        objectName
+        scopeNContent
+        baselineDescription
+        collectionType
+        collectionCode
         constituents {
           id
           name

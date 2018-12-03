@@ -53,8 +53,36 @@
                 <td>{{object.objectNumber}}</td>
               </tr>
               <tr>
+                <td class="has-text-weight-bold">collectionType</td>
+                <td>{{object.collectionType}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">collectionCode</td>
+                <td>{{object.collectionCode}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">allORC</td>
+                <td>{{object.allORC}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">objectStatus</td>
+                <td>{{object.objectStatus}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">objectName</td>
+                <td>{{object.objectName}}</td>
+              </tr>
+              <tr>
                 <td class="has-text-weight-bold">sortNumber</td>
                 <td>{{object.sortNumber}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">publicAccess</td>
+                <td>{{object.publicAccess}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">onView</td>
+                <td>{{object.onView}}</td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">displayDate</td>
@@ -73,12 +101,34 @@
                 <td>{{object.dimension}}</td>
               </tr>
               <tr>
+                <td class="has-text-weight-bold">inscription</td>
+                <td>{{object.inscription}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">archiveDescription</td>
+                <td>{{object.archiveDescription}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">scopeNContent</td>
+                <td>{{object.scopeNContent}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">baselineDescription</td>
+                <td>{{object.baselineDescription}}</td>
+              </tr>
+              <tr>
                 <td class="has-text-weight-bold">creditLine</td>
                 <td>{{object.creditLine}}</td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">medium</td>
-                <td><a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a></td>
+                <td>
+                  {{#if object.medium}}
+                    <a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">area</td>
@@ -121,6 +171,10 @@
                     </form>
                   </p>
                 </td>
+              </tr>
+              <tr>
+                <td>&nbsp</td>
+                <td><a class="button is-link" href="/search/objects/mplus/{{object.id}}">View RAW data</a></td>
               </tr>
             </table>
 
