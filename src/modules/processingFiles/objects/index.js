@@ -301,8 +301,10 @@ const parseItem = item => {
     medium: {},
     creditLine: {},
     inscription: {},
+    archiveDescription: {},
     objectName: {},
     scopeNContent: {},
+    baselineDescriptionTC: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -324,10 +326,14 @@ const parseItem = item => {
   if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
   if ('Inscription' in item) newItem.inscription['en'] = item.Inscription
   if ('InscriptionTC' in item) newItem.inscription['zh-hant'] = item.InscriptionTC
+  if ('ArchiveDescription' in item) newItem.archiveDescription['en'] = item.ArchiveDescription
+  if ('ArchiveDescriptionTC' in item) newItem.archiveDescription['zh-hant'] = item.ArchiveDescriptionTC
   if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
   if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
   if ('ScopeNContent' in item) newItem.scopeNContent['en'] = item.ScopeNContent
   if ('ScopeNContentTC' in item) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
+  if ('BaselineDescription' in item) newItem.baselineDescriptionTC['en'] = item.BaselineDescription
+  if ('BaselineDescriptionTC' in item) newItem.baselineDescriptionTC['zh-hant'] = item.BaselineDescriptionTC
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
@@ -346,6 +352,10 @@ const parseItem = item => {
     const possibleCollectionType = item.ObjectNumber.slice(0, 2)
     if (possibleCollectionType === 'CA' || possibleCollectionType === 'CL') {
       newItem.collectionType = possibleCollectionType
+    }
+    if (possibleCollectionType === 'CA') {
+      const collectionCodeSplit = item.ObjectNumber.split('/')
+      newItem.collectionCode = collectionCodeSplit[0]
     }
   }
 
