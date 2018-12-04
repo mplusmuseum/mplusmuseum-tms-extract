@@ -140,6 +140,15 @@ body {
 
   }
 
+  div.topExloreMenu {
+    margin-bottom: 2rem;
+
+    div {
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+  }
+
   a.hidename {
     color: inherit;
     cursor: default;

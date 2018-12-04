@@ -1,0 +1,24 @@
+<section class="section">
+  <div class="container">
+    <nav class="pagination is-right" role="navigation" aria-label="pagination">
+      <a href="{{pagination.target}}{{pagination.previousPage}}" class="pagination-previous"
+        {{#unless pagination.showPrevious}} disabled{{/unless}}>Previous </a> <a href="{{pagination.target}}{{pagination.nextPage}}"
+        class="pagination-next" {{#unless pagination.showNext}} disabled{{/unless}}>Next page</a> <ul class="pagination-list">
+        {{#if pagination.showStartEllipses}}
+          <li><a href="{{pagination.target}}1" class="pagination-link" aria-label="Goto page 1">1</a></li>
+          <li><span class="pagination-ellipsis">&hellip;</span></li>
+        {{/if}}
+        {{#each pagination.pageLoop}}
+          <li><a href="{{../pagination.target}}{{@this}}" class="pagination-link{{#ifEqual @this ../pagination.page}} is-current{{/ifEqual}}"
+              aria-label="Goto page {{@this}}" {{#ifEqual @this ../pagination.page}} aria-current="page" {{/ifEqual}}>{{@this}}</a></li>
+        {{/each}}
+        {{#if pagination.showEndEllipses}}
+          <li><span class="pagination-ellipsis">&hellip;</span></li>
+          <li><a href="{{pagination.target}}{{pagination.maxPage}}" class="pagination-link" aria-label="Goto page {{pagination.maxPage}}">{{pagination.maxPage}}</a></li>
+        {{/if}}
+        </ul>
+    </nav>
+    <br />
+    <div class="is-size-7 has-text-weight-bold">(Total: {{pagination.total}})</div>
+  </div>
+</section>

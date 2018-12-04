@@ -98,6 +98,7 @@ class Queries {
         classification {
           area
           category
+          archivalLevel
         }
         images {
           rank
@@ -144,7 +145,19 @@ class Queries {
       randomobjects[[]] {
         id
         title
+        publicAccess
         displayDate
+        popularCount
+        classification {
+          area
+          category
+          archivalLevel
+        }
+        medium
+        objectName
+        objectStatus
+        collectionType
+        collectionCode
         color {
           predominant {
             color
@@ -197,7 +210,19 @@ class Queries {
         objects {
           id
           title
+          publicAccess
           displayDate
+          popularCount
+          classification {
+            area
+            category
+            archivalLevel
+          }
+          medium
+          objectName
+          objectStatus
+          collectionType
+          collectionCode
           color {
             predominant {
               color
@@ -213,8 +238,6 @@ class Queries {
           constituents {
             id
             name
-            rank
-            role
           }
           _sys {
             pagination {
@@ -236,7 +259,19 @@ class Queries {
       objects[[]] {
         id
         title
+        publicAccess
         displayDate
+        popularCount
+        classification {
+          area
+          category
+          archivalLevel
+        }
+        medium
+        objectName
+        objectStatus
+        collectionType
+        collectionCode
         color {
           predominant {
             color
@@ -281,24 +316,56 @@ class Queries {
     this.areas = `query {
       areas[[]] {
         title
+        count
       }
     }`
 
     this.categories = `query {
       categories[[]] {
         title
+        count
       }
     }`
 
     this.archivalLevels = `query {
       archivalLevels[[]] {
         title
+        count
+      }
+    }`
+
+    this.objectNames = `query {
+      names[[]] {
+        title
+        count
+      }
+    }`
+
+    this.objectStatuses = `query {
+      statuses[[]] {
+        title
+        count
+      }
+    }`
+
+    this.collectionTypes = `query {
+      collectionTypes[[]] {
+        title
+        count
+      }
+    }`
+
+    this.collectionCodes = `query {
+      collectionCodes[[]] {
+        title
+        count
       }
     }`
 
     this.mediums = `query {
       mediums[[]] {
         title
+        count
       }
     }`
 
@@ -325,7 +392,19 @@ class Queries {
         objects {
           id
           title
+          publicAccess
           displayDate
+          popularCount
+          classification {
+            area
+            category
+            archivalLevel
+          }
+          medium
+          objectName
+          objectStatus
+          collectionType
+          collectionCode
           color {
             predominant {
               color
@@ -341,8 +420,6 @@ class Queries {
           constituents {
             id
             name
-            rank
-            role
           }
           _sys {
             pagination {

@@ -13,10 +13,10 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title capitalise is-1">
-          Explore-o-matic - Mediums
+          Explore-o-matic - Collection Codes
         </h1>
         <h2 class="subtitle is-3">
-          Here are all the different "Mediums" connected to objects.
+          Here are all the different "collection codes" connected to objects.
         </h2>
       </div>
     </div>
@@ -24,11 +24,11 @@
 
   {{> exploreomatic/nav}}
 
-  {{#if mediums}}
+  {{#if collectionCodes}}
     <section class="section">
       <div class="container">
-        {{#each mediums}}
-          <a href="/explore-o-matic/medium/{{stub}}" class="button cardButton">{{title}} ({{count}})</a>
+        {{#each collectionCodes}}
+          <a href="/explore-o-matic/collectionCode/{{stub}}" class="button cardButton">{{title}} ({{count}})</a>
         {{/each}}
       </div>
     </section>

@@ -14,8 +14,120 @@
         <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
       {{/each}}
     </p>
-    <h1 class="title" style="color: inherit"><a href="/explore-o-matic/object/{{id}}" style="color: inherit">{{title}}{{#if displayDate}},
+    <h1 class="title" style="color: inherit"><a href="/explore-o-matic/object/{{id}}" style="color: inherit">{{#if title}}{{title}}
+          [view]
+        {{else}}&nbsp;{{/if}}{{#if displayDate}},
           {{displayDate}}{{/if}}</a></h1>
+    <table class="table is-hoverable is-fullwidth is-striped">
+      <tr>
+        <td class="has-text-weight-bold" style="width: 25%">title</td>
+        {{#unless title}}
+          <td class="has-background-danger has-text-white">[Missing title]</td>
+        {{else}}
+          <td>{{title}}</td>
+        {{/unless}}
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold" style="width: 25%">id</td>
+        <td>{{id}}</td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold" style="width: 25%">publicAccess</td>
+        {{#unless publicAccess}}
+          <td class="has-background-danger has-text-white">{{publicAccess}}</td>
+        {{else}}
+          <td class="has-background-primary has-text-white">{{publicAccess}}</td>
+        {{/unless}}
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">collectionType</td>
+        <td>
+          {{#if collectionType}}
+            <a href="/explore-o-matic/collectionType/{{collectionType}}" class="button cardButton">{{collectionType}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">collectionCode</td>
+        <td>
+          {{#if collectionCode}}
+            <a href="/explore-o-matic/collectionCode/{{collectionCode}}" class="button cardButton">{{collectionCode}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">archivalLevel</td>
+        <td>
+          {{#if classification.archivalLevel}}
+            <a href="/explore-o-matic/archivalLevel/{{classification.archivalLevel.stub}}" class="button cardButton">{{classification.archivalLevel.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">objectStatus</td>
+        <td>
+          {{#if objectStatus}}
+            <a href="/explore-o-matic/objectStatus/{{objectStatus.stub}}" class="button cardButton">{{objectStatus.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">objectName</td>
+        <td>
+          {{#if objectName}}
+            <a href="/explore-o-matic/objectName/{{objectName.stub}}" class="button cardButton">{{objectName.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">medium</td>
+        <td>
+          {{#if medium}}
+            <a href="/explore-o-matic/medium/{{medium.stub}}" class="button cardButton">{{medium.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">area</td>
+        <td>
+          {{#if classification.area}}
+            <a href="/explore-o-matic/area/{{classification.area.stub}}" class="button cardButton">{{classification.area.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">category</td>
+        <td>
+          {{#if classification.category}}
+            <a href="/explore-o-matic/category/{{classification.category.stub}}" class="button cardButton">{{classification.category.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold" style="width: 25%">popularCount</td>
+        <td>{{popularCount}}</td>
+      </tr>
+    </table>
+    <div class="level">
+      <a class="button is-link level-item is-centered" href="/explore-o-matic/object/{{id}}">View</a>
+    </div>
+
   </article>
 </div>
 {{#ifEndRow @index 3}}

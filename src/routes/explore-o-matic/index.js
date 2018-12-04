@@ -53,6 +53,51 @@ const contrastColors = (objects) => {
   })
 }
 
+const stubObjects = (objects) => {
+  return objects.map((object) => {
+    //  Turn things into title and stubs
+    if (object.medium) {
+      object.medium = {
+        title: object.medium,
+        stub: object.medium.replace(/\//g, '_')
+      }
+    }
+    if (object.objectStatus) {
+      object.objectStatus = {
+        title: object.objectStatus,
+        stub: object.objectStatus.replace(/\//g, '_')
+      }
+    }
+    if (object.objectName) {
+      object.objectName = {
+        title: object.objectName,
+        stub: object.objectName.replace(/\//g, '_')
+      }
+    }
+    if (object.classification) {
+      if (object.classification.area) {
+        object.classification.area = {
+          title: object.classification.area,
+          stub: object.classification.area.replace(/\//g, '_')
+        }
+      }
+      if (object.classification.category) {
+        object.classification.category = {
+          title: object.classification.category,
+          stub: object.classification.category.replace(/\//g, '_')
+        }
+      }
+      if (object.classification.archivalLevel) {
+        object.classification.archivalLevel = {
+          title: object.classification.archivalLevel,
+          stub: object.classification.archivalLevel.replace(/\//g, '_')
+        }
+      }
+    }
+    return object
+  })
+}
+
 exports.index = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
@@ -69,7 +114,7 @@ exports.index = async (req, res) => {
 
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.randomobjects) {
-    req.templateValues.objects = contrastColors(results.data.randomobjects)
+    req.templateValues.objects = stubObjects(contrastColors(results.data.randomobjects))
   }
   req.templateValues.mode = 'random'
   return res.render('explore-o-matic/index', req.templateValues)
@@ -252,6 +297,122 @@ exports.archivalLevels = async (req, res) => {
   return res.render('explore-o-matic/archivalLevels', req.templateValues)
 }
 
+exports.objectNames = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('objectNames', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.names) {
+    req.templateValues.objectNames = results.data.names.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'objectNames'
+  return res.render('explore-o-matic/objectNames', req.templateValues)
+}
+
+exports.objectStatuses = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('objectStatuses', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.statuses) {
+    req.templateValues.objectStatuses = results.data.statuses.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'objectStatuses'
+  return res.render('explore-o-matic/objectStatuses', req.templateValues)
+}
+
+exports.collectionTypes = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('collectionTypes', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.collectionTypes) {
+    req.templateValues.collectionTypes = results.data.collectionTypes.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'collectionTypes'
+  return res.render('explore-o-matic/collectionTypes', req.templateValues)
+}
+
+exports.collectionCodes = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('collectionCodes', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.collectionCodes) {
+    req.templateValues.collectionCodes = results.data.collectionCodes.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'collectionCodes'
+  return res.render('explore-o-matic/collectionCodes', req.templateValues)
+}
+
 exports.exhibitions = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
@@ -330,38 +491,80 @@ exports.getObjectsByThing = async (req, res) => {
 
   if (req.params.thing === 'category') {
     req.templateValues.mode = 'categories'
+    req.templateValues.title = `Category: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this category`
     searchFilter = `(per_page: ${perPage}, page: ${page}, category: "${newFilter}")`
   }
 
   if (req.params.thing === 'medium') {
     req.templateValues.mode = 'mediums'
+    req.templateValues.title = `Medium: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this medium`
     searchFilter = `(per_page: ${perPage}, page: ${page}, medium: "${newFilter}")`
   }
 
   if (req.params.thing === 'area') {
     req.templateValues.mode = 'areas'
+    req.templateValues.title = `Area: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this area`
     searchFilter = `(per_page: ${perPage}, page: ${page}, area: "${newFilter}")`
   }
 
   if (req.params.thing === 'archivalLevel') {
     req.templateValues.mode = 'archivalLevels'
+    req.templateValues.title = `Archival Level: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this archival level`
     searchFilter = `(per_page: ${perPage}, page: ${page}, archivalLevel: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'objectName') {
+    req.templateValues.mode = 'objectNames'
+    req.templateValues.title = `Object Name: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this object name`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, objectName: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'objectStatus') {
+    req.templateValues.mode = 'objectStatuses'
+    req.templateValues.title = `Object Status: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this object status`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, objectStatus: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'collectionType') {
+    req.templateValues.mode = 'collectionTypes'
+    req.templateValues.title = `Collection Type: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this collection type`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionType: "${newFilter}")`
+  }
+
+  if (req.params.thing === 'collectionCode') {
+    req.templateValues.mode = 'collectionCodes'
+    req.templateValues.title = `Collection Code: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this collection code`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${newFilter}")`
   }
 
   if (req.params.thing === 'constituent') {
     req.templateValues.mode = 'constituent'
+    req.templateValues.title = `Constituent ID: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this constituent`
     thisQuery = 'constituent'
     searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
   }
 
   if (req.params.thing === 'exhibition') {
     req.templateValues.mode = 'exhibition'
+    req.templateValues.title = `Exhibition ID: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this exhibition`
     thisQuery = 'exhibition'
     searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
   }
 
   if (req.params.filter === 'popular') {
     req.templateValues.mode = 'popular'
+    req.templateValues.title = `Popular Objects`
+    req.templateValues.subTitle = `A collection of objects sorted by popular`
     searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc")`
   }
 
@@ -378,10 +581,11 @@ exports.getObjectsByThing = async (req, res) => {
     if (thisQuery === 'constituent' || thisQuery === 'exhibition') {
       if (thisQuery === 'constituent') {
         const constituent = results.data[thisQuery]
-        const objects = contrastColors(constituent.objects)
+        const objects = stubObjects(contrastColors(constituent.objects))
         req.templateValues.objects = objects
         delete constituent.objects
-        //  Convert the roles into an array we can deal with
+
+        //  Convert the roles into an array we can deal with stubs
         constituent.roles = constituent.roles.map((role) => {
           return {
             title: role,
@@ -396,7 +600,7 @@ exports.getObjectsByThing = async (req, res) => {
       }
       if (thisQuery === 'exhibition') {
         const exhibition = results.data[thisQuery]
-        const objects = contrastColors(exhibition.objects)
+        const objects = stubObjects(contrastColors(exhibition.objects))
         req.templateValues.objects = objects
         delete exhibition.objects
         req.templateValues.exhibition = exhibition
@@ -405,9 +609,13 @@ exports.getObjectsByThing = async (req, res) => {
           pagination = objects[0]._sys.pagination
         }
       }
+
+      //  Stub up the objects
     } else {
       const objects = contrastColors(results.data[thisQuery])
-      req.templateValues.objects = objects
+
+      req.templateValues.objects = stubObjects(objects)
+
       //  Grab the pagination if we can
       if (objects.length > 0 && objects[0]._sys && objects[0]._sys.pagination) {
         pagination = objects[0]._sys.pagination
@@ -542,29 +750,7 @@ exports.getObject = async (req, res) => {
 
   const results = await graphQL.fetch(payload)
   if (results.data && results.data[thisQuery]) {
-    const object = contrastColors([results.data[thisQuery]])[0]
-    //  Convert the medium to title and stub
-    if (object.medium) {
-      object.medium = {
-        title: object.medium,
-        stub: object.medium.replace(/\//g, '_')
-      }
-    }
-    //  Convert the classifications to title and stub
-    if (object.classification) {
-      if (object.classification.area) {
-        object.classification.area = {
-          title: object.classification.area,
-          stub: object.classification.area.replace(/\//g, '_')
-        }
-      }
-      if (object.classification.category) {
-        object.classification.category = {
-          title: object.classification.category,
-          stub: object.classification.category.replace(/\//g, '_')
-        }
-      }
-    }
+    const object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
 
     //  See if we have been passed an bump action, if so we need to adjust the
     //  popularCount
@@ -592,6 +778,5 @@ exports.getObject = async (req, res) => {
     }
     req.templateValues.object = object
   }
-
   return res.render('explore-o-matic/object', req.templateValues)
 }
