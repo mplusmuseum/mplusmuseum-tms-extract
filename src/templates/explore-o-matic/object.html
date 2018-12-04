@@ -45,16 +45,90 @@
             </p>
             <table class="table is-hoverable is-fullwidth is-striped">
               <tr>
+                <td class="has-text-weight-bold" style="width: 25%">title</td>
+                {{#unless object.title}}
+                  <td class="has-background-danger has-text-white">[Missing title]</td>
+                {{else}}
+                  <td>{{object.title}}</td>
+                {{/unless}}
+              </tr>
+              <tr>
                 <td class="has-text-weight-bold" style="width: 25%">id</td>
                 <td>{{object.id}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold" style="width: 25%">publicAccess</td>
+                {{#unless object.publicAccess}}
+                  <td class="has-background-danger has-text-white">false</td>
+                {{else}}
+                  <td class="has-background-primary has-text-white">{{object.publicAccess}}</td>
+                {{/unless}}
               </tr>
               <tr>
                 <td class="has-text-weight-bold">objectNumber</td>
                 <td>{{object.objectNumber}}</td>
               </tr>
               <tr>
+                <td class="has-text-weight-bold">collectionType</td>
+                <td>
+                  {{#if object.collectionType}}
+                    <a href="/explore-o-matic/collectionType/{{object.collectionType}}" class="button cardButton">{{object.collectionType}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">collectionCode</td>
+                <td>
+                  {{#if object.collectionCode}}
+                    <a href="/explore-o-matic/collectionCode/{{object.collectionCode}}" class="button cardButton">{{object.collectionCode}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">allORC</td>
+                <td>{{object.allORC}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">archivalLevel</td>
+                <td>
+                  {{#if object.classification.archivalLevel}}
+                    <a href="/explore-o-matic/archivalLevel/{{object.classification.archivalLevel.stub}}" class="button cardButton">{{object.classification.archivalLevel.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">objectStatus</td>
+                <td>
+                  {{#if object.objectStatus}}
+                    <a href="/explore-o-matic/objectStatus/{{object.objectStatus.stub}}" class="button cardButton">{{object.objectStatus.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">objectName</td>
+                <td>
+                  {{#if object.objectName}}
+                    <a href="/explore-o-matic/objectName/{{object.objectName.stub}}" class="button cardButton">{{object.objectName.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
+              </tr>
+              <tr>
                 <td class="has-text-weight-bold">sortNumber</td>
                 <td>{{object.sortNumber}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">onView</td>
+                <td>{{object.onView}}</td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">displayDate</td>
@@ -73,22 +147,54 @@
                 <td>{{object.dimension}}</td>
               </tr>
               <tr>
+                <td class="has-text-weight-bold">inscription</td>
+                <td>{{object.inscription}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">archiveDescription</td>
+                <td>{{{deSlashRSlashN object.archiveDescription}}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">scopeNContent</td>
+                <td>{{object.scopeNContent}}</td>
+              </tr>
+              <tr>
+                <td class="has-text-weight-bold">baselineDescription</td>
+                <td>{{object.baselineDescription}}</td>
+              </tr>
+              <tr>
                 <td class="has-text-weight-bold">creditLine</td>
                 <td>{{object.creditLine}}</td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">medium</td>
-                <td><a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a></td>
+                <td>
+                  {{#if object.medium}}
+                    <a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">area</td>
-                <td>{{#if object.classification.area}}<a href="/explore-o-matic/area/{{object.classification.area.stub}}"
-                      class="button cardButton">{{object.classification.area.title}}</a>{{/if}}</td>
+                <td>
+                  {{#if object.classification.area}}
+                    <a href="/explore-o-matic/area/{{object.classification.area.stub}}" class="button cardButton">{{object.classification.area.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">category</td>
-                <td>{{#if object.classification.category}}<a href="/explore-o-matic/category/{{object.classification.category.stub}}"
-                      class="button cardButton">{{object.classification.category.title}}</a>{{/if}}</td>
+                <td>
+                  {{#if object.classification.category}}
+                    <a href="/explore-o-matic/category/{{object.classification.category.stub}}" class="button cardButton">{{object.classification.category.title}}</a>
+                  {{else}}
+                    &nbsp;
+                  {{/if}}
+                </td>
               </tr>
               <tr>
                 <td class="has-text-weight-bold">popularCount</td>
@@ -121,6 +227,10 @@
                     </form>
                   </p>
                 </td>
+              </tr>
+              <tr>
+                <td>&nbsp</td>
+                <td><a class="button is-link" href="/search/objects/mplus/{{object.id}}">View RAW data</a></td>
               </tr>
             </table>
 
