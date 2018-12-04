@@ -97,8 +97,11 @@ const findConstituentRoles = async (tms) => {
   //  Check to see if the index that we are going to put all
   //  this records into exists, if not then we make it.
   const bulkThisArray = []
+  const bulkConstituentUpdateArray = []
   let bulkIndex = 0
+
   Object.entries(constituentRoles).forEach((roleRecord) => {
+    const rolesList = []
     const id = parseInt(roleRecord[0], 10)
     const record = roleRecord[1]
     Object.entries(record.role).forEach((langRole) => {
@@ -107,6 +110,7 @@ const findConstituentRoles = async (tms) => {
       Object.entries(roles).forEach((roleCount) => {
         const role = roleCount[0]
         const count = roleCount[1]
+        rolesList.push(role)
         bulkThisArray.push({
           index: {
             _id: bulkIndex
@@ -122,6 +126,16 @@ const findConstituentRoles = async (tms) => {
         bulkIndex++
       })
     })
+    bulkConstituentUpdateArray.push({
+      update: {
+        _id: id
+      }
+    })
+    bulkConstituentUpdateArray.push({
+      doc: {
+        roles: rolesList
+      }
+    })
   })
 
   const esclient = new elasticsearch.Client(elasticsearchConfig)
@@ -135,6 +149,7 @@ const findConstituentRoles = async (tms) => {
       index
     })
   }
+
   esclient.bulk({
     index,
     type,
@@ -147,7 +162,17 @@ const findConstituentRoles = async (tms) => {
       ms: new Date().getTime() - startTime
     })
   })
+
+  //  Now we also need to update all the constituents with their new roles
+  esclient.bulk({
+    index: `constituents_${tms}`,
+    type: `constituent`,
+    body: bulkConstituentUpdateArray
+  }).then(() => {
+    console.log('updated constituents')
+  })
 }
+
 exports.findConstituentRoles = findConstituentRoles
 
 exports.startFindConstituentRoles = () => {

@@ -8,6 +8,7 @@ class Queries {
       object[[]] {
         id
         publicAccess
+        onView
         objectNumber
         sortNumber
         title
@@ -26,6 +27,7 @@ class Queries {
         baselineDescription
         collectionType
         collectionCode
+        allORC
         constituents {
           id
           name
