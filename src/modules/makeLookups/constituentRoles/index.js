@@ -168,8 +168,6 @@ const findConstituentRoles = async (tms) => {
     index: `constituents_${tms}`,
     type: `constituent`,
     body: bulkConstituentUpdateArray
-  }).then(() => {
-    console.log('updated constituents')
   })
 }
 
