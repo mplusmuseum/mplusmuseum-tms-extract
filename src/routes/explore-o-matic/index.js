@@ -104,7 +104,7 @@ exports.index = async (req, res) => {
 
   //  Grab the query used to ask for an object
   const queries = new Queries()
-  const query = queries.get('objectsRandom')
+  const query = queries.get('objectsRandom', `(lang:"${req.templateValues.dbLang}")`)
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
   const payload = {
@@ -128,7 +128,7 @@ exports.constituents = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"alphaSortName")`
+  let searchFilter = `(per_page: 5000, sort_field:"alphaSortName", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const makertypesQuery = queries.get('makertypes')
@@ -146,7 +146,7 @@ exports.constituents = async (req, res) => {
 
   if ('makerStub' in req.params) {
     const makerType = req.params.makerStub.replace(/_/g, '/')
-    searchFilter = `(per_page: 5000, sort_field:"alphaSortName", role:"${makerType}")`
+    searchFilter = `(per_page: 5000, sort_field:"alphaSortName", role:"${makerType}", lang:"${req.templateValues.dbLang}")`
     req.templateValues.thisMakerType = req.params.makerStub
   }
 
@@ -218,7 +218,7 @@ exports.areas = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('areas', searchFilter)
@@ -247,7 +247,7 @@ exports.categories = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('categories', searchFilter)
@@ -276,7 +276,7 @@ exports.archivalLevels = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('archivalLevels', searchFilter)
@@ -305,7 +305,7 @@ exports.objectNames = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('objectNames', searchFilter)
@@ -334,7 +334,7 @@ exports.objectStatuses = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('objectStatuses', searchFilter)
@@ -363,7 +363,7 @@ exports.collectionTypes = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('collectionTypes', searchFilter)
@@ -392,7 +392,7 @@ exports.collectionCodes = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('collectionCodes', searchFilter)
@@ -421,7 +421,7 @@ exports.exhibitions = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('exhibitions', searchFilter)
@@ -450,7 +450,7 @@ exports.mediums = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000, sort_field:"title")`
+  let searchFilter = `(per_page: 5000, sort_field:"title", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get('mediums', searchFilter)
@@ -493,56 +493,56 @@ exports.getObjectsByThing = async (req, res) => {
     req.templateValues.mode = 'categories'
     req.templateValues.title = `Category: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this category`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, category: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, category: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'medium') {
     req.templateValues.mode = 'mediums'
     req.templateValues.title = `Medium: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this medium`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, medium: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, medium: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'area') {
     req.templateValues.mode = 'areas'
     req.templateValues.title = `Area: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this area`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, area: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, area: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'archivalLevel') {
     req.templateValues.mode = 'archivalLevels'
     req.templateValues.title = `Archival Level: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this archival level`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, archivalLevel: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, archivalLevel: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'objectName') {
     req.templateValues.mode = 'objectNames'
     req.templateValues.title = `Object Name: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this object name`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, objectName: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, objectName: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'objectStatus') {
     req.templateValues.mode = 'objectStatuses'
     req.templateValues.title = `Object Status: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this object status`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, objectStatus: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, objectStatus: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'collectionType') {
     req.templateValues.mode = 'collectionTypes'
     req.templateValues.title = `Collection Type: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this collection type`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionType: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionType: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'collectionCode') {
     req.templateValues.mode = 'collectionCodes'
     req.templateValues.title = `Collection Code: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this collection code`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${newFilter}")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'constituent') {
@@ -550,7 +550,7 @@ exports.getObjectsByThing = async (req, res) => {
     req.templateValues.title = `Constituent ID: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this constituent`
     thisQuery = 'constituent'
-    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'exhibition') {
@@ -558,14 +558,14 @@ exports.getObjectsByThing = async (req, res) => {
     req.templateValues.title = `Exhibition ID: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this exhibition`
     thisQuery = 'exhibition'
-    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter})`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.filter === 'popular') {
     req.templateValues.mode = 'popular'
     req.templateValues.title = `Popular Objects`
     req.templateValues.subTitle = `A collection of objects sorted by popular`
-    searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc")`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc", lang:"${req.templateValues.dbLang}")`
   }
 
   //  Grab all the different maker types
@@ -712,7 +712,7 @@ exports.getColor = async (req, res) => {
     //  This is the initial search query we are going to use to grab all the constituents
     const perPage = 60
     const page = 0
-    const searchFilter = `(per_page: ${perPage}, page: ${page}, hue: ${h}, luminosity: ${l / 2})`
+    const searchFilter = `(per_page: ${perPage}, page: ${page}, hue: ${h}, luminosity: ${l / 2}, lang:"${req.templateValues.dbLang}")`
     const thisQuery = 'objects'
     const query = queries.get(thisQuery, searchFilter)
     const payload = {
@@ -739,7 +739,7 @@ exports.getObject = async (req, res) => {
   //  This is the initial search query we are going to use to grab all the constituents
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
-  let searchFilter = `(id: ${newFilter})`
+  let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
   const query = queries.get(thisQuery, searchFilter)
