@@ -139,6 +139,8 @@ router.use(function (req, res, next) {
     })
   }
   req.templateValues.selectedLang = selectedLang
+  req.templateValues.dbLang = 'en'
+  if (selectedLang === 'tc') req.templateValues.dbLang = 'zh-hant'
   req.templateValues.i18n = i18n
 
   //  If there is no Auth0 setting in config then we _must_
