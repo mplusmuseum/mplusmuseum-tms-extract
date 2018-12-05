@@ -30,6 +30,9 @@
         <div class="tile is-parent">
           <article class="tile is-child box" style="color: {{object.predominant.foreground}}; background:{{object.predominant.background}}">
             <h1 class="title" style="color: inherit">{{object.title}}</h1>
+            {{#if object.titleOther}}
+              <h2 class="subtitle" style="color: inherit">{{object.titleOther}}</h2>
+            {{/if}}
             {{#if object.mainImage}}
               <figure class="image">
                 <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v{{object.mainImage.version}}/{{object.mainImage.public_id}}.jpg">

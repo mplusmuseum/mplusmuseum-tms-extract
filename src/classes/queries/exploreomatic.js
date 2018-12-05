@@ -12,7 +12,9 @@ class Queries {
         objectNumber
         sortNumber
         title
+        titleOther
         displayDate
+        displayDateOther
         beginDate
         endDate
         dimension
@@ -31,6 +33,7 @@ class Queries {
         constituents {
           id
           name
+          nameOther
           alphaSortName
           displayBio
           gender
@@ -189,6 +192,7 @@ class Queries {
       constituent[[]] {
         id
         name
+        nameOther
         alphaSortName
         displayBio
         gender
@@ -210,6 +214,7 @@ class Queries {
         objects {
           id
           title
+          titleOther
           publicAccess
           displayDate
           popularCount
@@ -392,6 +397,7 @@ class Queries {
         objects {
           id
           title
+          titleOther
           publicAccess
           displayDate
           popularCount
