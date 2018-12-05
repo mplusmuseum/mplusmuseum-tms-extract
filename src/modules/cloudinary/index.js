@@ -278,6 +278,78 @@ const checkImages = () => {
   if (foundImageToUpload !== null) {
     uploadImage(foundImageToUpload.tms, foundImageToUpload.type, foundImageToUpload.id)
   }
+
+  //  If we didn't find any images to upload, then check for any missing ones that we now have
+  if (foundImageToUpload === null) {
+    if (tmsses !== null) {
+      tmsses.forEach((tms) => {
+        //  And get the file path
+        let imagePath = null
+        if (!config.tms == null) return
+        config.tms.forEach((imageTms) => {
+          if (imageTms.stub === tms.stub) imagePath = imageTms.imagePath
+        })
+        types.forEach((type) => {
+          //  Grab the process and perfect folders
+          const processDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'process')
+          const processedDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'processed')
+          const perfectDir = path.join(rootDir, 'imports', type.parent, tms.stub, 'perfect')
+          //  Make sure we have something to
+          if (fs.existsSync(perfectDir)) {
+            const subFolders = fs.readdirSync(perfectDir)
+            subFolders.forEach((subFolder) => {
+              const jsonFiles = fs.readdirSync(path.join(perfectDir, subFolder)).filter((file) => {
+                const filesSplit = file.split('.')
+                if (filesSplit.length !== 2) return false
+                if (filesSplit[1] !== 'json') return false
+                return true
+              }).filter(Boolean)
+              jsonFiles.forEach((file) => {
+                const processFilename = path.join(processDir, subFolder, file)
+                const processedFilename = path.join(processedDir, subFolder, file)
+                const perfectFilename = path.join(perfectDir, subFolder, file)
+                //  If we have a process file *and* a perfect file, then we need to read in
+                //  the process file to look at the images it has
+                if (fs.existsSync(perfectFilename)) {
+                  const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
+                  const perfectFileJSON = JSON.parse(perfectFileRaw)
+                  //  If we don't even have a remote field in the perfect, then we need to
+                  //  add the remote information
+                  if (perfectFileJSON.remote && perfectFileJSON.remote.images) {
+                    let foundMissingImage = false
+                    Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+                      const id = remoteImage[0]
+                      const imageObj = remoteImage[1]
+                      if (imageObj.status === 'missing') {
+                        const imagefilePath = path.join(imagePath, imageObj.src)
+                        if (fs.existsSync(imagefilePath)) {
+                          foundMissingImage = true
+                          perfectFileJSON.remote.images[id].status = 'upload'
+                        }
+                      }
+                    })
+                    //  If we found a missing image, then we need to save the file back out so it can
+                    //  be found to be uploaded
+                    if (foundMissingImage) {
+                      //  Now we need to check that the file exists in the processed folder
+                      //  so we can move it back to the process folder
+                      if (fs.existsSync(processedFilename) && !fs.existsSync(processFilename)) {
+                        perfectFileJSON.remote.status = 'upload'
+                        const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+                        fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+                        fs.copyFileSync(processedFilename, processFilename)
+                        fs.unlinkSync(processedFilename)
+                      }
+                    }
+                  }
+                }
+              })
+            })
+          }
+        })
+      })
+    }
+  }
 }
 
 /**
