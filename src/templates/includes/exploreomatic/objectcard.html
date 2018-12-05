@@ -92,7 +92,7 @@
         <td class="has-text-weight-bold">medium</td>
         <td>
           {{#if medium}}
-            <a href="/explore-o-matic/medium/{{medium.stub}}" class="button cardButton">{{medium.title}}</a>
+            <a href="/explore-o-matic/medium/{{medium.stub}}" class="button cardButton">{{truncate medium.title 24}}</a>
           {{else}}
             &nbsp;
           {{/if}}

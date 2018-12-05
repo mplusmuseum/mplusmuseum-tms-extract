@@ -116,6 +116,13 @@ exports.or = (v1, v2) => {
 exports.toLowerCase = text => {
   return text.toLowerCase()
 }
+
+exports.truncate = (text, targetLength) => {
+  if (!text) return null
+  if (text.length <= targetLength) return text
+  return `${text.substr(0, targetLength)}...`
+}
+
 exports.prettyMonth = month => {
   if (month === '01') {
     return 'January'
