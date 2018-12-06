@@ -1,6 +1,8 @@
 const moment = require('moment')
 const querystring = require('querystring')
 const Prism = require('prismjs')
+const marked = require('marked')
+
 var loadLanguages = require('prismjs/components/index.js')
 loadLanguages(['bash', 'graphql', 'json'])
 
@@ -117,10 +119,38 @@ exports.toLowerCase = text => {
   return text.toLowerCase()
 }
 
-exports.truncate = (text, targetLength) => {
+const truncate = (text, targetLength) => {
   if (!text) return null
   if (text.length <= targetLength) return text
   return `${text.substr(0, targetLength)}...`
+}
+exports.truncate = truncate
+
+const markdown = (text) => {
+  return marked(text)
+}
+exports.markdown = markdown
+
+exports.convertShortCode = (text) => {
+  let formattedText = ''
+  if (text) {
+    const firstChunks = text.split('[[')
+    firstChunks.forEach((chunk) => {
+      const subChunk = chunk.split(']]')
+      //  If there's only one thing, that means it's just a simple text
+      if (subChunk.length === 1) {
+        formattedText += subChunk[0]
+      } else {
+        const thingSplit = subChunk[0].split('|')
+        //  Check we have exactually three parts
+        if (thingSplit.length === 3) {
+          formattedText += `<a href="/explore-o-matic/${thingSplit[0]}/${thingSplit[2]}" class="button cardButton">${truncate(thingSplit[1], 24)}</a>`
+        }
+        formattedText += subChunk[1]
+      }
+    })
+  }
+  return markdown(formattedText)
 }
 
 exports.prettyMonth = month => {

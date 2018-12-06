@@ -774,8 +774,8 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/object/${newFilter}#record`)
-      }, 3000)
+        res.redirect(`/explore-o-matic/object/${newFilter}#admintools`)
+      }, 1000)
     }
   }
 
@@ -787,6 +787,7 @@ exports.getObject = async (req, res) => {
   req.templateValues.query = query
 
   const results = await graphQL.fetch(payload)
+
   if (results.data && results.data[thisQuery]) {
     const object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
 
@@ -805,10 +806,54 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/object/${object.id}#record`)
+        res.redirect(`/explore-o-matic/object/${object.id}#admintools`)
       }, 3000)
     }
     req.templateValues.object = object
+
+    //  As we have an object we need to go through and grab all the shortcodes
+    const shortCodes = []
+
+    //  1st the constituents
+    if (object.constituents) {
+      object.constituents.forEach((constituent) => {
+        shortCodes.push(`[[constituent|${constituent.name}|${constituent.id}]]`)
+      })
+    }
+    //  Now the area, category and archivalLevel
+    if (object.classification) {
+      if (object.classification.area) {
+        shortCodes.push(`[[area|${object.classification.area.title}|${object.classification.area.stub}]]`)
+      }
+      if (object.classification.category) {
+        shortCodes.push(`[[category|${object.classification.category.title}|${object.classification.category.stub}]]`)
+      }
+      if (object.classification.archivalLevel) {
+        shortCodes.push(`[[archivalLevel|${object.classification.archivalLevel.title}|${object.classification.archivalLevel.stub}]]`)
+      }
+    }
+    //  Medium
+    if (object.medium) {
+      shortCodes.push(`[[medium|${object.medium.title}|${object.medium.stub}]]`)
+    }
+    //  objectName
+    if (object.objectName) {
+      shortCodes.push(`[[objectName|${object.objectName.title}|${object.objectName.stub}]]`)
+    }
+    //  objectStatus
+    if (object.objectStatus) {
+      shortCodes.push(`[[objectStatus|${object.objectStatus.title}|${object.objectStatus.stub}]]`)
+    }
+    //  collectionType
+    if (object.collectionType) {
+      shortCodes.push(`[[collectionType|${object.collectionType.title}|${object.collectionType.stub}]]`)
+    }
+    //  collectionCode
+    if (object.collectionCode) {
+      shortCodes.push(`[[collectionCode|${object.collectionCode.title}|${object.collectionCode.stub}]]`)
+    }
+    req.templateValues.shortCodes = shortCodes
   }
+
   return res.render('explore-o-matic/object', req.templateValues)
 }
