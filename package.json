@@ -29,6 +29,7 @@
     "http-auth": "^3.2.3",
     "is-running": "^2.1.0",
     "line-by-line": "^0.1.6",
+    "marked": "^0.5.2",
     "mkdirp": "^0.5.1",
     "moment": "^2.20.1",
     "node-sass": "^4.9.2",

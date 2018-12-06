@@ -104,7 +104,7 @@ exports.index = async (req, res) => {
 
   //  Grab the query used to ask for an object
   const queries = new Queries()
-  const query = queries.get('objectsRandom', `(lang:"${req.templateValues.dbLang}")`)
+  const query = queries.get('objects', `(isRecommended: true, lang:"${req.templateValues.dbLang}")`)
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
   const payload = {
@@ -113,10 +113,10 @@ exports.index = async (req, res) => {
   req.templateValues.query = query
 
   const results = await graphQL.fetch(payload)
-  if (results.data && results.data.randomobjects) {
-    req.templateValues.objects = stubObjects(contrastColors(results.data.randomobjects))
+  if (results.data && results.data.objects) {
+    req.templateValues.objects = stubObjects(contrastColors(results.data.objects))
   }
-  req.templateValues.mode = 'random'
+  req.templateValues.mode = 'recommended'
   return res.render('explore-o-matic/index', req.templateValues)
 }
 
@@ -736,10 +736,48 @@ exports.getObject = async (req, res) => {
   const queries = new Queries()
   const graphQL = new GraphQL()
 
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = 'objects_mplus'
+  const type = 'object'
+
   //  This is the initial search query we are going to use to grab all the constituents
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
   let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
+
+  //  If we have an action the we want to set something on this object, we need
+  //  to do that here
+  if (req.body.action) {
+    //  If the action is to toggle the recommended value then we need to do that
+    if (req.body.action === 'toggleRecommended') {
+      let isRecommended = false
+      if (req.body.recommended && req.body.recommended === 'true') isRecommended = true
+      //  Check to see if there's any blurb, if so we need to set there here
+      const blurb = {}
+      if (req.body.blurb) {
+        blurb[req.templateValues.dbLang] = req.body.blurb
+      }
+      //  Update the database
+      await esclient.update({
+        index,
+        type,
+        id: newFilter,
+        body: {
+          doc: {
+            id: newFilter,
+            isRecommended,
+            recommendedBlurb: blurb
+          },
+          doc_as_upsert: true
+        }
+      })
+      return setTimeout(() => {
+        res.redirect(`/explore-o-matic/object/${newFilter}#admintools`)
+      }, 1000)
+    }
+  }
 
   //  Grab all the different maker types
   const query = queries.get(thisQuery, searchFilter)
@@ -749,6 +787,7 @@ exports.getObject = async (req, res) => {
   req.templateValues.query = query
 
   const results = await graphQL.fetch(payload)
+
   if (results.data && results.data[thisQuery]) {
     const object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
 
@@ -756,12 +795,6 @@ exports.getObject = async (req, res) => {
     //  popularCount
     if (req.body.bumpPopular) {
       let newPopularCount = parseInt(req.body.bumpPopular, 10)
-
-      const config = new Config()
-      const elasticsearchConfig = config.get('elasticsearch')
-      const esclient = new elasticsearch.Client(elasticsearchConfig)
-      const index = 'objects_mplus'
-      const type = 'object'
 
       //  Update the database
       await esclient.update({
@@ -773,10 +806,54 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/object/${object.id}#record`)
+        res.redirect(`/explore-o-matic/object/${object.id}#admintools`)
       }, 3000)
     }
     req.templateValues.object = object
+
+    //  As we have an object we need to go through and grab all the shortcodes
+    const shortCodes = []
+
+    //  1st the constituents
+    if (object.constituents) {
+      object.constituents.forEach((constituent) => {
+        shortCodes.push(`[[constituent|${constituent.name}|${constituent.id}]]`)
+      })
+    }
+    //  Now the area, category and archivalLevel
+    if (object.classification) {
+      if (object.classification.area) {
+        shortCodes.push(`[[area|${object.classification.area.title}|${object.classification.area.stub}]]`)
+      }
+      if (object.classification.category) {
+        shortCodes.push(`[[category|${object.classification.category.title}|${object.classification.category.stub}]]`)
+      }
+      if (object.classification.archivalLevel) {
+        shortCodes.push(`[[archivalLevel|${object.classification.archivalLevel.title}|${object.classification.archivalLevel.stub}]]`)
+      }
+    }
+    //  Medium
+    if (object.medium) {
+      shortCodes.push(`[[medium|${object.medium.title}|${object.medium.stub}]]`)
+    }
+    //  objectName
+    if (object.objectName) {
+      shortCodes.push(`[[objectName|${object.objectName.title}|${object.objectName.stub}]]`)
+    }
+    //  objectStatus
+    if (object.objectStatus) {
+      shortCodes.push(`[[objectStatus|${object.objectStatus.title}|${object.objectStatus.stub}]]`)
+    }
+    //  collectionType
+    if (object.collectionType) {
+      shortCodes.push(`[[collectionType|${object.collectionType.title}|${object.collectionType.stub}]]`)
+    }
+    //  collectionCode
+    if (object.collectionCode) {
+      shortCodes.push(`[[collectionCode|${object.collectionCode.title}|${object.collectionCode.stub}]]`)
+    }
+    req.templateValues.shortCodes = shortCodes
   }
+
   return res.render('explore-o-matic/object', req.templateValues)
 }
