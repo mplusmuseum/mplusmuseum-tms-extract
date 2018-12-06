@@ -104,7 +104,7 @@ exports.index = async (req, res) => {
 
   //  Grab the query used to ask for an object
   const queries = new Queries()
-  const query = queries.get('objectsRandom', `(lang:"${req.templateValues.dbLang}")`)
+  const query = queries.get('objects', `(isRecommended: true, lang:"${req.templateValues.dbLang}")`)
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
   const payload = {
@@ -113,10 +113,10 @@ exports.index = async (req, res) => {
   req.templateValues.query = query
 
   const results = await graphQL.fetch(payload)
-  if (results.data && results.data.randomobjects) {
-    req.templateValues.objects = stubObjects(contrastColors(results.data.randomobjects))
+  if (results.data && results.data.objects) {
+    req.templateValues.objects = stubObjects(contrastColors(results.data.objects))
   }
-  req.templateValues.mode = 'random'
+  req.templateValues.mode = 'recommended'
   return res.render('explore-o-matic/index', req.templateValues)
 }
 
