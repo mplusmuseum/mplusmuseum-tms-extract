@@ -385,6 +385,36 @@
           </article>
         </div>
       </div>
+      <div class="tile is-ancestor">
+        <div class="tile is-parent">
+          <article class="tile is-child box">
+            <h1 class="title">Admin tools</h1>
+            <hr />
+            <h2 class="title is-5">Recommend</h2>
+            <h3 class="subtitle is-6">If you want this object to show up as a recommended item <em>and</em> in the
+              random pool then set the check box here.</h3>
+            <form method="POST">
+              <label class="checkbox is-spaced">
+                <input type="checkbox" name="recommended" value=true>
+                Recommended
+              </label>
+              <br />
+              <label class="is-spaced">
+                <p>
+                  When we show a single recommended object we often show some "blurb" to go with it, you can enter that
+                  below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb for other
+                  languages use the language toggle from the top right of the page.
+                </p>
+                <textarea class="textarea" placeholder="Enter some descriptive text here" name="blurb"></textarea>
+              </label>
+              <br />
+              <div class="control">
+                <button class="button is-primary" name="action" value="toggleRecommended">Update</button>
+              </div>
+            </form>
+          </article>
+        </div>
+      </div>
     </div>
   </section>
 

@@ -736,10 +736,48 @@ exports.getObject = async (req, res) => {
   const queries = new Queries()
   const graphQL = new GraphQL()
 
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = 'objects_mplus'
+  const type = 'object'
+
   //  This is the initial search query we are going to use to grab all the constituents
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
   let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
+
+  //  If we have an action the we want to set something on this object, we need
+  //  to do that here
+  if (req.body.action) {
+    //  If the action is to toggle the recommended value then we need to do that
+    if (req.body.action === 'toggleRecommended') {
+      let isRecommended = false
+      if (req.body.recommended && req.body.recommended === 'true') isRecommended = true
+      //  Check to see if there's any blurb, if so we need to set there here
+      const blurb = {}
+      if (req.body.blurb) {
+        blurb[req.templateValues.dbLang] = req.body.blurb
+      }
+      //  Update the database
+      await esclient.update({
+        index,
+        type,
+        id: newFilter,
+        body: {
+          doc: {
+            id: newFilter,
+            isRecommended,
+            recommendedBlurb: blurb
+          },
+          doc_as_upsert: true
+        }
+      })
+      return setTimeout(() => {
+        res.redirect(`/explore-o-matic/object/${newFilter}#record`)
+      }, 3000)
+    }
+  }
 
   //  Grab all the different maker types
   const query = queries.get(thisQuery, searchFilter)
@@ -756,12 +794,6 @@ exports.getObject = async (req, res) => {
     //  popularCount
     if (req.body.bumpPopular) {
       let newPopularCount = parseInt(req.body.bumpPopular, 10)
-
-      const config = new Config()
-      const elasticsearchConfig = config.get('elasticsearch')
-      const esclient = new elasticsearch.Client(elasticsearchConfig)
-      const index = 'objects_mplus'
-      const type = 'object'
 
       //  Update the database
       await esclient.update({
