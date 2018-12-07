@@ -24,3 +24,4 @@ package-lock.json
 /tmp
 /*.old
 /*.old.*
+/lang/collection/strings.json

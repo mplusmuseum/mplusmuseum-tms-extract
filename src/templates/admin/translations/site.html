@@ -1,0 +1,132 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Translations - Collections
+        </h1>
+        <h2 class="subtitle is-3">
+          Here's where you can set the translation strings for the collections site
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+      <form method="POST">
+        {{#each strings}}
+          <a name="{{@key}}"></a>
+          <h1 class="title">{{@key}}</h1>
+
+          {{#if @this}}
+            <h2 class="
+            subtitle is-6">Below are the strings for this section of the site</h2>
+            <p>
+              <div class="columns">
+                <div class="field column is-2">
+                  <label class="label">String Stub</label>
+                </div>
+                <div class="field column is-5">
+                  <label class="label">English text</label>
+                </div>
+                <div class="field column is-5">
+                  <label class="label">Translation text</label>
+                </div>
+              </div>
+            </p>
+          {{/if}}
+
+          {{#each @this}}
+            <div class="columns{{#ifOdd @index}} has-background-white-ter{{/ifOdd}}">
+              <div class="field column is-2">
+                <div class="control has-text-weight-bold">
+                  {{@key}}
+                </div>
+              </div>
+              <div class="field column is-5">
+                <div class="control">
+                  <textarea class="textarea {{#unless en}}is-danger{{/unless}}" placeholder="English text" name="{{@../key}}|{{@key}}|en">{{en}}</textarea>
+                </div>
+              </div>
+              <div class="field column is-5">
+                <div class="control">
+                  <textarea class="textarea {{#unless tc}}is-danger{{/unless}}" placeholder="Translation" name="{{@../key}}|{{@key}}|tc">{{tc}}</textarea>
+                </div>
+              </div>
+            </div>
+          {{/each}}
+          <p>
+            <br />
+            <h3 class="title is-6">Add new string</h3>
+            <div class="columns has-background-grey-lighter">
+              <div class="field column is-2">
+                <label class="label">String Stub</label>
+                <div class="control">
+                  <input class="input is-primary" type="text" name="{{@key}}|newStub|" placeholder="stringStub">
+                </div>
+              </div>
+              <div class="field column is-5">
+                <label class="label">English text</label>
+                <div class="control">
+                  <textarea class="textarea" placeholder="English text" name="{{@key}}|newString|en"></textarea>
+                </div>
+              </div>
+              <div class="field column is-5">
+                <label class="label">Translation text</label>
+                <div class="control">
+                  <textarea class="textarea" placeholder="Translation" name="{{@key}}|newString|tc"></textarea>
+                </div>
+              </div>
+            </div>
+          </p>
+          <div class="control">
+            <button class="button is-primary" name="action" value="updateString">Update Strings</button>
+          </div>
+          <hr />
+        {{/each}}
+      </form>
+
+      <hr />
+      <hr />
+
+      <h1 class="title">Add new section</h1>
+      <h2 class="subtitle">If you need to add a new section, you can do it here</h2>
+      <form method="POST">
+        <div class="notification">
+          You can create a new section in the translation file by entering a "stub" here. The "stub"
+          should contain no spaces or punctuation. Please use camelCaps and minus symbols only. For example:
+          "helpSectionSearching" (preferable) or "helpSection-searching".
+        </div>
+        <input type="text" class="input is-spaced" placeholder="enterSectionNameHere" name="section">
+        <div class="control">
+          <button class="button is-primary" name="action" value="newSection">Add section</button>
+        </div>
+      </form>
+
+      <hr />
+
+      <form method="POST">
+        <div class="control">
+          <a href="/admin/translations/{{site}}/download/strings" class="button is-primary" name="action" value="downloadJSON"
+            target="_blank">Download translations file</a>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+  {{> tail}}
+</body>
+
+</html>

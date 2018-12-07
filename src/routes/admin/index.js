@@ -9,6 +9,7 @@ const elasticsearch = require('elasticsearch')
 const myElasticsearch = require('../../modules/elasticsearch')
 const rootDir = path.join(__dirname, '../../../data')
 const constituentMakers = require('../../modules/makeLookups/constituentMakers')
+exports.translations = require('./translations')
 
 exports.index = (req, res) => {
   //  Make sure we are an admin user
