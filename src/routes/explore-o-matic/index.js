@@ -131,7 +131,7 @@ exports.constituents = async (req, res) => {
   let searchFilter = `(per_page: 5000, sort_field:"alphaSortName", lang:"${req.templateValues.dbLang}")`
 
   //  Grab all the different maker types
-  const makertypesQuery = queries.get('makertypes')
+  const makertypesQuery = queries.get('makertypes', `(lang:"${req.templateValues.dbLang}")`)
   const makertypesPayload = {
     query: makertypesQuery
   }
@@ -140,8 +140,17 @@ exports.constituents = async (req, res) => {
     req.templateValues.makertypes = makertypesResults.data.makertypes.map((type) => {
       //  TODO: make this replace *all* not just the first one
       type.stub = type.title.replace(/\//g, '_')
-      return type
-    })
+
+      //  TODO: Don't do checking for language this way
+      if (req.templateValues.dbLang === 'en') {
+        if (type.title.match(/^([a-zA-Z0-9@*#])/) !== null) return type
+        return false
+      }
+      if (req.templateValues.dbLang === 'zh-hant') {
+        if (type.title.match(/^([a-zA-Z0-9@*#])/) === null) return type
+        return false
+      }
+    }).filter(Boolean)
   }
 
   if ('makerStub' in req.params) {
