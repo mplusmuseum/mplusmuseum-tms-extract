@@ -866,3 +866,118 @@ exports.getObject = async (req, res) => {
 
   return res.render('explore-o-matic/object', req.templateValues)
 }
+
+exports.factpedia = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  if (req.body.action) {
+    //  Get all the elastic search stuff
+    const config = new Config()
+    const elasticsearchConfig = config.get('elasticsearch')
+    if (elasticsearchConfig === null) {
+      req.templateValues.mode = 'factpedia'
+      return res.render('explore-o-matic/factpedia', req.templateValues)
+    }
+    const esclient = new elasticsearch.Client(elasticsearchConfig)
+
+    if (req.body.action === 'addFactoid') {
+      //  Build a new record to enter
+      //  Create the index if we need to
+      const index = `factoids_mplus`
+      const exists = await esclient.indices.exists({
+        index
+      })
+      if (exists === false) {
+        await esclient.indices.create({
+          index
+        })
+      }
+
+      await esclient.index({
+        index,
+        type: 'factoid',
+        body: {
+          fact: {
+            en: req.body.factoidEN,
+            'zh-hant': req.body.factoidTC
+          }
+        }
+      })
+      return setTimeout(() => {
+        res.redirect('/explore-o-matic/factpedia')
+      }, 2000)
+    }
+
+    if (req.body.action === 'updateFactoids') {
+      const bulkThisArray = []
+      Object.entries(req.body).forEach((thing) => {
+        const key = thing[0]
+        const value = thing[1]
+        const keySplit = key.split('_')
+        if (keySplit.length === 2) {
+          if (keySplit[1] === 'factoidEN') {
+            bulkThisArray.push({
+              update: {
+                _id: keySplit[0]
+              }
+            })
+            bulkThisArray.push({
+              doc: {
+                fact: {
+                  en: value
+                }
+              }
+            })
+          }
+          if (keySplit[1] === 'factoidTC') {
+            bulkThisArray.push({
+              update: {
+                _id: keySplit[0]
+              }
+            })
+            bulkThisArray.push({
+              doc: {
+                fact: {
+                  'zh-hant': value
+                }
+              }
+            })
+          }
+        }
+      })
+
+      if (bulkThisArray.length > 0) {
+        await esclient.bulk({
+          index: `factoids_mplus`,
+          type: 'factoid',
+          body: bulkThisArray
+        })
+        // Note that we want to rebuld the constituents
+        return setTimeout(() => {
+          res.redirect('/explore-o-matic/factpedia')
+        }, 2000)
+      }
+    }
+  }
+
+  //  Go and get the factoids
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000)`
+
+  //  Grab all the different maker types
+  const query = queries.get('factoids', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.factoids) req.templateValues.factoids = results.data.factoids
+
+  req.templateValues.mode = 'factpedia'
+  return res.render('explore-o-matic/factpedia', req.templateValues)
+}

@@ -290,6 +290,8 @@ router.get('/:lang/explore-o-matic/colour', ensureLoggedIn, exploreomatic.getCol
 router.get('/:lang/explore-o-matic/colour/:hsl', ensureLoggedIn, exploreomatic.getColor)
 router.get('/:lang/explore-o-matic/:thing/:filter/page/:page', ensureLoggedIn, exploreomatic.getObjectsByThing)
 router.get('/:lang/explore-o-matic/:thing/:filter', ensureLoggedIn, exploreomatic.getObjectsByThing)
+router.get('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
+router.post('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)
