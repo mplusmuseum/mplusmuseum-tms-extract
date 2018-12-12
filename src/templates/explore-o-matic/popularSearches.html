@@ -34,7 +34,7 @@
             <div class="columns">
               <div class="column">
                 <label class="is-spaced">
-                  <h1 class="title is-5">Factoid in EN</h1>
+                  <h1 class="title is-5">Popular Search in EN</h1>
                   <div class="notification">
                     {{{convertShortCode text}}}
                   </div>
@@ -43,7 +43,7 @@
               </div>
               <div class="column">
                 <label class="is-spaced">
-                  <h1 class="title is-5">Factoid in TC</h1>
+                  <h1 class="title is-5">Popular Search in TC</h1>
                   <div class="notification">
                     {{{convertShortCode textTC}}}
                   </div>
@@ -53,12 +53,12 @@
             </div>
             <input type="hidden" name="{{id}}|isPopular" value=true>
             <div class="has-text-right">
-              <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete factoid</button>
+              <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete search</button>
             </div>
             <hr />
           {{/each}}
           <div class="control is-spaced">
-            <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
+            <button class="button is-primary" name="action" value="updateFactoids">Update search</button>
           </div>
 
           <hr />
@@ -68,24 +68,25 @@
       <div class="tile is-ancestor">
         <div class="tile is-parent">
           <article class="tile is-child box">
-            <h1 class="title">Add new factoid</h1>
+            <h1 class="title">Add new popular search</h1>
             <hr />
             <form method="POST">
               <p>
-                When we show a single recommended object we often show some "blurb" to go with it, you can enter
-                that below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb
-                for other languages use the language toggle from the top right of the page.
+                You can define new popular searches here, the front end will pick one at random to display. You can add
+                as many [[shortcodes]] to a search as you'd like, for example <code>[[category|Architectural
+                  Drawing|Architectural Drawing]] [[category|Sculpture|Sculpture]] [[medium|acrylic on paper|acrylic on
+                  paper]]</code> and all three will be displayed as possible searches.
               </p>
               <div class="columns">
                 <div class="column">
                   <label class="is-spaced">
-                    <h1 class="title is-5">Factoid in EN</h1>
+                    <h1 class="title is-5">Search in EN</h1>
                     <textarea class="textarea" placeholder="Enter your factoid here" name="factoidEN"></textarea>
                   </label>
                 </div>
                 <div class="column">
                   <label class="is-spaced">
-                    <h1 class="title is-5">Factoid in TC</h1>
+                    <h1 class="title is-5">Search in TC</h1>
                     <textarea class="textarea" placeholder="Enter your factoid here" name="factoidTC"></textarea>
                   </label>
                 </div>
@@ -94,7 +95,7 @@
 
 
               <div class="control is-spaced">
-                <button class="button is-primary" name="action" value="addFactoid">Add factoid</button>
+                <button class="button is-primary" name="action" value="addFactoid">Add search</button>
               </div>
 
               <div class="notification">
@@ -155,7 +156,6 @@
                     </tr>
                   </tbody>
                 </table>
-
 
                 </p>
               </div>
