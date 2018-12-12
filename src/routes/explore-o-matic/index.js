@@ -894,15 +894,24 @@ exports.factpedia = async (req, res) => {
         })
       }
 
+      const body = {
+        fact: {
+          en: req.body.factoidEN,
+          'zh-hant': req.body.factoidTC
+        },
+        isConstituent: (req.body.isConstituent === 'true'),
+        isArea: (req.body.isArea === 'true'),
+        isCategory: (req.body.isCategory === 'true'),
+        isMedium: (req.body.isMedium === 'true'),
+        isArchive: (req.body.isArchive === 'true'),
+        isColour: (req.body.isColour === 'true'),
+        isRecommended: (req.body.isRecommended === 'true'),
+        isPopular: (req.body.isPopular === 'true')
+      }
       await esclient.index({
         index,
         type: 'factoid',
-        body: {
-          fact: {
-            en: req.body.factoidEN,
-            'zh-hant': req.body.factoidTC
-          }
-        }
+        body
       })
       return setTimeout(() => {
         res.redirect('/explore-o-matic/factpedia')
@@ -911,40 +920,55 @@ exports.factpedia = async (req, res) => {
 
     if (req.body.action === 'updateFactoids') {
       const bulkThisArray = []
+      const newFacts = {}
       Object.entries(req.body).forEach((thing) => {
         const key = thing[0]
         const value = thing[1]
-        const keySplit = key.split('_')
+        const keySplit = key.split('|')
+        const id = keySplit[0]
+        let field = null
         if (keySplit.length === 2) {
-          if (keySplit[1] === 'factoidEN') {
-            bulkThisArray.push({
-              update: {
-                _id: keySplit[0]
-              }
-            })
-            bulkThisArray.push({
-              doc: {
-                fact: {
-                  en: value
-                }
-              }
-            })
+          field = keySplit[1]
+          if (!newFacts[id]) {
+            newFacts[id] = {
+              fact: {
+                en: null,
+                'zh-hant': null
+              },
+              isConstituent: false,
+              isArea: false,
+              isCategory: false,
+              isMedium: false,
+              isArchive: false,
+              isColour: false,
+              isRecommended: false,
+              isPopular: false
+            }
           }
-          if (keySplit[1] === 'factoidTC') {
-            bulkThisArray.push({
-              update: {
-                _id: keySplit[0]
-              }
-            })
-            bulkThisArray.push({
-              doc: {
-                fact: {
-                  'zh-hant': value
-                }
-              }
-            })
-          }
+          if (field === 'factoidEN') newFacts[id].fact.en = value
+          if (field === 'factoidTC') newFacts[id].fact['zh-hant'] = value
+          if (field === 'isConstituent') newFacts[id].isConstituent = true
+          if (field === 'isArea') newFacts[id].isArea = true
+          if (field === 'isCategory') newFacts[id].isCategory = true
+          if (field === 'isMedium') newFacts[id].isMedium = true
+          if (field === 'isArchive') newFacts[id].isArchive = true
+          if (field === 'isColour') newFacts[id].isColour = true
+          if (field === 'isRecommended') newFacts[id].isRecommended = true
+          if (field === 'isPopular') newFacts[id].isPopular = true
         }
+      })
+
+      Object.entries(newFacts).forEach((factThing) => {
+        const _id = factThing[0]
+        const doc = factThing[1]
+        bulkThisArray.push({
+          update: {
+            _id
+          }
+        })
+        bulkThisArray.push({
+          doc
+        })
       })
 
       if (bulkThisArray.length > 0) {
