@@ -897,11 +897,9 @@ exports.factpedia = async (req, res) => {
     const type = 'factoid'
 
     if (req.body.action.indexOf('deleteFactoid') >= 0) {
-      console.log('delete factoid')
       const splitAction = req.body.action.split('|')
       if (splitAction.length === 2) {
         const id = splitAction[1]
-        console.log('deleting: ', id)
         await esclient.delete({
           index,
           type,
