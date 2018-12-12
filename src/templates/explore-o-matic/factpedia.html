@@ -38,7 +38,7 @@
                   <div class="notification">
                     {{{convertShortCode text}}}
                   </div>
-                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}_factoidEN">{{text}}</textarea>
+                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidEN">{{text}}</textarea>
                 </label>
               </div>
               <div class="column">
@@ -47,11 +47,36 @@
                   <div class="notification">
                     {{{convertShortCode textTC}}}
                   </div>
-                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}_factoidTC">{{textTC}}</textarea>
+                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidTC">{{textTC}}</textarea>
                 </label>
               </div>
             </div>
-            <hr />
+            <div class="columns">
+              <div class="column">
+                <label class="checkbox">
+                  <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}}>
+                    Constituent </label> </div> <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}}> Area </label>
+                      </div> <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}}>
+                        Category </label> </div> <div class="column">
+                      <label class="checkbox">
+                        <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}}>
+                          Medium </label> </div> <div class="column">
+                        <label class="checkbox">
+                          <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}}>
+                            Archive </label> </div> <div class="column">
+                          <label class="checkbox">
+                            <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}}>
+                              Colour </label> </div> <div class="column">
+                            <label class="checkbox">
+                              <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
+                                checked{{/if}}> Recommended </label> </div> <div class="column">
+                              <label class="checkbox">
+                                <input type="checkbox" name="{{id}}|isPopular" value=true {{#if isPopular}} checked{{/if}}>
+                                  Popular </label> </div> </div> <hr />
           {{/each}}
           <div class="control is-spaced">
             <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
@@ -83,6 +108,57 @@
                   <label class="is-spaced">
                     <h1 class="title is-5">Factoid in TC</h1>
                     <textarea class="textarea" placeholder="Enter your factoid here" name="factoidTC"></textarea>
+                  </label>
+                </div>
+              </div>
+              <h2 class="title is-6">Which site areas should this fact show up in?</h2>
+              <div class="columns">
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isConstituent" value=true>
+                    Constituent
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isArea" value=true>
+                    Area
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isCategory" value=true>
+                    Category
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isMedium" value=true>
+                    Medium
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isArchive" value=true>
+                    Archive
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isColour" value=true>
+                    Colour
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isRecommended" value=true>
+                    Recommended
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="isPopular" value=true>
+                    Popular
                   </label>
                 </div>
               </div>

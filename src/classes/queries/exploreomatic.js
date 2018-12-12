@@ -3,7 +3,7 @@ class Queries {
   /**
    * Create a collection of queries
    */
-  constructor() {
+  constructor () {
     this.object = `query {
       object[[]] {
         id
@@ -388,6 +388,14 @@ class Queries {
         id
         text
         textTC
+        isConstituent
+        isArea
+        isCategory
+        isMedium
+        isArchive
+        isColour
+        isRecommended
+        isPopular
       }
     }`
 
@@ -456,7 +464,7 @@ class Queries {
    * @param {string} filter The filter we want to apply to the query i.e. '(limit: 20)'
    * @returns {string|null} A representation of the query ready to be used if found, or null if not.
    */
-  get(query, filter) {
+  get (query, filter) {
     if (!(query in this)) return null
     if (!filter) filter = ''
     return this[query].replace('[[]]', filter)
