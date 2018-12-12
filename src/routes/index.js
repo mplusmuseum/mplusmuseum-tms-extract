@@ -292,6 +292,8 @@ router.get('/:lang/explore-o-matic/:thing/:filter/page/:page', ensureLoggedIn, e
 router.get('/:lang/explore-o-matic/:thing/:filter', ensureLoggedIn, exploreomatic.getObjectsByThing)
 router.get('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
 router.post('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
+router.get('/:lang/explore-o-matic/popularSearches', ensureLoggedIn, exploreomatic.factpedia)
+router.post('/:lang/explore-o-matic/popularSearches', ensureLoggedIn, exploreomatic.factpedia)
 
 router.get('/:lang/apihelp', ensureLoggedIn, api.index)
 router.post('/api/checkToken', api.checkToken)

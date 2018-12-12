@@ -871,20 +871,51 @@ exports.factpedia = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
+  //  Work out if we are on the factpedia or popularSearches, 'cause
+  //  we'll be needing to know this
+  const isFactpedia = (req.path.indexOf('factpedia') >= 0)
+  let returnUrl = '/explore-o-matic/factpedia'
+  let template = 'factpedia'
+
+  if (isFactpedia) {
+    req.templateValues.mode = 'factpedia'
+  } else {
+    req.templateValues.mode = 'popularSearches'
+    returnUrl = '/explore-o-matic/popularSearches'
+    template = 'popularSearches'
+  }
+
   if (req.body.action) {
     //  Get all the elastic search stuff
     const config = new Config()
     const elasticsearchConfig = config.get('elasticsearch')
     if (elasticsearchConfig === null) {
-      req.templateValues.mode = 'factpedia'
       return res.render('explore-o-matic/factpedia', req.templateValues)
     }
     const esclient = new elasticsearch.Client(elasticsearchConfig)
+    const index = `factoids_mplus`
+    const type = 'factoid'
+
+    if (req.body.action.indexOf('deleteFactoid') >= 0) {
+      console.log('delete factoid')
+      const splitAction = req.body.action.split('|')
+      if (splitAction.length === 2) {
+        const id = splitAction[1]
+        console.log('deleting: ', id)
+        await esclient.delete({
+          index,
+          type,
+          id
+        })
+        return setTimeout(() => {
+          res.redirect(returnUrl)
+        }, 2000)
+      }
+    }
 
     if (req.body.action === 'addFactoid') {
       //  Build a new record to enter
       //  Create the index if we need to
-      const index = `factoids_mplus`
       const exists = await esclient.indices.exists({
         index
       })
@@ -910,11 +941,11 @@ exports.factpedia = async (req, res) => {
       }
       await esclient.index({
         index,
-        type: 'factoid',
+        type,
         body
       })
       return setTimeout(() => {
-        res.redirect('/explore-o-matic/factpedia')
+        res.redirect(returnUrl)
       }, 2000)
     }
 
@@ -973,13 +1004,13 @@ exports.factpedia = async (req, res) => {
 
       if (bulkThisArray.length > 0) {
         await esclient.bulk({
-          index: `factoids_mplus`,
-          type: 'factoid',
+          index,
+          type,
           body: bulkThisArray
         })
         // Note that we want to rebuld the constituents
         return setTimeout(() => {
-          res.redirect('/explore-o-matic/factpedia')
+          res.redirect(returnUrl)
         }, 2000)
       }
     }
@@ -990,7 +1021,10 @@ exports.factpedia = async (req, res) => {
   const graphQL = new GraphQL()
 
   //  This is the initial search query we are going to use to grab all the constituents
-  let searchFilter = `(per_page: 5000)`
+  let searchFilter = `(per_page: 5000, isPopular: false)`
+  if (!isFactpedia) {
+    searchFilter = `(per_page: 5000, isPopular: true)`
+  }
 
   //  Grab all the different maker types
   const query = queries.get('factoids', searchFilter)
@@ -1002,6 +1036,5 @@ exports.factpedia = async (req, res) => {
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.factoids) req.templateValues.factoids = results.data.factoids
 
-  req.templateValues.mode = 'factpedia'
-  return res.render('explore-o-matic/factpedia', req.templateValues)
+  return res.render(`explore-o-matic/${template}`, req.templateValues)
 }

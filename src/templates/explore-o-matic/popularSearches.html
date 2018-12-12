@@ -13,10 +13,10 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title capitalise is-1">
-          Explore-o-matic - Factpedia
+          Explore-o-matic - Popular searches
         </h1>
         <h2 class="subtitle is-3">
-          Here is the list of facts that we sometimes present to the user. You can add more here.
+          You can define all the popular searches here.
         </h2>
       </div>
     </div>
@@ -51,31 +51,7 @@
                 </label>
               </div>
             </div>
-            <div class="columns">
-              <div class="column">
-                <label class="checkbox">
-                  <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}}>
-                    Constituent </label> </div> <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}}> Area </label>
-                      </div> <div class="column">
-                    <label class="checkbox">
-                      <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}}>
-                        Category </label> </div> <div class="column">
-                      <label class="checkbox">
-                        <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}}>
-                          Medium </label> </div> <div class="column">
-                        <label class="checkbox">
-                          <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}}>
-                            Archive </label> </div> <div class="column">
-                          <label class="checkbox">
-                            <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}}>
-                              Colour </label> </div> <div class="column">
-                            <label class="checkbox">
-                              <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
-                                checked{{/if}}> Recommended </label> </div> <div class="column">
-              </div>
-            </div>
+            <input type="hidden" name="{{id}}|isPopular" value=true>
             <div class="has-text-right">
               <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete factoid</button>
             </div>
@@ -114,51 +90,8 @@
                   </label>
                 </div>
               </div>
-              <h2 class="title is-6">Which site areas should this fact show up in?</h2>
-              <div class="columns">
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isConstituent" value=true>
-                    Constituent
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isArea" value=true>
-                    Area
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isCategory" value=true>
-                    Category
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isMedium" value=true>
-                    Medium
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isArchive" value=true>
-                    Archive
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isColour" value=true>
-                    Colour
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isRecommended" value=true>
-                    Recommended
-                  </label>
-                </div>
-              </div>
+              <input type="hidden" name="isPopular" value=true>
+
 
               <div class="control is-spaced">
                 <button class="button is-primary" name="action" value="addFactoid">Add factoid</button>
