@@ -56,38 +56,38 @@ const contrastColors = (objects) => {
 const stubObjects = (objects) => {
   return objects.map((object) => {
     //  Turn things into title and stubs
-    if (object.medium) {
+    if (object.medium && !object.medium.stub) {
       object.medium = {
         title: object.medium,
         stub: object.medium.replace(/\//g, '_')
       }
     }
-    if (object.objectStatus) {
+    if (object.objectStatus && !object.objectStatus.stub) {
       object.objectStatus = {
         title: object.objectStatus,
         stub: object.objectStatus.replace(/\//g, '_')
       }
     }
-    if (object.objectName) {
+    if (object.objectName && !object.objectName.stub) {
       object.objectName = {
         title: object.objectName,
         stub: object.objectName.replace(/\//g, '_')
       }
     }
     if (object.classification) {
-      if (object.classification.area) {
+      if (object.classification.area && !object.classification.area.stub) {
         object.classification.area = {
           title: object.classification.area,
           stub: object.classification.area.replace(/\//g, '_')
         }
       }
-      if (object.classification.category) {
+      if (object.classification.category && !object.classification.category.stub) {
         object.classification.category = {
           title: object.classification.category,
           stub: object.classification.category.replace(/\//g, '_')
         }
       }
-      if (object.classification.archivalLevel) {
+      if (object.classification.archivalLevel && !object.classification.archivalLevel.stub) {
         object.classification.archivalLevel = {
           title: object.classification.archivalLevel,
           stub: object.classification.archivalLevel.replace(/\//g, '_')
@@ -842,6 +842,7 @@ exports.getObject = async (req, res) => {
     }
 
     //  Stub up the related objects
+    console.log(object)
     if (object.relatedObjects) {
       if (!Array.isArray(object.relatedObjects)) object.relatedObjects = [object.relatedObjects]
       object.relatedObjects = stubObjects(contrastColors(object.relatedObjects))
