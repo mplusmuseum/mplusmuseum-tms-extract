@@ -634,7 +634,7 @@ exports.getObjectsByThing = async (req, res) => {
 
       //  Stub up the objects
     } else {
-      const objects = contrastColors(results.data[thisQuery])
+      const objects = stubObjects(contrastColors(results.data[thisQuery]))
 
       req.templateValues.objects = stubObjects(objects)
 
@@ -743,7 +743,7 @@ exports.getColor = async (req, res) => {
     req.templateValues.query = query
     const results = await graphQL.fetch(payload)
     if (results.data && results.data[thisQuery]) {
-      req.templateValues.objects = contrastColors(results.data[thisQuery])
+      req.templateValues.objects = stubObjects(contrastColors(results.data[thisQuery]))
     }
   }
 
@@ -771,6 +771,7 @@ exports.getObject = async (req, res) => {
   if (req.path.indexOf('/archive') >= 0) {
     urlStub = 'archive'
     isArchive = true
+    req.templateValues.mode = 'archives'
   }
 
   //  This is the initial search query we are going to use to grab all the constituents
