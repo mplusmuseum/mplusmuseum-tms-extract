@@ -56,38 +56,38 @@ const contrastColors = (objects) => {
 const stubObjects = (objects) => {
   return objects.map((object) => {
     //  Turn things into title and stubs
-    if (object.medium) {
+    if (object.medium && !object.medium.stub) {
       object.medium = {
         title: object.medium,
         stub: object.medium.replace(/\//g, '_')
       }
     }
-    if (object.objectStatus) {
+    if (object.objectStatus && !object.objectStatus.stub) {
       object.objectStatus = {
         title: object.objectStatus,
         stub: object.objectStatus.replace(/\//g, '_')
       }
     }
-    if (object.objectName) {
+    if (object.objectName && !object.objectName.stub) {
       object.objectName = {
         title: object.objectName,
         stub: object.objectName.replace(/\//g, '_')
       }
     }
     if (object.classification) {
-      if (object.classification.area) {
+      if (object.classification.area && !object.classification.area.stub) {
         object.classification.area = {
           title: object.classification.area,
           stub: object.classification.area.replace(/\//g, '_')
         }
       }
-      if (object.classification.category) {
+      if (object.classification.category && !object.classification.category.stub) {
         object.classification.category = {
           title: object.classification.category,
           stub: object.classification.category.replace(/\//g, '_')
         }
       }
-      if (object.classification.archivalLevel) {
+      if (object.classification.archivalLevel && !object.classification.archivalLevel.stub) {
         object.classification.archivalLevel = {
           title: object.classification.archivalLevel,
           stub: object.classification.archivalLevel.replace(/\//g, '_')
@@ -490,13 +490,17 @@ exports.getObjectsByThing = async (req, res) => {
   //  This is the initial search query we are going to use to grab all the constituents
   let searchFilter = ''
   let thisQuery = 'objects'
-  const perPage = 30
+  let perPage = 30
   let page = 0
   if (req.params.page) page = parseInt(req.params.page, 10) - 1
   if (isNaN(page)) page = 0
   if (page < 0) page = 0
 
-  const newFilter = req.params.filter.replace(/_/g, '/')
+  //  Grab the filter if there is one
+  let newFilter = null
+  if (req.params && req.params.filter) {
+    newFilter = req.params.filter.replace(/_/g, '/')
+  }
 
   if (req.params.thing === 'category') {
     req.templateValues.mode = 'categories'
@@ -577,6 +581,15 @@ exports.getObjectsByThing = async (req, res) => {
     searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc", lang:"${req.templateValues.dbLang}")`
   }
 
+  if (req.path.indexOf('explore-o-matic/archives') >= 0) {
+    perPage = 100
+    req.templateValues.isArchives = true
+    req.templateValues.mode = 'archives'
+    req.templateValues.title = 'Archives'
+    req.templateValues.subTitle = `These are the objects that represent archives`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, archivalLevel: "Fonds", lang:"${req.templateValues.dbLang}")`
+  }
+
   //  Grab all the different maker types
   const query = queries.get(thisQuery, searchFilter)
   const payload = {
@@ -621,7 +634,7 @@ exports.getObjectsByThing = async (req, res) => {
 
       //  Stub up the objects
     } else {
-      const objects = contrastColors(results.data[thisQuery])
+      const objects = stubObjects(contrastColors(results.data[thisQuery]))
 
       req.templateValues.objects = stubObjects(objects)
 
@@ -730,7 +743,7 @@ exports.getColor = async (req, res) => {
     req.templateValues.query = query
     const results = await graphQL.fetch(payload)
     if (results.data && results.data[thisQuery]) {
-      req.templateValues.objects = contrastColors(results.data[thisQuery])
+      req.templateValues.objects = stubObjects(contrastColors(results.data[thisQuery]))
     }
   }
 
@@ -750,6 +763,16 @@ exports.getObject = async (req, res) => {
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const index = 'objects_mplus'
   const type = 'object'
+
+  //  Find out if we are dealing with looking at an object or an "archive" (which
+  //  if really an object)
+  let urlStub = 'object'
+  let isArchive = false
+  if (req.path.indexOf('/archive') >= 0) {
+    urlStub = 'archive'
+    isArchive = true
+    req.templateValues.mode = 'archives'
+  }
 
   //  This is the initial search query we are going to use to grab all the constituents
   let thisQuery = 'object'
@@ -783,7 +806,7 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/object/${newFilter}#admintools`)
+        res.redirect(`/explore-o-matic/${urlStub}/${newFilter}#admintools`)
       }, 1000)
     }
   }
@@ -794,11 +817,10 @@ exports.getObject = async (req, res) => {
     query
   }
   req.templateValues.query = query
-
+  let object = null
   const results = await graphQL.fetch(payload)
-
   if (results.data && results.data[thisQuery]) {
-    const object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
+    object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
 
     //  See if we have been passed an bump action, if so we need to adjust the
     //  popularCount
@@ -815,8 +837,15 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/object/${object.id}#admintools`)
+        res.redirect(`/explore-o-matic/${urlStub}/${object.id}#admintools`)
       }, 3000)
+    }
+
+    //  Stub up the related objects
+    console.log(object)
+    if (object.relatedObjects) {
+      if (!Array.isArray(object.relatedObjects)) object.relatedObjects = [object.relatedObjects]
+      object.relatedObjects = stubObjects(contrastColors(object.relatedObjects))
     }
     req.templateValues.object = object
 
@@ -855,16 +884,96 @@ exports.getObject = async (req, res) => {
     }
     //  collectionType
     if (object.collectionType) {
-      shortCodes.push(`[[collectionType|${object.collectionType.title}|${object.collectionType.stub}]]`)
+      shortCodes.push(`[[collectionType|${object.collectionType}|${object.collectionType}]]`)
     }
     //  collectionCode
     if (object.collectionCode) {
-      shortCodes.push(`[[collectionCode|${object.collectionCode.title}|${object.collectionCode.stub}]]`)
+      shortCodes.push(`[[collectionCode|${object.collectionCode}|${object.collectionCode}]]`)
     }
     req.templateValues.shortCodes = shortCodes
   }
 
-  return res.render('explore-o-matic/object', req.templateValues)
+  //  If we are an archive object, then we need to go grab some more stuff
+  if (isArchive && object && object.collectionCode && object.collectionCode !== '') {
+    let perPage = 60
+    let page = 0
+    thisQuery = 'objects'
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${object.collectionCode}", onlyNotObjects: true)`
+    let notObjects = await graphQL.fetch({
+      query: queries.get(thisQuery, searchFilter)
+    })
+    if (notObjects.data && notObjects.data.objects) {
+      req.templateValues.notObjects = stubObjects(contrastColors(notObjects.data.objects)).map((object) => {
+        if (object.id === newFilter) return false
+        return object
+      }).filter(Boolean)
+    }
+
+    perPage = 60
+    if (req.params.page) page = parseInt(req.params.page, 10) - 1
+    if (isNaN(page)) page = 0
+    if (page < 0) page = 0
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${object.collectionCode}", onlyObjects: true)`
+    let yesObjects = await graphQL.fetch({
+      query: queries.get(thisQuery, searchFilter)
+    })
+    if (yesObjects.data && yesObjects.data.objects) {
+      req.templateValues.yesObjects = stubObjects(contrastColors(yesObjects.data.objects)).map((object) => {
+        if (object.id === newFilter) return false
+        return object
+      }).filter(Boolean)
+      let pagination = {}
+      if (req.templateValues.yesObjects.length > 0) {
+        pagination = req.templateValues.yesObjects[0]._sys.pagination
+        const range = 2
+
+        pagination.showStartEllipses = false
+        pagination.showEndEllipses = false
+        pagination.showEllipses = false
+        pagination.showPrevious = true
+        pagination.showNext = true
+
+        pagination.page += 1
+        pagination.maxPage += 1
+
+        if (pagination.page - range - 1 <= 1) {
+          pagination.startPage = 1
+        } else {
+          pagination.startPage = pagination.page - range
+          pagination.showStartEllipses = true
+          pagination.showEllipses = true
+        }
+
+        if (pagination.page + range + 1 >= pagination.maxPage) {
+          pagination.endPage = pagination.maxPage
+        } else {
+          pagination.endPage = pagination.page + range
+          pagination.showEndEllipses = true
+          pagination.showEllipses = true
+        }
+
+        if (pagination.page <= 1) pagination.showPrevious = false
+        if (pagination.page >= pagination.maxPage) pagination.showNext = false
+        pagination.pageLoop = Array.from(Array(pagination.endPage - pagination.startPage + 1), (_, x) => x + pagination.startPage)
+        pagination.previousPage = pagination.page - 1
+        pagination.nextPage = pagination.page + 1
+      } else {
+        pagination = {}
+        pagination.showStartEllipses = false
+        pagination.showEndEllipses = false
+        pagination.showEllipses = false
+        pagination.showPrevious = false
+        pagination.showNext = false
+        pagination.pageLoop = [1]
+      }
+
+      pagination.target = `/explore-o-matic/archive`
+      if (req.params.filter) pagination.target += `/${req.params.filter}`
+      pagination.target += `/page/`
+      req.templateValues.pagination = pagination
+    }
+  }
+  return res.render(`explore-o-matic/${urlStub}`, req.templateValues)
 }
 
 exports.factpedia = async (req, res) => {

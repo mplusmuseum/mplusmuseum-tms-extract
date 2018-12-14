@@ -13,10 +13,10 @@
     <div class="hero-body">
       <div class="container">
         <h1 class="title capitalise is-1">
-          {{title}}
+          Explore-o-matic - Archives
         </h1>
         <h2 class="subtitle is-3">
-          {{subTitle}}
+          Here are all the different archives.
         </h2>
       </div>
     </div>
@@ -24,22 +24,15 @@
 
   {{> exploreomatic/nav}}
 
-  {{#if constituent}}{{> exploreomatic/constituentHeader}}{{/if}}
-  {{#if exhibition}}{{> exploreomatic/exhibitionHeader}}{{/if}}
-
-  <section class="section">
-    <div class="container">
-      {{#each objects}}
-        {{#if ../isArchives}}
+  {{#if archives}}
+    <section class="section">
+      <div class="container">
+        {{#each objects}}
           {{> exploreomatic/archivecard @this cloudname=../config.cloudinary.cloud_name}}
-        {{else}}
-          {{> exploreomatic/objectcard @this cloudname=../config.cloudinary.cloud_name}}
-        {{/if}}
-      {{/each}}
-    </div>
-  </section>
-
-  {{>exploreomatic/pagination}}
+        {{/each}}
+      </div>
+    </section>
+  {{/if}}
 
   <section class="section">
     <div class="container">
