@@ -135,6 +135,46 @@ class Queries {
             }
           }
         }
+        relatedObjects {
+          id
+          relatedType
+          selfType
+          title
+          titleOther
+          publicAccess
+          displayDate
+          displayDateOther
+          collectionType
+          collectionCode
+          objectStatus
+          objectName
+          popularCount
+          classification {
+            area
+            category
+            archivalLevel
+          }
+          images {
+            rank
+            primaryDisplay
+            publicAccess
+            public_id
+            status
+            version
+            signature
+            width
+            height
+            format
+            altText
+            mediaUse
+          }
+          color {
+            predominant {
+              color
+              value
+            }
+          }
+        }
         _sys {
           pagination {
             page
@@ -178,6 +218,11 @@ class Queries {
         constituents {
           id
           name
+        }
+        relatedObjects {
+          id
+          relatedType
+          selfType
         }
         _sys {
           pagination {
@@ -246,6 +291,11 @@ class Queries {
             id
             name
           }
+          relatedObjects {
+            id
+            relatedType
+            selfType
+          }
           _sys {
             pagination {
               page
@@ -294,6 +344,11 @@ class Queries {
         constituents {
           id
           name
+        }
+        relatedObjects {
+          id
+          relatedType
+          selfType
         }
         _sys {
           pagination {
@@ -444,6 +499,11 @@ class Queries {
           constituents {
             id
             name
+          }
+          relatedObjects {
+            id
+            relatedType
+            selfType
           }
           _sys {
             pagination {
