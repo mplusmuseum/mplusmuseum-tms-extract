@@ -53,30 +53,31 @@
         <a name="graphql" class="hidename">GraphQL</a>
       </h1>
       {{#if config.graphql}}
-      <p>
-        <ul>
-          <li>
-            <a href="/developer/terms">GraphQL API Terms of use</a>
-          </li>
-          <li>
-            <a href="/developer/graphql">GraphQL Documentation</a>
-          </li>
-          <li>
-            <a href="/developer/graphql/status">GraphQL Status</a>
-          </li>
-          {{#if user.roles.isAdmin}}
-          <li>
-            <a href="/config#graphql">GraphQL Configuration</a>
-          </li>
-          {{/if}}
-        </ul>
-      </p>
+        <p>
+          <ul>
+            <li>
+              <a href="/developer/terms">GraphQL API Terms of use</a>
+            </li>
+            <li>
+              <a href="/developer/graphql">GraphQL Documentation</a>
+            </li>
+            <li>
+              <a href="/developer/graphql/status">GraphQL Status</a>
+            </li>
+            {{#if user.roles.isAdmin}}
+              <li>
+                <a href="/config#graphql">GraphQL Configuration</a>
+              </li>
+            {{/if}}
+          </ul>
+        </p>
       {{else}}
-      <p>
-        GraphQL has not been configured yet. {{#if user.roles.isAdmin}}You can
-        <a href="/config">configure that now</a> if you wish.{{else}}You should ask the admin user to set that up
-        now.{{/if}}
-      </p>
+        <p>
+          GraphQL has not been configured yet. {{#if user.roles.isAdmin}}You can
+            <a href="/config#graphql">configure that now</a> if you wish.
+          {{else}}You should ask the admin user to set that up
+            now.{{/if}}
+        </p>
       {{/if}}
     </div>
   </section>
