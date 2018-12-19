@@ -324,8 +324,9 @@ exports.logs = async (req, res) => {
     }
   }
 
+  const graphQLConfig = config.get('graphql')
   let graphQLRecords = null
-  if (elasticsearchConfig !== null && baseTMS !== null) {
+  if (elasticsearchConfig !== null && baseTMS !== null && graphQLConfig !== null) {
     graphQLRecords = await esclient.search({
       index: `logs_${baseTMS}_graphql`,
       type,
