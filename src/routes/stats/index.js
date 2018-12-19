@@ -136,7 +136,7 @@ exports.index = async (req, res) => {
 
   const baseTMS = config.getRootTMS()
 
-  if (elasticsearchConfig !== null && baseTMS === null) {
+  if (elasticsearchConfig !== null && baseTMS !== null) {
     const esclient = new elasticsearch.Client(elasticsearchConfig)
     const index = `objects_${baseTMS}`
 
@@ -210,7 +210,7 @@ exports.logs = async (req, res) => {
   }
 
   let records = {}
-  if (elasticsearchConfig !== null && baseTMS === null) {
+  if (elasticsearchConfig !== null && baseTMS !== null) {
     records = await esclient.search({
       index,
       type,
@@ -263,11 +263,14 @@ exports.logs = async (req, res) => {
         'type': type.child
       }
     })
-    const upsertsRecords = await esclient.search({
-      index,
-      type: 'log',
-      body: upsertTypeBody
-    })
+    let upsertsRecords = null
+    if (elasticsearchConfig !== null && baseTMS !== null) {
+      upsertsRecords = await esclient.search({
+        index,
+        type: 'log',
+        body: upsertTypeBody
+      })
+    }
     req.templateValues.last100Upserted[type.parent] = {}
     if (upsertsRecords && upsertsRecords.hits && upsertsRecords.hits.hits) {
       req.templateValues.last100Upserted[type.parent].items = upsertsRecords.hits.hits.map((record) => record._source)
@@ -288,11 +291,14 @@ exports.logs = async (req, res) => {
       }]
     }
   }
-  const processingRecords = await esclient.search({
-    index,
-    type,
-    body: processingBody
-  })
+  let processingRecords = null
+  if (elasticsearchConfig !== null && baseTMS !== null) {
+    processingRecords = await esclient.search({
+      index,
+      type,
+      body: processingBody
+    })
+  }
   if (processingRecords && processingRecords.hits && processingRecords.hits.hits) {
     req.templateValues.processingMainXML = processingRecords.hits.hits.map((record) => record._source)
   }
@@ -319,7 +325,7 @@ exports.logs = async (req, res) => {
   }
 
   let graphQLRecords = null
-  if (elasticsearchConfig !== null && baseTMS === null) {
+  if (elasticsearchConfig !== null && baseTMS !== null) {
     graphQLRecords = await esclient.search({
       index: `logs_${baseTMS}_graphql`,
       type,

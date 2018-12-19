@@ -115,8 +115,10 @@ class Config {
    */
   getRootTMS () {
     //  Getting the root TMS node
-    console.log(this)
-    return null
+    if (!this.tms) return null
+    if (this.tms.length < 1) return null
+    if (!this.tms[0].stub) return null
+    return this.tms[0].stub
   }
 
   save () {
