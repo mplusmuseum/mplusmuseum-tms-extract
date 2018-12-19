@@ -793,23 +793,32 @@ exports.getObject = async (req, res) => {
       let isRecommended = false
       if (req.body.recommended && req.body.recommended === 'true') isRecommended = true
       //  Check to see if there's any blurb, if so we need to set there here
+      const body = {
+        doc: {
+          id: newFilter,
+          isRecommended
+        },
+        doc_as_upsert: true
+      }
+
       const blurb = {}
       if (req.body.blurb) {
         blurb[req.templateValues.dbLang] = req.body.blurb
+        body.doc.recommendedBlurb = blurb
       }
+
+      const blurbExternalUrl = {}
+      if (req.body.blurbExternalUrl) {
+        blurbExternalUrl[req.templateValues.dbLang] = req.body.blurbExternalUrl
+        body.doc.blurbExternalUrl = blurbExternalUrl
+      }
+
       //  Update the database
       await esclient.update({
         index,
         type,
         id: newFilter,
-        body: {
-          doc: {
-            id: newFilter,
-            isRecommended,
-            recommendedBlurb: blurb
-          },
-          doc_as_upsert: true
-        }
+        body
       })
       return setTimeout(() => {
         res.redirect(`/explore-o-matic/${urlStub}/${newFilter}#admintools`)
@@ -848,7 +857,6 @@ exports.getObject = async (req, res) => {
     }
 
     //  Stub up the related objects
-    console.log(object)
     if (object.relatedObjects) {
       if (!Array.isArray(object.relatedObjects)) object.relatedObjects = [object.relatedObjects]
       object.relatedObjects = stubObjects(contrastColors(object.relatedObjects))

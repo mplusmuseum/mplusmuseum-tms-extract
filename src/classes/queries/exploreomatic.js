@@ -32,6 +32,7 @@ class Queries {
         allORC
         isRecommended
         recommendedBlurb
+        blurbExternalUrl
         constituents {
           id
           name
