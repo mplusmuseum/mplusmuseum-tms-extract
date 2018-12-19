@@ -28,208 +28,221 @@
     <div class="container">
       <a name="admintools"></a>
 
-      {{#if factoids}}
-        <form method="POST">
-          {{#each factoids}}
-            <div class="columns">
-              <div class="column">
-                <label class="is-spaced">
-                  <h1 class="title is-5">Factoid in EN</h1>
-                  <div class="notification">
-                    {{{convertShortCode text}}}
-                  </div>
-                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidEN">{{text}}</textarea>
-                </label>
-              </div>
-              <div class="column">
-                <label class="is-spaced">
-                  <h1 class="title is-5">Factoid in TC</h1>
-                  <div class="notification">
-                    {{{convertShortCode textTC}}}
-                  </div>
-                  <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidTC">{{textTC}}</textarea>
-                </label>
-              </div>
-            </div>
-            <div class="columns">
-              <div class="column">
-                <label class="checkbox">
-                  <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}}>
-                    Constituent </label> </div> <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}}> Area </label>
-                      </div> <div class="column">
-                    <label class="checkbox">
-                      <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}}>
-                        Category </label> </div> <div class="column">
-                      <label class="checkbox">
-                        <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}}>
-                          Medium </label> </div> <div class="column">
-                        <label class="checkbox">
-                          <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}}>
-                            Archive </label> </div> <div class="column">
-                          <label class="checkbox">
-                            <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}}>
-                              Colour </label> </div> <div class="column">
-                            <label class="checkbox">
-                              <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
-                                checked{{/if}}> Recommended </label> </div> <div class="column">
-              </div>
-            </div>
-            <div class="has-text-right">
-              <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete factoid</button>
-            </div>
-            <hr />
-          {{/each}}
-          <div class="control is-spaced">
-            <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
-          </div>
-
-          <hr />
-        </form>
-      {{/if}}
-
-      <div class="tile is-ancestor">
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <h1 class="title">Add new factoid</h1>
-            <hr />
-            <form method="POST">
-              <p>
-                When we show a single recommended object we often show some "blurb" to go with it, you can enter
-                that below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb
-                for other languages use the language toggle from the top right of the page.
-              </p>
+      {{#if baseTMS}}
+        {{#if factoids}}
+          <form method="POST">
+            {{#each factoids}}
               <div class="columns">
                 <div class="column">
                   <label class="is-spaced">
                     <h1 class="title is-5">Factoid in EN</h1>
-                    <textarea class="textarea" placeholder="Enter your factoid here" name="factoidEN"></textarea>
+                    <div class="notification">
+                      {{{convertShortCode text}}}
+                    </div>
+                    <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidEN">{{text}}</textarea>
                   </label>
                 </div>
                 <div class="column">
                   <label class="is-spaced">
                     <h1 class="title is-5">Factoid in TC</h1>
-                    <textarea class="textarea" placeholder="Enter your factoid here" name="factoidTC"></textarea>
+                    <div class="notification">
+                      {{{convertShortCode textTC}}}
+                    </div>
+                    <textarea class="textarea" placeholder="Enter your factoid here" name="{{id}}|factoidTC">{{textTC}}</textarea>
                   </label>
                 </div>
               </div>
-              <h2 class="title is-6">Which site areas should this fact show up in?</h2>
               <div class="columns">
                 <div class="column">
                   <label class="checkbox">
-                    <input type="checkbox" name="isConstituent" value=true>
-                    Constituent
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isArea" value=true>
-                    Area
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isCategory" value=true>
-                    Category
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isMedium" value=true>
-                    Medium
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isArchive" value=true>
-                    Archive
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isColour" value=true>
-                    Colour
-                  </label>
-                </div>
-                <div class="column">
-                  <label class="checkbox">
-                    <input type="checkbox" name="isRecommended" value=true>
-                    Recommended
-                  </label>
+                    <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}}>
+                      Constituent </label> </div> <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}}> Area </label>
+                        </div> <div class="column">
+                      <label class="checkbox">
+                        <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}}>
+                          Category </label> </div> <div class="column">
+                        <label class="checkbox">
+                          <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}}>
+                            Medium </label> </div> <div class="column">
+                          <label class="checkbox">
+                            <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}}>
+                              Archive </label> </div> <div class="column">
+                            <label class="checkbox">
+                              <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}}>
+                                Colour </label> </div> <div class="column">
+                              <label class="checkbox">
+                                <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
+                                  checked{{/if}}> Recommended </label> </div> <div class="column">
                 </div>
               </div>
-
-              <div class="control is-spaced">
-                <button class="button is-primary" name="action" value="addFactoid">Add factoid</button>
+              <div class="has-text-right">
+                <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete factoid</button>
               </div>
+              <hr />
+            {{/each}}
+            <div class="control is-spaced">
+              <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
+            </div>
 
-              <div class="notification">
-                <h1 class="title is-5">Short Codes</h1>
-                <h2 class="subtitle is-6">These are used to allow you to make links that function correctly in the
-                  site. If you use the Explore-O-Matic to find objects you'll see related short codes below them. You
-                  can also construct short codes using the following format...</h2>
+            <hr />
+          </form>
+        {{/if}}
+
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
+              <h1 class="title">Add new factoid</h1>
+              <hr />
+              <form method="POST">
                 <p>
-                  A short code is made up of three parts, separated with the "pipe" character "|" and then wrapped in
-                  <em>double</em> square brackets "[[]]". The parts are, <code>type of thing</code>, <code>display name
-                    of thing</code>, <code>id or stub of thing</code>. So <code>[[thing|title|id]]</code>, here are
-                  some examples...
+                  When we show a single recommended object we often show some "blurb" to go with it, you can enter
+                  that below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb
+                  for other languages use the language toggle from the top right of the page.
                 </p>
-                <table class="table">
-                  <thead>
-                    <tr>
-                      <th>Short Code</th>
-                      <th>example</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[object|Lanwei 19/ The
-                        Beasts / Taipei|865]]</td>
-                      <td>{{{convertShortCode '[[object|Lanwei 19/ The Beasts / Taipei|865]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[constituent|Stanley
-                        Wong|17]]</td>
-                      <td>{{{convertShortCode '[[constituent|Stanley Wong|17]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|Visual Art|Visual
-                        Art]]</td>
-                      <td>{{{convertShortCode '[[area|Visual Art|Visual Art]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|視覺藝術|視覺藝術]]</td>
-                      <td>{{{convertShortCode '[[area|視覺藝術|視覺藝術]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[category|Photography|Photography]]</td>
-                      <td>{{{convertShortCode '[[category|Photography|Photography]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[category|攝影|攝影]]</td>
-                      <td>{{{convertShortCode '[[category|攝影|攝影]]'}}}</td>
-                    </tr>
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[colour|Blue|238,100,46]]</td>
-                      <td>{{{convertShortCode '[[colour|Blue|238,100,46]]'}}}</td>
-                    </tr>
+                <div class="columns">
+                  <div class="column">
+                    <label class="is-spaced">
+                      <h1 class="title is-5">Factoid in EN</h1>
+                      <textarea class="textarea" placeholder="Enter your factoid here" name="factoidEN"></textarea>
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="is-spaced">
+                      <h1 class="title is-5">Factoid in TC</h1>
+                      <textarea class="textarea" placeholder="Enter your factoid here" name="factoidTC"></textarea>
+                    </label>
+                  </div>
+                </div>
+                <h2 class="title is-6">Which site areas should this fact show up in?</h2>
+                <div class="columns">
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isConstituent" value=true>
+                      Constituent
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isArea" value=true>
+                      Area
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isCategory" value=true>
+                      Category
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isMedium" value=true>
+                      Medium
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isArchive" value=true>
+                      Archive
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isColour" value=true>
+                      Colour
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isRecommended" value=true>
+                      Recommended
+                    </label>
+                  </div>
+                </div>
 
-                    <tr>
-                      <td class="is-family-monospace is-size-5" style="font-family: monospace">[[medium|archival inkjet
-                        print|archival inkjet print]]</td>
-                      <td>{{{convertShortCode '[[medium|archival inkjet print|archival inkjet print]]'}}}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div class="control is-spaced">
+                  <button class="button is-primary" name="action" value="addFactoid">Add factoid</button>
+                </div>
+
+                <div class="notification">
+                  <h1 class="title is-5">Short Codes</h1>
+                  <h2 class="subtitle is-6">These are used to allow you to make links that function correctly in the
+                    site. If you use the Explore-O-Matic to find objects you'll see related short codes below them. You
+                    can also construct short codes using the following format...</h2>
+                  <p>
+                    A short code is made up of three parts, separated with the "pipe" character "|" and then wrapped in
+                    <em>double</em> square brackets "[[]]". The parts are, <code>type of thing</code>, <code>display
+                      name
+                      of thing</code>, <code>id or stub of thing</code>. So <code>[[thing|title|id]]</code>, here are
+                    some examples...
+                  </p>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Short Code</th>
+                        <th>example</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[object|Lanwei 19/
+                          The
+                          Beasts / Taipei|865]]</td>
+                        <td>{{{convertShortCode '[[object|Lanwei 19/ The Beasts / Taipei|865]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[constituent|Stanley
+                          Wong|17]]</td>
+                        <td>{{{convertShortCode '[[constituent|Stanley Wong|17]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|Visual
+                          Art|Visual
+                          Art]]</td>
+                        <td>{{{convertShortCode '[[area|Visual Art|Visual Art]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|視覺藝術|視覺藝術]]</td>
+                        <td>{{{convertShortCode '[[area|視覺藝術|視覺藝術]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[category|Photography|Photography]]</td>
+                        <td>{{{convertShortCode '[[category|Photography|Photography]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[category|攝影|攝影]]</td>
+                        <td>{{{convertShortCode '[[category|攝影|攝影]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[colour|Blue|238,100,46]]</td>
+                        <td>{{{convertShortCode '[[colour|Blue|238,100,46]]'}}}</td>
+                      </tr>
+
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[medium|archival
+                          inkjet
+                          print|archival inkjet print]]</td>
+                        <td>{{{convertShortCode '[[medium|archival inkjet print|archival inkjet print]]'}}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
 
 
-                </p>
-              </div>
-            </form>
-          </article>
+                  </p>
+                </div>
+              </form>
+            </article>
+          </div>
         </div>
-      </div>
+      {{else}}
+        <p class="notification is-warning">
+          No TMS systems have been configured yet. {{#if user.roles.isAdmin}}You can
+            <a href="/config#tms">configure that now</a> if you wish.
+          {{else}}You should ask the admin user to set that up
+            now.{{/if}}
+        </p>
+      {{/if}}
     </div>
   </section>
 

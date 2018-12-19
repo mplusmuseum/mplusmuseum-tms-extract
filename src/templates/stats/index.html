@@ -86,48 +86,24 @@
     {{#ifOdd processingData.length}}
       </div class="columns">
     {{/ifOdd}}
-    {{!---
-    <div class="columns">
-      <div class="column">
-
-        <div class="panel">
-          <div class="panel-heading">Objects</div>
-          <div class="panel-block">
-            <ul>
-              <li>{{../i18n.stats.total_objects_processed}}: <span class="has-text-weight-bold">{{prettyNumber
-                  objectsProcessed}}</span></li>
-              <li>{{../i18n.stats.object_files_waiting}}: <span class="has-text-weight-bold">{{prettyNumber
-                  objectsWaitingToBeProcessed}}</span> (Finishes
-                {{timeAgo timeToUpsertObjects}}, estimate)</li>
-            </ul>
-          </div>
-
-          <div class="panel-block">
-            <form method="post">
-              <input type="hidden" name="tms" value="{{stub}}">
-              <input type="hidden" name="action" value="search">
-              <p class="control has-icons-left">
-                <input class="input" type="text" name="objectID" placeholder="{{../i18n.stats.search_object}}">
-                <span class="icon is-small is-left">
-                  <i class="fas fa-search" aria-hidden="true"></i>
-                </span>
-              </p>
-            </form>
-          </div>
-        </div>
-
-      </div>
-    </div>
-    ---}}
 
     {{#if ../user.roles.isAdmin}}
       <div class="notification is-info">
         {{{../i18n.stats.lot_of_files_to_upload}}}
       </div>
     {{/if}}
-    {{/each}} {{/if}}
+    {{/each}}
+    {{else}}
+      <p class="notification is-warning">
+        No TMS systems have been configured yet. {{#if user.roles.isAdmin}}You can
+          <a href="/config#tms">configure that now</a> if you wish.
+        {{else}}You should ask the admin user to set that up
+          now.{{/if}}
+      </p>
 
-    </div>
+      {{/if}}
+
+      </div>
   </section>
 
   {{> tail}}

@@ -61,6 +61,7 @@ router.use(function (req, res, next) {
   const configObj = new Config()
   req.config = configObj
   req.templateValues.config = req.config
+  req.templateValues.baseTMS = configObj.getRootTMS()
 
   const defaultLang = 'en'
   let selectedLang = 'en'

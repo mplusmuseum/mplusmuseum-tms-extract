@@ -8,7 +8,7 @@ class Config {
   /**
    * This will load in all the config details.
    */
-  constructor() {
+  constructor () {
     //  Read in the config details from the file system
     const configFile = path.join(rootDir, 'config.json')
     if (!fs.existsSync(configFile)) {
@@ -34,7 +34,7 @@ class Config {
    * @returns {string|int|Array|json} Returns the value, matching the item we are looking for
    * which may be in the format of a string, numerical, array, json and so on.
    */
-  get(key) {
+  get (key) {
     //  Turn it all into an array so we can step through it.
     //  This is a slightly annoying way of moving through a set
     //  nodes on a JSON object. But I find this the most readable
@@ -88,7 +88,7 @@ class Config {
    * a single top level node, i.e. 'alpha' or a full path 'alpha.beta.gamma'
    * @param {string|number|Array|object} value The value we want to set
    */
-  set(key, value) {
+  set (key, value) {
     //  This is easier than the above code, we basically walk down
     //  the node path, creating the nodes if we need to.
     const keyPath = key.split('.')
@@ -108,7 +108,20 @@ class Config {
     this.save()
   }
 
-  save() {
+  /**
+   * This is our getter that allows us to get the base tms system
+   * that gets used as the default tme for logging and various
+   * user based data stores
+   */
+  getRootTMS () {
+    //  Getting the root TMS node
+    if (!this.tms) return null
+    if (this.tms.length < 1) return null
+    if (!this.tms[0].stub) return null
+    return this.tms[0].stub
+  }
+
+  save () {
     const configFile = path.join(rootDir, 'config.json')
     const configJSONPretty = JSON.stringify(this, null, 4)
     fs.writeFileSync(configFile, configJSONPretty, 'utf-8')
