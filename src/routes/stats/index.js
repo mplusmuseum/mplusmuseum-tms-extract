@@ -125,7 +125,7 @@ exports.index = async (req, res) => {
   req.templateValues.tms = newTMS
 
   //  THIS IS BAD
-  //  I'm now going to check all the mplus_objects. I should really be doing
+  //  I'm now going to check all the objects. I should really be doing
   //  this inside the TMS loop, as we may have more than one thing. But for
   //  the moment I'm just going to do it here
   const elasticsearchConfig = config.get('elasticsearch')
@@ -134,9 +134,11 @@ exports.index = async (req, res) => {
   let publicAccessTrue = null
   let publicAccessFalse = null
 
-  if (elasticsearchConfig !== null) {
+  const baseTMS = config.getRootTMS()
+
+  if (elasticsearchConfig !== null && baseTMS === null) {
     const esclient = new elasticsearch.Client(elasticsearchConfig)
-    const index = `objects_mplus`
+    const index = `objects_${baseTMS}`
 
     //  Get all the public access files
     try {
@@ -193,7 +195,10 @@ exports.logs = async (req, res) => {
   const config = new Config()
   const elasticsearchConfig = config.get('elasticsearch')
   const esclient = new elasticsearch.Client(elasticsearchConfig)
-  const index = 'logs_mplus_tmsextract'
+
+  const baseTMS = config.getRootTMS()
+
+  const index = `logs_${baseTMS}_tmsextract`
   const type = 'log'
   const basebody = {
     size: 100,
@@ -204,11 +209,14 @@ exports.logs = async (req, res) => {
     }]
   }
 
-  const records = await esclient.search({
-    index,
-    type,
-    body: basebody
-  })
+  let records = {}
+  if (elasticsearchConfig !== null && baseTMS === null) {
+    records = await esclient.search({
+      index,
+      type,
+      body: basebody
+    })
+  }
   req.templateValues.last100Lines = null
   if (records && records.hits && records.hits.hits) {
     req.templateValues.last100Lines = records.hits.hits.map((record) => record._source)
@@ -309,11 +317,15 @@ exports.logs = async (req, res) => {
       }
     }
   }
-  const graphQLRecords = await esclient.search({
-    index: 'logs_mplus_graphql',
-    type,
-    body
-  })
+
+  let graphQLRecords = null
+  if (elasticsearchConfig !== null && baseTMS === null) {
+    graphQLRecords = await esclient.search({
+      index: `logs_${baseTMS}_graphql`,
+      type,
+      body
+    })
+  }
 
   if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.hits) {
     req.templateValues.graphQLRecords = graphQLRecords.hits.hits.map((record) => record._source).map((record) => {

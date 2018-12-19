@@ -107,9 +107,6 @@ exports.aggrigateObjects = async (req, res) => {
 }
 
 exports.isMakers = async (req, res) => {
-  //  TODO: remove this hardcoded TMS system and get it dynamically
-  const tms = 'mplus'
-
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
@@ -124,20 +121,23 @@ exports.isMakers = async (req, res) => {
   const startTime = new Date().getTime()
   const config = new Config()
   const elasticsearchConfig = config.get('elasticsearch')
+
+  const baseTMS = config.getRootTMS()
+
   //  If there's no elasticsearch configured then we don't bother
   //  to do anything
-  if (elasticsearchConfig === null) {
+  if (elasticsearchConfig === null || baseTMS === null) {
     tmsLogger.object(`No elasticsearch configured`, {
       action: 'finished admin.isMakers',
       status: 'info',
-      tms,
+      tms: baseTMS,
       ms: new Date().getTime() - startTime
     })
     return res.render('admin/isMakers', req.templateValues)
   }
 
   //  Now go and fetch all the isMakers data
-  const index = `config_ismakers_${tms}`
+  const index = `config_ismakers_${baseTMS}`
   const type = `config_isMaker`
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const exists = await esclient.indices.exists({
@@ -175,7 +175,7 @@ exports.isMakers = async (req, res) => {
       })
       // Note that we want to rebuld the constituents
       setTimeout(() => {
-        constituentMakers.updateConstituentsAsMakers(tms)
+        constituentMakers.updateConstituentsAsMakers(baseTMS)
       }, 5000)
       //  And redirect back to this page
       return res.redirect('/admin/isMakers')
@@ -210,7 +210,7 @@ exports.isMakers = async (req, res) => {
   //  Now loop through all the objects getting all the different type
   //  of makers
   const makers = {}
-  const tmsProcessedDir = path.join(rootDir, 'imports', 'Objects', tms, 'processed')
+  const tmsProcessedDir = path.join(rootDir, 'imports', 'Objects', baseTMS, 'processed')
   if (fs.existsSync(tmsProcessedDir)) {
     const subFolders = fs.readdirSync(tmsProcessedDir)
     subFolders.forEach((subFolder) => {

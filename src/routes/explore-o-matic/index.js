@@ -759,10 +759,6 @@ exports.getObject = async (req, res) => {
   const graphQL = new GraphQL()
 
   const config = new Config()
-  const elasticsearchConfig = config.get('elasticsearch')
-  const esclient = new elasticsearch.Client(elasticsearchConfig)
-  const index = 'objects_mplus'
-  const type = 'object'
 
   //  Find out if we are dealing with looking at an object or an "archive" (which
   //  if really an object)
@@ -773,6 +769,16 @@ exports.getObject = async (req, res) => {
     isArchive = true
     req.templateValues.mode = 'archives'
   }
+
+  const baseTMS = config.getRootTMS()
+  if (baseTMS === null) {
+    return res.render(`explore-o-matic/${urlStub}`, req.templateValues)
+  }
+
+  const elasticsearchConfig = config.get('elasticsearch')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `objects_${baseTMS}`
+  const type = 'object'
 
   //  This is the initial search query we are going to use to grab all the constituents
   let thisQuery = 'object'
@@ -997,12 +1003,18 @@ exports.factpedia = async (req, res) => {
   if (req.body.action) {
     //  Get all the elastic search stuff
     const config = new Config()
+
+    const baseTMS = config.getRootTMS()
+    if (baseTMS === null) {
+      return res.render('explore-o-matic/factpedia', req.templateValues)
+    }
+
     const elasticsearchConfig = config.get('elasticsearch')
     if (elasticsearchConfig === null) {
       return res.render('explore-o-matic/factpedia', req.templateValues)
     }
     const esclient = new elasticsearch.Client(elasticsearchConfig)
-    const index = `factoids_mplus`
+    const index = `factoids_${baseTMS}`
     const type = 'factoid'
 
     if (req.body.action.indexOf('deleteFactoid') >= 0) {

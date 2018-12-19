@@ -59,12 +59,18 @@ const tmsLogger = winston.createLogger({
 class ESLogger {
   object (name, data) {
     const config = new Config()
+
+    //  See if we have a base TMS system set up yet, if not
+    //  then we get out here
+    const baseTMS = config.getRootTMS()
+    if (baseTMS === null) return
+
     const elasticsearchConfig = config.get('elasticsearch')
     if (elasticsearchConfig === null) {
       return
     }
     const esclient = new elasticsearch.Client(elasticsearchConfig)
-    const index = 'logs_mplus_tmsextract'
+    const index = `logs_${baseTMS}_tmsextract`
 
     data.name = name
     data.datetime = new Date()
@@ -93,6 +99,7 @@ class ESLogger {
  */
 exports.getTMSLogger = () => {
   const config = new Config()
+
   const elasticsearchConfig = config.get('elasticsearch')
   if (elasticsearchConfig === null) {
     return tmsLogger
@@ -102,12 +109,18 @@ exports.getTMSLogger = () => {
 
 exports.createIndex = async () => {
   const config = new Config()
+
+  //  See if we have a base TMS system set up yet, if not
+  //  then we get out here
+  const baseTMS = config.getRootTMS()
+  if (baseTMS === null) return
+
   const elasticsearchConfig = config.get('elasticsearch')
   if (elasticsearchConfig === null) {
     return
   }
   const esclient = new elasticsearch.Client(elasticsearchConfig)
-  const index = 'logs_mplus_tmsextract'
+  const index = `logs_${baseTMS}_tmsextract`
   const exists = await esclient.indices.exists({
     index
   })
