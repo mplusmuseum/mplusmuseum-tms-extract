@@ -802,16 +802,14 @@ exports.getObject = async (req, res) => {
       }
 
       const blurb = {}
-      if (req.body.blurb) {
-        blurb[req.templateValues.dbLang] = req.body.blurb
-        body.doc.recommendedBlurb = blurb
-      }
+      if (!req.body.blurb) req.body.blurb = null
+      blurb[req.templateValues.dbLang] = req.body.blurb
+      body.doc.recommendedBlurb = blurb
 
       const blurbExternalUrl = {}
-      if (req.body.blurbExternalUrl) {
-        blurbExternalUrl[req.templateValues.dbLang] = req.body.blurbExternalUrl
-        body.doc.blurbExternalUrl = blurbExternalUrl
-      }
+      if (!req.body.blurbExternalUrl) req.body.blurbExternalUrl = null
+      blurbExternalUrl[req.templateValues.dbLang] = req.body.blurbExternalUrl
+      body.doc.blurbExternalUrl = blurbExternalUrl
 
       //  Update the database
       await esclient.update({
