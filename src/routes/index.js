@@ -253,6 +253,8 @@ router.get('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
 router.post('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
 router.get('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.post('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
+router.get('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
+router.post('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
 
 router.get('/:lang/admin/translations', ensureLoggedIn, admin.translations.index)
 router.get('/:lang/admin/translations/:site', ensureLoggedIn, admin.translations.site)
@@ -274,6 +276,7 @@ router.get('/:lang/search/exhibitions/:tms/:id', ensureLoggedIn, search.exhibiti
 router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
 router.get('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
+router.get('/:lang/explore-o-matic/page/:page', ensureLoggedIn, exploreomatic.index)
 router.get('/:lang/explore-o-matic/constituents', ensureLoggedIn, exploreomatic.constituents)
 router.get('/:lang/explore-o-matic/constituents/:makerStub', ensureLoggedIn, exploreomatic.constituents)
 router.get('/:lang/explore-o-matic/areas', ensureLoggedIn, exploreomatic.areas)
