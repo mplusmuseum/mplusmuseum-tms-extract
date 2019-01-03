@@ -253,6 +253,8 @@ router.get('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
 router.post('/:lang/admin/user/:id', ensureLoggedIn, admin.user)
 router.get('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.post('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
+router.get('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
+router.post('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
 
 router.get('/:lang/admin/translations', ensureLoggedIn, admin.translations.index)
 router.get('/:lang/admin/translations/:site', ensureLoggedIn, admin.translations.site)

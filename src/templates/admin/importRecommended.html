@@ -1,0 +1,62 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Import Recommended
+        </h1>
+        <h2 class="subtitle is-3">
+          This is where you import recommended objects from a CSV file
+        </h2>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section">
+    <div class="container documentation">
+      <form method="POST">
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Recommended IDs</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <textarea class="textarea" rows="20" name="csv" placeholder="Paste your ids here, one per row"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="level">
+          <div class="level-left">
+            <div class="level-item">&nbsp;</div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <p class="control">
+                <button class="button is-primary" name="action" value="update">Update</button>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+  </section>
+
+  {{> tail}}
+</body>
+
+</html>
