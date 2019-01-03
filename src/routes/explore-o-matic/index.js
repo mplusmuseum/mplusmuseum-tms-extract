@@ -103,8 +103,14 @@ exports.index = async (req, res) => {
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   //  Grab the query used to ask for an object
+  let perPage = 30
+  let page = 0
+  if (req.params.page) page = parseInt(req.params.page, 10) - 1
+  if (isNaN(page)) page = 0
+  if (page < 0) page = 0
+
   const queries = new Queries()
-  const query = queries.get('objects', `(isRecommended: true, lang:"${req.templateValues.dbLang}")`)
+  const query = queries.get('objects', `(per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
   const payload = {
@@ -114,8 +120,48 @@ exports.index = async (req, res) => {
 
   const results = await graphQL.fetch(payload)
   if (results.data && results.data.objects) {
-    req.templateValues.objects = stubObjects(contrastColors(results.data.objects))
+    const objects = stubObjects(contrastColors(results.data.objects))
+    //  Grab the pagination if we can
+    if (objects.length > 0 && objects[0]._sys && objects[0]._sys.pagination) {
+      const pagination = objects[0]._sys.pagination
+      const range = 2
+
+      pagination.showStartEllipses = false
+      pagination.showEndEllipses = false
+      pagination.showEllipses = false
+      pagination.showPrevious = true
+      pagination.showNext = true
+
+      pagination.page += 1
+      pagination.maxPage += 1
+
+      if (pagination.page - range - 1 <= 1) {
+        pagination.startPage = 1
+      } else {
+        pagination.startPage = pagination.page - range
+        pagination.showStartEllipses = true
+        pagination.showEllipses = true
+      }
+
+      if (pagination.page + range + 1 >= pagination.maxPage) {
+        pagination.endPage = pagination.maxPage
+      } else {
+        pagination.endPage = pagination.page + range
+        pagination.showEndEllipses = true
+        pagination.showEllipses = true
+      }
+
+      if (pagination.page <= 1) pagination.showPrevious = false
+      if (pagination.page >= pagination.maxPage) pagination.showNext = false
+      pagination.pageLoop = Array.from(Array(pagination.endPage - pagination.startPage + 1), (_, x) => x + pagination.startPage)
+      pagination.previousPage = pagination.page - 1
+      pagination.nextPage = pagination.page + 1
+      pagination.target = `/explore-o-matic/page/`
+      req.templateValues.pagination = pagination
+    }
+    req.templateValues.objects = objects
   }
+
   req.templateValues.mode = 'recommended'
   return res.render('explore-o-matic/index', req.templateValues)
 }
