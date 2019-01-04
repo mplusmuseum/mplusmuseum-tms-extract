@@ -99,6 +99,7 @@ const stubObjects = (objects) => {
 }
 
 exports.index = async (req, res) => {
+  const pageStart = new Date().getTime()
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
@@ -118,7 +119,9 @@ exports.index = async (req, res) => {
   }
   req.templateValues.query = query
 
+  const preObjectsTime = new Date().getTime()
   const results = await graphQL.fetch(payload)
+  const getObjectsQuery = new Date().getTime() - preObjectsTime
   if (results.data && results.data.objects) {
     const objects = stubObjects(contrastColors(results.data.objects))
     //  Grab the pagination if we can
@@ -163,6 +166,16 @@ exports.index = async (req, res) => {
   }
 
   req.templateValues.mode = 'recommended'
+
+  const pageEnd = new Date().getTime()
+
+  req.templateValues.timing = {
+    getObjectsQuery,
+    totalQueryTime: (getObjectsQuery),
+    totalNotQueryTime: (pageEnd - pageStart) - (getObjectsQuery),
+    pageGenerationTime: pageEnd - pageStart
+  }
+
   return res.render('explore-o-matic/index', req.templateValues)
 }
 
@@ -527,6 +540,8 @@ exports.mediums = async (req, res) => {
 }
 
 exports.getObjectsByThing = async (req, res) => {
+  const pageStart = new Date().getTime()
+
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
@@ -642,7 +657,9 @@ exports.getObjectsByThing = async (req, res) => {
     query
   }
   req.templateValues.query = query
+  const preObjectsTime = new Date().getTime()
   const results = await graphQL.fetch(payload)
+  const getObjectsQuery = new Date().getTime() - preObjectsTime
   let pagination = null
 
   if (results.data && results.data[thisQuery]) {
@@ -742,6 +759,16 @@ exports.getObjectsByThing = async (req, res) => {
   if (req.params.filter) pagination.target += `/${req.params.filter}`
   pagination.target += `/page/`
   req.templateValues.pagination = pagination
+
+  const pageEnd = new Date().getTime()
+
+  req.templateValues.timing = {
+    getObjectsQuery,
+    totalQueryTime: (getObjectsQuery),
+    totalNotQueryTime: (pageEnd - pageStart) - (getObjectsQuery),
+    pageGenerationTime: pageEnd - pageStart
+  }
+
   return res.render('explore-o-matic/objects', req.templateValues)
 }
 
@@ -799,6 +826,8 @@ exports.getColor = async (req, res) => {
 
 exports.getObject = async (req, res) => {
   //  Make sure we are an admin user
+  const pageStart = new Date().getTime()
+
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
   const queries = new Queries()
@@ -826,7 +855,7 @@ exports.getObject = async (req, res) => {
   const index = `objects_${baseTMS}`
   const type = 'object'
 
-  //  This is the initial search query we are going to use to grab all the constituents
+  //  This is the initial search query we are going to use to grab all the objects
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
   let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
@@ -870,14 +899,17 @@ exports.getObject = async (req, res) => {
     }
   }
 
-  //  Grab all the different maker types
+  //  Grab the query to get the object
   const query = queries.get(thisQuery, searchFilter)
   const payload = {
     query
   }
   req.templateValues.query = query
   let object = null
+  const preObjectTime = new Date().getTime()
   const results = await graphQL.fetch(payload)
+  const getObjectQuery = new Date().getTime() - preObjectTime
+
   if (results.data && results.data[thisQuery]) {
     object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
 
@@ -952,14 +984,20 @@ exports.getObject = async (req, res) => {
   }
 
   //  If we are an archive object, then we need to go grab some more stuff
+  let getNotObjectQuery = 0
+  let getYesObjectQuery = 0
   if (isArchive && object && object.collectionCode && object.collectionCode !== '') {
     let perPage = 60
     let page = 0
     thisQuery = 'objects'
     searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${object.collectionCode}", onlyNotObjects: true)`
+
+    const preNotObjectTime = new Date().getTime()
     let notObjects = await graphQL.fetch({
       query: queries.get(thisQuery, searchFilter)
     })
+    getNotObjectQuery = new Date().getTime() - preNotObjectTime
+
     if (notObjects.data && notObjects.data.objects) {
       req.templateValues.notObjects = stubObjects(contrastColors(notObjects.data.objects)).map((object) => {
         if (object.id === newFilter) return false
@@ -972,9 +1010,12 @@ exports.getObject = async (req, res) => {
     if (isNaN(page)) page = 0
     if (page < 0) page = 0
     searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${object.collectionCode}", onlyObjects: true)`
+    const preYesObjectTime = new Date().getTime()
     let yesObjects = await graphQL.fetch({
       query: queries.get(thisQuery, searchFilter)
     })
+    getYesObjectQuery = new Date().getTime() - preYesObjectTime
+
     if (yesObjects.data && yesObjects.data.objects) {
       req.templateValues.yesObjects = stubObjects(contrastColors(yesObjects.data.objects)).map((object) => {
         if (object.id === newFilter) return false
@@ -1031,6 +1072,17 @@ exports.getObject = async (req, res) => {
       req.templateValues.pagination = pagination
     }
   }
+  const pageEnd = new Date().getTime()
+
+  req.templateValues.timing = {
+    getObjectQuery,
+    getNotObjectQuery,
+    getYesObjectQuery,
+    totalQueryTime: (getObjectQuery + getNotObjectQuery + getYesObjectQuery),
+    totalNotQueryTime: (pageEnd - pageStart) - (getObjectQuery + getNotObjectQuery + getYesObjectQuery),
+    pageGenerationTime: pageEnd - pageStart
+  }
+
   return res.render(`explore-o-matic/${urlStub}`, req.templateValues)
 }
 
