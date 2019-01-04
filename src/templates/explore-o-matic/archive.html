@@ -482,6 +482,45 @@
     </div>
   </section>
 
+  {{#if timing}}
+    <section class="section">
+      <div class="container">
+        <hr />
+        <h1 class="title">Page generation timings</h1>
+        <table class="table">
+          <tr>
+            <td>Total generation time</td>
+            <td>{{prettyNumber timing.pageGenerationTime}}ms</td>
+          </tr>
+          <tr>
+            <td>Total time spend on queries</td>
+            <td>{{prettyNumber timing.totalQueryTime}}ms</td>
+          </tr>
+          <tr>
+            <td>Total time doing other stuff</td>
+            <td>{{prettyNumber timing.totalNotQueryTime}}ms</td>
+          </tr>
+          <tr>
+            <td>Getting the main object query</td>
+            <td>{{prettyNumber timing.getObjectQuery}}ms</td>
+          </tr>
+          {{#ifgt timing.getNotObjectQuery 0}}
+            <tr>
+              <td>Getting NOT objects query</td>
+              <td>{{prettyNumber ../timing.getNotObjectQuery}}ms</td>
+            </tr>
+          {{/ifgt}}
+          {{#ifgt timing.getYesObjectQuery 0}}
+            <tr>
+              <td>Getting YES objects query</td>
+              <td>{{prettyNumber ../timing.getYesObjectQuery}}ms</td>
+            </tr>
+          {{/ifgt}}
+        </table>
+      </div>
+    </section>
+  {{/if}}
+
   <section class="section">
     <div class="container">
       <hr />
