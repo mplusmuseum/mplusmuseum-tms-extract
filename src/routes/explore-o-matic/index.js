@@ -893,6 +893,10 @@ exports.getObject = async (req, res) => {
         id: newFilter,
         body
       })
+      //  Kill the cache
+      await graphQL.fetch({
+        query: queries.get('killCache', '')
+      })
       return setTimeout(() => {
         res.redirect(`/explore-o-matic/${urlStub}/${newFilter}#admintools`)
       }, 1000)
@@ -1121,6 +1125,9 @@ exports.factpedia = async (req, res) => {
     const index = `factoids_${baseTMS}`
     const type = 'factoid'
 
+    const graphQL = new GraphQL()
+    const queries = new Queries()
+
     if (req.body.action.indexOf('deleteFactoid') >= 0) {
       const splitAction = req.body.action.split('|')
       if (splitAction.length === 2) {
@@ -1129,6 +1136,10 @@ exports.factpedia = async (req, res) => {
           index,
           type,
           id
+        })
+        //  Kill the cache
+        await graphQL.fetch({
+          query: queries.get('killCache', '')
         })
         return setTimeout(() => {
           res.redirect(returnUrl)
@@ -1166,6 +1177,10 @@ exports.factpedia = async (req, res) => {
         index,
         type,
         body
+      })
+      //  Kill the cache
+      await graphQL.fetch({
+        query: queries.get('killCache', '')
       })
       return setTimeout(() => {
         res.redirect(returnUrl)
@@ -1232,6 +1247,10 @@ exports.factpedia = async (req, res) => {
           body: bulkThisArray
         })
         // Note that we want to rebuld the constituents
+        //  Kill the cache
+        await graphQL.fetch({
+          query: queries.get('killCache', '')
+        })
         return setTimeout(() => {
           res.redirect(returnUrl)
         }, 2000)

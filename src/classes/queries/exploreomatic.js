@@ -4,6 +4,10 @@ class Queries {
    * Create a collection of queries
    */
   constructor () {
+    this.killCache = `query {
+      killCache[[]]
+    }`
+
     this.object = `query {
       object[[]] {
         id
