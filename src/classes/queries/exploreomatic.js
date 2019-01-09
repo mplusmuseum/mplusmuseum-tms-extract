@@ -195,6 +195,7 @@ class Queries {
       randomobjects[[]] {
         id
         title
+        objectNumber
         publicAccess
         displayDate
         popularCount
@@ -321,6 +322,7 @@ class Queries {
       objects[[]] {
         id
         title
+        objectNumber
         publicAccess
         displayDate
         popularCount

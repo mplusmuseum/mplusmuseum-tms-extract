@@ -276,6 +276,9 @@ router.get('/:lang/search/exhibitions/:tms/:id', ensureLoggedIn, search.exhibiti
 router.get('/:lang/search/objects/:tms/:id', ensureLoggedIn, search.objects.index)
 
 router.get('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
+router.post('/:lang/explore-o-matic', ensureLoggedIn, exploreomatic.index)
+router.get('/:lang/explore-o-matic/search/:query', ensureLoggedIn, exploreomatic.index)
+router.get('/:lang/explore-o-matic/search/:query/page/:page', ensureLoggedIn, exploreomatic.index)
 router.get('/:lang/explore-o-matic/page/:page', ensureLoggedIn, exploreomatic.index)
 router.get('/:lang/explore-o-matic/constituents', ensureLoggedIn, exploreomatic.constituents)
 router.get('/:lang/explore-o-matic/constituents/:makerStub', ensureLoggedIn, exploreomatic.constituents)

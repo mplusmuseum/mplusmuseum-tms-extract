@@ -103,6 +103,11 @@ exports.index = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
+  //  See if we've been passed a query
+  if (req.body && req.body.query) {
+    return res.redirect(`/explore-o-matic/search/${req.body.query}`)
+  }
+
   //  Grab the query used to ask for an object
   let perPage = 30
   let page = 0
@@ -111,7 +116,11 @@ exports.index = async (req, res) => {
   if (page < 0) page = 0
 
   const queries = new Queries()
-  const query = queries.get('objects', `(per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
+  let query = queries.get('objects', `(per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
+  if (req.params.query) {
+    req.templateValues.searchQuery = req.params.query
+    query = queries.get('objects', `(keyword: "${req.params.query}", per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
+  }
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
   const payload = {
@@ -160,6 +169,9 @@ exports.index = async (req, res) => {
       pagination.previousPage = pagination.page - 1
       pagination.nextPage = pagination.page + 1
       pagination.target = `/explore-o-matic/page/`
+      if (req.templateValues.searchQuery) {
+        pagination.target = `/explore-o-matic/search/${req.templateValues.searchQuery}/page/`
+      }
       req.templateValues.pagination = pagination
     }
     req.templateValues.objects = objects
