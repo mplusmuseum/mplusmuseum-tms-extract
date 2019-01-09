@@ -119,7 +119,7 @@ exports.index = async (req, res) => {
   let query = queries.get('objects', `(per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
   if (req.params.query) {
     req.templateValues.searchQuery = req.params.query
-    query = queries.get('objects', `(keyword: "${req.params.query}", per_page: ${perPage}, page: ${page}, isRecommended: true, lang:"${req.templateValues.dbLang}")`)
+    query = queries.get('objects', `(keyword: "${req.params.query}", per_page: ${perPage}, page: ${page}, lang:"${req.templateValues.dbLang}")`)
   }
   //  Now we need to actually run the query
   const graphQL = new GraphQL()
