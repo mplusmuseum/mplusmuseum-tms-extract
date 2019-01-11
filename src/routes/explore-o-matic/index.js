@@ -860,9 +860,17 @@ exports.getObject = async (req, res) => {
   //  if really an object)
   let urlStub = 'object'
   let isArchive = false
+  let isObjectNumber = false
+
   if (req.path.indexOf('/archive') >= 0) {
     urlStub = 'archive'
     isArchive = true
+    req.templateValues.mode = 'archives'
+  }
+
+  if (req.path.indexOf('/objectNumber') >= 0) {
+    urlStub = 'objectNumber'
+    isObjectNumber = true
     req.templateValues.mode = 'archives'
   }
 
@@ -880,52 +888,11 @@ exports.getObject = async (req, res) => {
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
   let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
-  if (req.path.indexOf('/objectNumber') >= 0) {
+
+  //  If we are searching by object number
+  if (isObjectNumber) {
     thisQuery = 'objects'
     searchFilter = `(objectNumber: "${req.params.filter}", lang:"${req.templateValues.dbLang}")`
-  }
-
-  //  If we have an action the we want to set something on this object, we need
-  //  to do that here
-  if (req.body.action) {
-    //  If the action is to toggle the recommended value then we need to do that
-    if (req.body.action === 'toggleRecommended') {
-      let isRecommended = false
-      if (req.body.recommended && req.body.recommended === 'true') isRecommended = true
-      //  Check to see if there's any blurb, if so we need to set there here
-      const body = {
-        doc: {
-          id: newFilter,
-          isRecommended
-        },
-        doc_as_upsert: true
-      }
-
-      const blurb = {}
-      if (!req.body.blurb) req.body.blurb = null
-      blurb[req.templateValues.dbLang] = req.body.blurb
-      body.doc.recommendedBlurb = blurb
-
-      const blurbExternalUrl = {}
-      if (!req.body.blurbExternalUrl) req.body.blurbExternalUrl = null
-      blurbExternalUrl[req.templateValues.dbLang] = req.body.blurbExternalUrl
-      body.doc.blurbExternalUrl = blurbExternalUrl
-
-      //  Update the database
-      await esclient.update({
-        index,
-        type,
-        id: newFilter,
-        body
-      })
-      //  Kill the cache
-      await graphQL.fetch({
-        query: queries.get('killCache', '')
-      })
-      return setTimeout(() => {
-        res.redirect(`/explore-o-matic/${urlStub}/${newFilter}#admintools`)
-      }, 1000)
-    }
   }
 
   //  Grab the query to get the object
@@ -939,14 +906,14 @@ exports.getObject = async (req, res) => {
   const results = await graphQL.fetch(payload)
   const getObjectQuery = new Date().getTime() - preObjectTime
   if (results.data && results.data[thisQuery]) {
-    if (req.path.indexOf('/objectNumber') >= 0) {
+    if (isObjectNumber) {
       object = stubObjects(contrastColors(results.data[thisQuery])).filter((object) => object.objectNumber === req.params.filter)[0]
     } else {
       object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
     }
     //  See if we have been passed an bump action, if so we need to adjust the
     //  popularCount
-    if (req.body.bumpPopular) {
+    if (object && req.body.bumpPopular) {
       let newPopularCount = parseInt(req.body.bumpPopular, 10)
 
       //  Update the database
@@ -959,7 +926,15 @@ exports.getObject = async (req, res) => {
         }
       })
       return setTimeout(() => {
-        res.redirect(`/explore-o-matic/${urlStub}/${object.id}#admintools`)
+        if (isArchive) {
+          res.redirect(`/explore-o-matic/archive/${req.params.filter}#admintools`)
+        } else {
+          if (object) {
+            res.redirect(`/explore-o-matic/object/${object.id}#admintools`)
+          } else {
+            res.redirect(`/explore-o-matic`)
+          }
+        }
       }, 3000)
     }
 
@@ -1012,6 +987,57 @@ exports.getObject = async (req, res) => {
       shortCodes.push(`[[collectionCode|${object.collectionCode}|${object.collectionCode}]]`)
     }
     req.templateValues.shortCodes = shortCodes
+  }
+
+  //  If we have an action the we want to set something on this object, we need
+  //  to do that here
+  if (object && req.body.action) {
+    //  If the action is to toggle the recommended value then we need to do that
+    if (req.body.action === 'toggleRecommended') {
+      let isRecommended = false
+      if (req.body.recommended && req.body.recommended === 'true') isRecommended = true
+      //  Check to see if there's any blurb, if so we need to set there here
+      const body = {
+        doc: {
+          id: object.id,
+          isRecommended
+        },
+        doc_as_upsert: true
+      }
+
+      const blurb = {}
+      if (!req.body.blurb) req.body.blurb = null
+      blurb[req.templateValues.dbLang] = req.body.blurb
+      body.doc.recommendedBlurb = blurb
+
+      const blurbExternalUrl = {}
+      if (!req.body.blurbExternalUrl) req.body.blurbExternalUrl = null
+      blurbExternalUrl[req.templateValues.dbLang] = req.body.blurbExternalUrl
+      body.doc.blurbExternalUrl = blurbExternalUrl
+      //  Update the database
+      await esclient.update({
+        index,
+        type,
+        id: object.id,
+        body
+      })
+
+      //  Kill the cache
+      await graphQL.fetch({
+        query: queries.get('killCache', '')
+      })
+      return setTimeout(() => {
+        if (isArchive) {
+          res.redirect(`/explore-o-matic/archive/${req.params.filter}#admintools`)
+        } else {
+          if (object) {
+            res.redirect(`/explore-o-matic/object/${object.id}#admintools`)
+          } else {
+            res.redirect(`/explore-o-matic`)
+          }
+        }
+      }, 1000)
+    }
   }
 
   //  If we are an archive object, then we need to go grab some more stuff
@@ -1114,7 +1140,10 @@ exports.getObject = async (req, res) => {
     pageGenerationTime: pageEnd - pageStart
   }
 
-  return res.render(`explore-o-matic/${urlStub}`, req.templateValues)
+  if (isArchive) {
+    return res.render(`explore-o-matic/${urlStub}`, req.templateValues)
+  }
+  return res.render(`explore-o-matic/object`, req.templateValues)
 }
 
 exports.factpedia = async (req, res) => {
