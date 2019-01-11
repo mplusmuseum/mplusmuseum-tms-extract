@@ -654,6 +654,15 @@ exports.getObjectsByThing = async (req, res) => {
     searchFilter = `(per_page: ${perPage}, page: ${page}, sort_field: "popularCount", sort: "desc", lang:"${req.templateValues.dbLang}")`
   }
 
+  if (req.params.thing === 'recommendedMissingImages') {
+    req.templateValues.mode = 'recommendedMissingImages'
+    req.templateValues.title = `Recommended Objects Missing Images`
+    req.templateValues.subTitle = `Recommended objects which have images assigned but are missing them`
+    perPage = 200
+    page = 0
+    searchFilter = `(per_page: ${perPage}, page: ${page}, isRecommended: true, hasImage: true, missingPrimaryImage: ${newFilter}, lang:"${req.templateValues.dbLang}")`
+  }
+
   if (req.path.indexOf('explore-o-matic/archives') >= 0) {
     perPage = 100
     req.templateValues.isArchives = true
