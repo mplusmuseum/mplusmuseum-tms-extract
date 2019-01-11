@@ -292,6 +292,7 @@ router.get('/:lang/explore-o-matic/collectionCodes', ensureLoggedIn, exploreomat
 router.get('/:lang/explore-o-matic/mediums', ensureLoggedIn, exploreomatic.mediums)
 router.get('/:lang/explore-o-matic/exhibitions', ensureLoggedIn, exploreomatic.exhibitions)
 router.get('/:lang/explore-o-matic/object/:filter', ensureLoggedIn, exploreomatic.getObject)
+router.get('/:lang/explore-o-matic/objectNumber/:filter', ensureLoggedIn, exploreomatic.getObject)
 router.post('/:lang/explore-o-matic/object/:filter', ensureLoggedIn, exploreomatic.getObject)
 router.get('/:lang/explore-o-matic/archive/:filter/page/:page', ensureLoggedIn, exploreomatic.getObject)
 router.post('/:lang/explore-o-matic/archive/:filter/page/:page', ensureLoggedIn, exploreomatic.getObject)

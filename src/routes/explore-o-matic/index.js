@@ -871,6 +871,10 @@ exports.getObject = async (req, res) => {
   let thisQuery = 'object'
   const newFilter = parseInt(req.params.filter, 10)
   let searchFilter = `(id: ${newFilter}, lang:"${req.templateValues.dbLang}")`
+  if (req.path.indexOf('/objectNumber') >= 0) {
+    thisQuery = 'objects'
+    searchFilter = `(objectNumber: "${req.params.filter}", lang:"${req.templateValues.dbLang}")`
+  }
 
   //  If we have an action the we want to set something on this object, we need
   //  to do that here
@@ -925,10 +929,12 @@ exports.getObject = async (req, res) => {
   const preObjectTime = new Date().getTime()
   const results = await graphQL.fetch(payload)
   const getObjectQuery = new Date().getTime() - preObjectTime
-
   if (results.data && results.data[thisQuery]) {
-    object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
-
+    if (req.path.indexOf('/objectNumber') >= 0) {
+      object = stubObjects(contrastColors(results.data[thisQuery])).filter((object) => object.objectNumber === req.params.filter)[0]
+    } else {
+      object = stubObjects(contrastColors([results.data[thisQuery]]))[0]
+    }
     //  See if we have been passed an bump action, if so we need to adjust the
     //  popularCount
     if (req.body.bumpPopular) {
@@ -949,7 +955,7 @@ exports.getObject = async (req, res) => {
     }
 
     //  Stub up the related objects
-    if (object.relatedObjects) {
+    if (object && object.relatedObjects) {
       if (!Array.isArray(object.relatedObjects)) object.relatedObjects = [object.relatedObjects]
       object.relatedObjects = stubObjects(contrastColors(object.relatedObjects))
     }
@@ -959,13 +965,13 @@ exports.getObject = async (req, res) => {
     const shortCodes = []
 
     //  1st the constituents
-    if (object.constituents) {
+    if (object && object.constituents) {
       object.constituents.forEach((constituent) => {
         shortCodes.push(`[[constituent|${constituent.name}|${constituent.id}]]`)
       })
     }
     //  Now the area, category and archivalLevel
-    if (object.classification) {
+    if (object && object.classification) {
       if (object.classification.area) {
         shortCodes.push(`[[area|${object.classification.area.title}|${object.classification.area.stub}]]`)
       }
@@ -977,23 +983,23 @@ exports.getObject = async (req, res) => {
       }
     }
     //  Medium
-    if (object.medium) {
+    if (object && object.medium) {
       shortCodes.push(`[[medium|${object.medium.title}|${object.medium.stub}]]`)
     }
     //  objectName
-    if (object.objectName) {
+    if (object && object.objectName) {
       shortCodes.push(`[[objectName|${object.objectName.title}|${object.objectName.stub}]]`)
     }
     //  objectStatus
-    if (object.objectStatus) {
+    if (object && object.objectStatus) {
       shortCodes.push(`[[objectStatus|${object.objectStatus.title}|${object.objectStatus.stub}]]`)
     }
     //  collectionType
-    if (object.collectionType) {
+    if (object && object.collectionType) {
       shortCodes.push(`[[collectionType|${object.collectionType}|${object.collectionType}]]`)
     }
     //  collectionCode
-    if (object.collectionCode) {
+    if (object && object.collectionCode) {
       shortCodes.push(`[[collectionCode|${object.collectionCode}|${object.collectionCode}]]`)
     }
     req.templateValues.shortCodes = shortCodes
