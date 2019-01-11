@@ -24,297 +24,252 @@
 
   {{> exploreomatic/nav}}
 
-  <section class="section">
-    <div class="container">
-      <div class="tile is-ancestor">
-        <div class="tile is-parent">
-          <article class="tile is-child box" style="color: {{object.predominant.foreground}}; background:{{object.predominant.background}}">
-            <h1 class="title" style="color: inherit">{{object.title}}</h1>
-            {{#if object.titleOther}}
-              <h2 class="subtitle" style="color: inherit">{{object.titleOther}}</h2>
-            {{/if}}
-            {{#if object.mainImage}}
-              <figure class="image">
-                <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v{{object.mainImage.version}}/{{object.mainImage.public_id}}.jpg">
-              </figure>
-              <br />
-            {{/if}}
-            <a name="record"></a>
-            <p>
-              {{#each object.constituents}}
-                <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}
-                  ({{role}})</a>
-              {{/each}}
-            </p>
-            <table class="table is-hoverable is-fullwidth is-striped">
-              <tr>
-                <td class="has-text-weight-bold" style="width: 25%">title</td>
-                {{#unless object.title}}
-                  <td class="has-background-danger has-text-white">[Missing title]</td>
-                {{else}}
-                  <td>{{object.title}}</td>
-                {{/unless}}
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold" style="width: 25%">id</td>
-                <td>{{object.id}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold" style="width: 25%">publicAccess</td>
-                {{#unless object.publicAccess}}
-                  <td class="has-background-danger has-text-white">false</td>
-                {{else}}
-                  <td class="has-background-primary has-text-white">{{object.publicAccess}}</td>
-                {{/unless}}
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">objectNumber</td>
-                <td>{{object.objectNumber}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">collectionType</td>
-                <td>
-                  {{#if object.collectionType}}
-                    <a href="/explore-o-matic/collectionType/{{object.collectionType}}" class="button cardButton">{{object.collectionType}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">collectionCode</td>
-                <td>
-                  {{#if object.collectionCode}}
-                    <a href="/explore-o-matic/collectionCode/{{object.collectionCode}}" class="button cardButton">{{object.collectionCode}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">allORC</td>
-                <td>{{object.allORC}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">archivalLevel</td>
-                <td>
-                  {{#if object.classification.archivalLevel}}
-                    <a href="/explore-o-matic/archivalLevel/{{object.classification.archivalLevel.stub}}" class="button cardButton">{{object.classification.archivalLevel.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">objectStatus</td>
-                <td>
-                  {{#if object.objectStatus}}
-                    <a href="/explore-o-matic/objectStatus/{{object.objectStatus.stub}}" class="button cardButton">{{object.objectStatus.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">objectName</td>
-                <td>
-                  {{#if object.objectName}}
-                    <a href="/explore-o-matic/objectName/{{object.objectName.stub}}" class="button cardButton">{{object.objectName.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">sortNumber</td>
-                <td>{{object.sortNumber}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">onView</td>
-                <td>{{object.onView}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">displayDate</td>
-                <td>{{object.displayDate}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">beginDate</td>
-                <td>{{object.beginDate}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">endDate</td>
-                <td>{{object.endDate}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">dimension</td>
-                <td>{{object.dimension}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">inscription</td>
-                <td>{{object.inscription}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">archiveDescription</td>
-                <td>{{{deSlashRSlashN object.archiveDescription}}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">scopeNContent</td>
-                <td>{{object.scopeNContent}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">baselineDescription</td>
-                <td>{{object.baselineDescription}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">creditLine</td>
-                <td>{{object.creditLine}}</td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">medium</td>
-                <td>
-                  {{#if object.medium}}
-                    <a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">area</td>
-                <td>
-                  {{#if object.classification.area}}
-                    <a href="/explore-o-matic/area/{{object.classification.area.stub}}" class="button cardButton">{{object.classification.area.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">category</td>
-                <td>
-                  {{#if object.classification.category}}
-                    <a href="/explore-o-matic/category/{{object.classification.category.stub}}" class="button cardButton">{{object.classification.category.title}}</a>
-                  {{else}}
-                    &nbsp;
-                  {{/if}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">relatedObjects count</td>
-                <td>
-                  {{object.relatedObjects.length}}
-                </td>
-              </tr>
-              <tr>
-                <td class="has-text-weight-bold">popularCount</td>
-                <td>
-                  {{object.popularCount}}
-                  <p>
-                    <form method="POST">
-                      <div class="field is-grouped">
-                        <div class="control">
-                          <button class="button is-primary" name="bumpPopular" value="8">+10</button>
-                        </div>
-                        <div class="control">
-                          <button class="button is-primary" name="bumpPopular" value="48">+50</button>
-                        </div>
-                        <div class="control">
-                          <button class="button is-primary" name="bumpPopular" value="98">+100</button>
-                        </div>
-                      </div>
-                      <div class="field is-grouped">
-                        <div class="control">
-                          <button class="button is-warning" name="bumpPopular" value="-12">-10</button>
-                        </div>
-                        <div class="control">
-                          <button class="button is-warning" name="bumpPopular" value="-52">-50</button>
-                        </div>
-                        <div class="control">
-                          <button class="button is-warning" name="bumpPopular" value="-102">-100</button>
-                        </div>
-                      </div>
-                    </form>
-                  </p>
-                </td>
-              </tr>
-              <tr>
-                <td>&nbsp</td>
-                <td><a class="button is-link" href="/search/objects/mplus/{{object.id}}">View RAW data</a></td>
-              </tr>
-            </table>
-
-            {{#if object.color.predominant}}
-              <hr />
-              <h2 class="title" style="color: inherit">Predominant Colours, hsl({{object.predominant.hsl.h}},{{object.predominant.hsl.s}}%,{{object.predominant.hsl.l}}%)</h2>
-              <div class="swatch" style="border: 2px solid {{object.predominant.foreground}}">
-                {{#each object.color.predominant}}
-                  <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>
+  {{#if object}}
+    <section class="section">
+      <div class="container">
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box" style="color: {{object.predominant.foreground}}; background:{{object.predominant.background}}">
+              <h1 class="title" style="color: inherit">{{object.title}}</h1>
+              {{#if object.titleOther}}
+                <h2 class="subtitle" style="color: inherit">{{object.titleOther}}</h2>
+              {{/if}}
+              {{#if object.mainImage}}
+                <figure class="image">
+                  <img src="http://res.cloudinary.com/{{config.cloudinary.cloud_name}}/image/upload/v{{object.mainImage.version}}/{{object.mainImage.public_id}}.jpg">
+                </figure>
+                <br />
+              {{/if}}
+              <a name="record"></a>
+              <p>
+                {{#each object.constituents}}
+                  <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}
+                    ({{role}})</a>
                 {{/each}}
-              </div>
-            {{/if}}
+              </p>
+              <table class="table is-hoverable is-fullwidth is-striped">
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">title</td>
+                  {{#unless object.title}}
+                    <td class="has-background-danger has-text-white">[Missing title]</td>
+                  {{else}}
+                    <td>{{object.title}}</td>
+                  {{/unless}}
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">id</td>
+                  <td>{{object.id}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold" style="width: 25%">publicAccess</td>
+                  {{#unless object.publicAccess}}
+                    <td class="has-background-danger has-text-white">false</td>
+                  {{else}}
+                    <td class="has-background-primary has-text-white">{{object.publicAccess}}</td>
+                  {{/unless}}
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">objectNumber</td>
+                  <td>{{object.objectNumber}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">collectionType</td>
+                  <td>
+                    {{#if object.collectionType}}
+                      <a href="/explore-o-matic/collectionType/{{object.collectionType}}" class="button cardButton">{{object.collectionType}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">collectionCode</td>
+                  <td>
+                    {{#if object.collectionCode}}
+                      <a href="/explore-o-matic/collectionCode/{{object.collectionCode}}" class="button cardButton">{{object.collectionCode}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">allORC</td>
+                  <td>{{object.allORC}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">archivalLevel</td>
+                  <td>
+                    {{#if object.classification.archivalLevel}}
+                      <a href="/explore-o-matic/archivalLevel/{{object.classification.archivalLevel.stub}}" class="button cardButton">{{object.classification.archivalLevel.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">objectStatus</td>
+                  <td>
+                    {{#if object.objectStatus}}
+                      <a href="/explore-o-matic/objectStatus/{{object.objectStatus.stub}}" class="button cardButton">{{object.objectStatus.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">objectName</td>
+                  <td>
+                    {{#if object.objectName}}
+                      <a href="/explore-o-matic/objectName/{{object.objectName.stub}}" class="button cardButton">{{object.objectName.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">sortNumber</td>
+                  <td>{{object.sortNumber}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">onView</td>
+                  <td>{{object.onView}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">displayDate</td>
+                  <td>{{object.displayDate}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">beginDate</td>
+                  <td>{{object.beginDate}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">endDate</td>
+                  <td>{{object.endDate}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">dimension</td>
+                  <td>{{object.dimension}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">inscription</td>
+                  <td>{{object.inscription}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">archiveDescription</td>
+                  <td>{{{deSlashRSlashN object.archiveDescription}}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">scopeNContent</td>
+                  <td>{{object.scopeNContent}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">baselineDescription</td>
+                  <td>{{object.baselineDescription}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">creditLine</td>
+                  <td>{{object.creditLine}}</td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">medium</td>
+                  <td>
+                    {{#if object.medium}}
+                      <a href="/explore-o-matic/medium/{{object.medium.stub}}" class="button cardButton">{{object.medium.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">area</td>
+                  <td>
+                    {{#if object.classification.area}}
+                      <a href="/explore-o-matic/area/{{object.classification.area.stub}}" class="button cardButton">{{object.classification.area.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">category</td>
+                  <td>
+                    {{#if object.classification.category}}
+                      <a href="/explore-o-matic/category/{{object.classification.category.stub}}" class="button cardButton">{{object.classification.category.title}}</a>
+                    {{else}}
+                      &nbsp;
+                    {{/if}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">relatedObjects count</td>
+                  <td>
+                    {{object.relatedObjects.length}}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="has-text-weight-bold">popularCount</td>
+                  <td>
+                    {{object.popularCount}}
+                    <p>
+                      <form method="POST">
+                        <div class="field is-grouped">
+                          <div class="control">
+                            <button class="button is-primary" name="bumpPopular" value="8">+10</button>
+                          </div>
+                          <div class="control">
+                            <button class="button is-primary" name="bumpPopular" value="48">+50</button>
+                          </div>
+                          <div class="control">
+                            <button class="button is-primary" name="bumpPopular" value="98">+100</button>
+                          </div>
+                        </div>
+                        <div class="field is-grouped">
+                          <div class="control">
+                            <button class="button is-warning" name="bumpPopular" value="-12">-10</button>
+                          </div>
+                          <div class="control">
+                            <button class="button is-warning" name="bumpPopular" value="-52">-50</button>
+                          </div>
+                          <div class="control">
+                            <button class="button is-warning" name="bumpPopular" value="-102">-100</button>
+                          </div>
+                        </div>
+                      </form>
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>&nbsp</td>
+                  <td><a class="button is-link" href="/search/objects/mplus/{{object.id}}">View RAW data</a></td>
+                </tr>
+              </table>
 
-            {{#if object.concepts}}
-              <hr />
-              <h2 class="title" style="color: inherit">Concepts</h2>
-              {{#each object.concepts}}
-                <table class="table is-hoverable is-fullwidth is-striped">
-                  <tr>
-                    <td class="has-text-weight-bold" style="width: 25%">title</td>
-                    <td class="has-text-weight-bold">{{title}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">id</td>
-                    <td>{{id}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">displayDate</td>
-                    <td>{{displayDate}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">beginDate</td>
-                    <td>{{beginDate}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">endDate</td>
-                    <td>{{endDate}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">timeline</td>
-                    <td>{{timeline}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">description</td>
-                    <td>{{{deSlashRSlashN description}}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">conceptUse</td>
-                    <td class="has-text-weight-bold">{{conceptUse}}</td>
-                  </tr>
-                  <tr>
-                    <td class="has-text-weight-bold">publicAccess</td>
-                    <td>{{publicAccess}}</td>
-                  </tr>
-                </table>
-              {{/each}}
-            {{/if}}
+              {{#if object.color.predominant}}
+                <hr />
+                <h2 class="title" style="color: inherit">Predominant Colours, hsl({{object.predominant.hsl.h}},{{object.predominant.hsl.s}}%,{{object.predominant.hsl.l}}%)</h2>
+                <div class="swatch" style="border: 2px solid {{object.predominant.foreground}}">
+                  {{#each object.color.predominant}}
+                    <div class="strip" style="background-color: {{color}}; height: {{percent}}%" title="{{color}} {{nicePercent}}%"></div>
+                  {{/each}}
+                </div>
+              {{/if}}
 
-            {{#if object.exhibitions}}
-              <hr />
-              <h2 class="title" style="color: inherit">Exhibitions</h2>
-              {{#if object.exhibitions.exhibitions}}
-                {{#each object.exhibitions.exhibitions}}
+              {{#if object.concepts}}
+                <hr />
+                <h2 class="title" style="color: inherit">Concepts</h2>
+                {{#each object.concepts}}
                   <table class="table is-hoverable is-fullwidth is-striped">
                     <tr>
                       <td class="has-text-weight-bold" style="width: 25%">title</td>
-                      <td><a href="/explore-o-matic/exhibition/{{id}}" class="button cardButton">{{title}}</a></td>
+                      <td class="has-text-weight-bold">{{title}}</td>
                     </tr>
                     <tr>
                       <td class="has-text-weight-bold">id</td>
                       <td>{{id}}</td>
                     </tr>
                     <tr>
-                      <td class="has-text-weight-bold">type</td>
-                      <td>{{type}}</td>
+                      <td class="has-text-weight-bold">displayDate</td>
+                      <td>{{displayDate}}</td>
                     </tr>
                     <tr>
                       <td class="has-text-weight-bold">beginDate</td>
@@ -325,210 +280,271 @@
                       <td>{{endDate}}</td>
                     </tr>
                     <tr>
-                      <td class="has-text-weight-bold">venues</td>
-                      <td>
-                        {{#if venues}}
-                          {{#each venues}}
-                            <h2 class="title is-5">{{title}}</h2>
-                            <table class="table is-hoverable is-fullwidth is-striped">
-                              <tr>
-                                <td class="has-text-weight-bold">beginDate</td>
-                                <td>{{beginDate}}</td>
-                              </tr>
-                              <tr>
-                                <td class="has-text-weight-bold">endDate</td>
-                                <td>{{endDate}}</td>
-                              </tr>
-                            </table>
-
-                          {{/each}}
-                        {{/if}}
-                      </td>
+                      <td class="has-text-weight-bold">timeline</td>
+                      <td>{{timeline}}</td>
                     </tr>
                     <tr>
-                      <td class="has-text-weight-bold">section</td>
-                      <td>{{section}}</td>
+                      <td class="has-text-weight-bold">description</td>
+                      <td>{{{deSlashRSlashN description}}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">conceptUse</td>
+                      <td class="has-text-weight-bold">{{conceptUse}}</td>
+                    </tr>
+                    <tr>
+                      <td class="has-text-weight-bold">publicAccess</td>
+                      <td>{{publicAccess}}</td>
                     </tr>
                   </table>
                 {{/each}}
               {{/if}}
-            {{/if}}
 
-            {{#if object.objectRights}}
-              <hr />
-              <h2 class="title" style="color: inherit">Object Rights</h2>
-              <table class="table is-hoverable is-fullwidth is-striped">
-                <tr>
-                  <td class="has-text-weight-bold" style="width: 25%">type</td>
-                  <td>{{object.objectRights.type}}</td>
-                </tr>
-                <tr>
-                  <td class="has-text-weight-bold" style="width: 25%">copyright</td>
-                  <td>{{object.objectRights.copyright}}</td>
-                </tr>
-                <tr>
-                  <td class="has-text-weight-bold" style="width: 25%">currentStatus</td>
-                  <td>{{object.objectRights.currentStatus}}</td>
-                </tr>
-                {{#if object.objectRights.rights}}
-                  <tr>
-                    <td class="has-text-weight-bold" style="width: 25%">rights</td>
-                    <td>
-                      <table class="table is-hoverable is-fullwidth is-striped">
-                        {{#each object.objectRights.rights}}
-                          <tr>
-                            <td class="has-text-weight-bold">{{group}}</td>
-                            <td>{{title}}</td>
-                          </tr>
-                        {{/each}}
-                      </table>
-                    </td>
-                  </tr>
+              {{#if object.exhibitions}}
+                <hr />
+                <h2 class="title" style="color: inherit">Exhibitions</h2>
+                {{#if object.exhibitions.exhibitions}}
+                  {{#each object.exhibitions.exhibitions}}
+                    <table class="table is-hoverable is-fullwidth is-striped">
+                      <tr>
+                        <td class="has-text-weight-bold" style="width: 25%">title</td>
+                        <td><a href="/explore-o-matic/exhibition/{{id}}" class="button cardButton">{{title}}</a></td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">id</td>
+                        <td>{{id}}</td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">type</td>
+                        <td>{{type}}</td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">beginDate</td>
+                        <td>{{beginDate}}</td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">endDate</td>
+                        <td>{{endDate}}</td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">venues</td>
+                        <td>
+                          {{#if venues}}
+                            {{#each venues}}
+                              <h2 class="title is-5">{{title}}</h2>
+                              <table class="table is-hoverable is-fullwidth is-striped">
+                                <tr>
+                                  <td class="has-text-weight-bold">beginDate</td>
+                                  <td>{{beginDate}}</td>
+                                </tr>
+                                <tr>
+                                  <td class="has-text-weight-bold">endDate</td>
+                                  <td>{{endDate}}</td>
+                                </tr>
+                              </table>
+
+                            {{/each}}
+                          {{/if}}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="has-text-weight-bold">section</td>
+                        <td>{{section}}</td>
+                      </tr>
+                    </table>
+                  {{/each}}
                 {{/if}}
-              </table>
-            {{/if}}
+              {{/if}}
 
-          </article>
-        </div>
-      </div>
+              {{#if object.objectRights}}
+                <hr />
+                <h2 class="title" style="color: inherit">Object Rights</h2>
+                <table class="table is-hoverable is-fullwidth is-striped">
+                  <tr>
+                    <td class="has-text-weight-bold" style="width: 25%">type</td>
+                    <td>{{object.objectRights.type}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold" style="width: 25%">copyright</td>
+                    <td>{{object.objectRights.copyright}}</td>
+                  </tr>
+                  <tr>
+                    <td class="has-text-weight-bold" style="width: 25%">currentStatus</td>
+                    <td>{{object.objectRights.currentStatus}}</td>
+                  </tr>
+                  {{#if object.objectRights.rights}}
+                    <tr>
+                      <td class="has-text-weight-bold" style="width: 25%">rights</td>
+                      <td>
+                        <table class="table is-hoverable is-fullwidth is-striped">
+                          {{#each object.objectRights.rights}}
+                            <tr>
+                              <td class="has-text-weight-bold">{{group}}</td>
+                              <td>{{title}}</td>
+                            </tr>
+                          {{/each}}
+                        </table>
+                      </td>
+                    </tr>
+                  {{/if}}
+                </table>
+              {{/if}}
 
-      {{#if object.relatedObjects}}
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <br />
-        <div class="tile is-ancestor">
-          <div class="tile is-parent">
-            <article class="tile is-child box">
-              <h1 class="title">Related Objects</h1>
-              <hr />
-              {{#each object.relatedObjects}}
-                {{> exploreomatic/objectcard @this cloudname=../config.cloudinary.cloud_name}}
-              {{/each}}
             </article>
           </div>
         </div>
-      {{/if}}
+
+        {{#if object.relatedObjects}}
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <br />
+          <div class="tile is-ancestor">
+            <div class="tile is-parent">
+              <article class="tile is-child box">
+                <h1 class="title">Related Objects</h1>
+                <hr />
+                {{#each object.relatedObjects}}
+                  {{> exploreomatic/objectcard @this cloudname=../config.cloudinary.cloud_name}}
+                {{/each}}
+              </article>
+            </div>
+          </div>
+        {{/if}}
 
 
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <br />
-      <a name="admintools"></a>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <a name="admintools"></a>
 
-      <div class="tile is-ancestor">
-        <div class="tile is-parent">
-          <article class="tile is-child box">
-            <h1 class="title">Admin tools</h1>
-            <hr />
-            <h2 class="title is-5">Recommend</h2>
-            <h3 class="subtitle is-6">If you want this object to show up as a recommended item <em>and</em> in the
-              random pool then set the check box here.</h3>
-            <form method="POST">
-              <label class="checkbox is-spaced">
-                <input type="checkbox" name="recommended" value=true {{#if object.isRecommended}} checked{{/if}}>
-                  Recommended </label> <br />
-                <label class="is-spaced">
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
+              <h1 class="title">Admin tools</h1>
+              <hr />
+              <h2 class="title is-5">Recommend</h2>
+              <h3 class="subtitle is-6">If you want this object to show up as a recommended item <em>and</em> in the
+                random pool then set the check box here.</h3>
+              <form method="POST">
+                <label class="checkbox is-spaced">
+                  <input type="checkbox" name="recommended" value=true {{#if object.isRecommended}} checked{{/if}}>
+                    Recommended </label> <br />
+                  <label class="is-spaced">
 
-                  <p>
-                    When we show a single recommended object we often show some "blurb" to go with it, you can enter
-                    that below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb
-                    for other languages use the language toggle from the top right of the page.
-                  </p>
+                    <p>
+                      When we show a single recommended object we often show some "blurb" to go with it, you can enter
+                      that below. Note you are entering blurb for the <code>{{dbLang}}</code> language, to enter blurb
+                      for other languages use the language toggle from the top right of the page.
+                    </p>
 
-                  {{#if object.recommendedBlurb}}
-                    <div class="notification">
-                      <h1 class="title is-5">Preview</h1>
-                      <h2 class="subtitle is-7">The preview will update when you save the text. Note, the links here
-                        stay within the Explore-O-Matic, on the live site they will do what they are supposed to do.</h2>
-                      <hr />
-                      {{{convertShortCode object.recommendedBlurb}}}
-                    </div>
-                  {{/if}}
+                    {{#if object.recommendedBlurb}}
+                      <div class="notification">
+                        <h1 class="title is-5">Preview</h1>
+                        <h2 class="subtitle is-7">The preview will update when you save the text. Note, the links here
+                          stay within the Explore-O-Matic, on the live site they will do what they are supposed to do.</h2>
+                        <hr />
+                        {{{convertShortCode object.recommendedBlurb}}}
+                      </div>
+                    {{/if}}
 
-                  <textarea class="textarea is-primary is-focused" placeholder="Enter some descriptive text here" name="blurb">{{object.recommendedBlurb}}</textarea>
-                </label>
-                <br />
+                    <textarea class="textarea is-primary is-focused" placeholder="Enter some descriptive text here"
+                      name="blurb">{{object.recommendedBlurb}}</textarea>
+                  </label>
+                  <br />
 
-                <label class="label">External URL
-                  <p class="control">
-                    <input class="input" type="text" name="blurbExternalUrl" placeholder="http://some.site" value="{{object.blurbExternalUrl}}">
-                  </p>
-                </label>
-                <br />
+                  <label class="label">External URL
+                    <p class="control">
+                      <input class="input" type="text" name="blurbExternalUrl" placeholder="http://some.site" value="{{object.blurbExternalUrl}}">
+                    </p>
+                  </label>
+                  <br />
 
-                <div class="notification">
-                  <h1 class="title is-5">Short Codes</h1>
-                  <h2 class="subtitle is-6">These short codes can be used to create the links in the "blurb", just copy
-                    and paste the short code you want to get converted. You can also use <em>some</em> markdown
-                    formatting.</h2>
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Short Code (copy this)</th>
-                        <th>Link</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {{#each shortCodes}}
+                  <div class="notification">
+                    <h1 class="title is-5">Short Codes</h1>
+                    <h2 class="subtitle is-6">These short codes can be used to create the links in the "blurb", just
+                      copy
+                      and paste the short code you want to get converted. You can also use <em>some</em> markdown
+                      formatting.</h2>
+                    <table class="table">
+                      <thead>
                         <tr>
-                          <td class="is-family-monospace is-size-5" style="font-family: monospace">{{@this}}</td>
-                          <td>{{{convertShortCode @this}}}</td>
+                          <th>Short Code (copy this)</th>
+                          <th>Link</th>
                         </tr>
-                      {{/each}}
-                    </tbody>
-                  </table>
-                </div>
-                <div class="control">
-                  <button class="button is-primary" name="action" value="toggleRecommended">Update</button>
-                </div>
-            </form>
-          </article>
+                      </thead>
+                      <tbody>
+                        {{#each shortCodes}}
+                          <tr>
+                            <td class="is-family-monospace is-size-5" style="font-family: monospace">{{@this}}</td>
+                            <td>{{{convertShortCode @this}}}</td>
+                          </tr>
+                        {{/each}}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="control">
+                    <button class="button is-primary" name="action" value="toggleRecommended">Update</button>
+                  </div>
+              </form>
+            </article>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  {{#if timing}}
+    {{#if timing}}
+      <section class="section">
+        <div class="container">
+          <hr />
+          <h1 class="title">Page generation timings</h1>
+          <table class="table">
+            <tr>
+              <td>Total generation time</td>
+              <td>{{prettyNumber timing.pageGenerationTime}}ms</td>
+            </tr>
+            <tr>
+              <td>Total time spend on queries</td>
+              <td>{{prettyNumber timing.totalQueryTime}}ms</td>
+            </tr>
+            <tr>
+              <td>Total time doing other stuff</td>
+              <td>{{prettyNumber timing.totalNotQueryTime}}ms</td>
+            </tr>
+            <tr>
+              <td>Getting the main object query</td>
+              <td>{{prettyNumber timing.getObjectQuery}}ms</td>
+            </tr>
+            {{#ifgt timing.getNotObjectQuery 0}}
+              <tr>
+                <td>Getting NOT objects query</td>
+                <td>{{prettyNumber ../timing.getNotObjectQuery}}ms</td>
+              </tr>
+            {{/ifgt}}
+            {{#ifgt timing.getYesObjectQuery 0}}
+              <tr>
+                <td>Getting YES objects query</td>
+                <td>{{prettyNumber ../timing.getYesObjectQuery}}ms</td>
+              </tr>
+            {{/ifgt}}
+          </table>
+        </div>
+      </section>
+    {{/if}}
+  {{else}}
     <section class="section">
       <div class="container">
-        <hr />
-        <h1 class="title">Page generation timings</h1>
-        <table class="table">
-          <tr>
-            <td>Total generation time</td>
-            <td>{{prettyNumber timing.pageGenerationTime}}ms</td>
-          </tr>
-          <tr>
-            <td>Total time spend on queries</td>
-            <td>{{prettyNumber timing.totalQueryTime}}ms</td>
-          </tr>
-          <tr>
-            <td>Total time doing other stuff</td>
-            <td>{{prettyNumber timing.totalNotQueryTime}}ms</td>
-          </tr>
-          <tr>
-            <td>Getting the main object query</td>
-            <td>{{prettyNumber timing.getObjectQuery}}ms</td>
-          </tr>
-          {{#ifgt timing.getNotObjectQuery 0}}
-            <tr>
-              <td>Getting NOT objects query</td>
-              <td>{{prettyNumber ../timing.getNotObjectQuery}}ms</td>
-            </tr>
-          {{/ifgt}}
-          {{#ifgt timing.getYesObjectQuery 0}}
-            <tr>
-              <td>Getting YES objects query</td>
-              <td>{{prettyNumber ../timing.getYesObjectQuery}}ms</td>
-            </tr>
-          {{/ifgt}}
-        </table>
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
+              <h1 class="title" style="color: inherit">Sorry, no object found</h1>
+            </article>
+          </div>
+        </div>
       </div>
     </section>
   {{/if}}
