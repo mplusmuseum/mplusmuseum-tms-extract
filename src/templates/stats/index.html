@@ -34,15 +34,13 @@
           <hr />
           <h3 class="title">{{stub}}</h3>
 
-          {{#ifEqual stub "mplus"}}
-            <p class="is-spaced">{{../../i18n.stats.publicAccess}}</p>
-            <progress class="progress is-success is-large is-spaced" value="{{../../publicAccess.truePercent}}" max="100">{{../../publicAccess.truePercent}}%</progress>
-            <p class="is-spaced">
-              {{prettyNumber ../../publicAccess.trueTotal}} ({{../../publicAccess.truePercent}}%) objects have been
-              made
-              public, {{prettyNumber ../../publicAccess.falseTotal}} are still remaining.
-            </p>
-          {{/ifEqual}}
+          <p class="is-spaced">{{../i18n.stats.publicAccess}}</p>
+          <progress class="progress is-success is-large is-spaced" value="{{../publicAccess.truePercent}}" max="100">{{../publicAccess.truePercent}}%</progress>
+          <p class="is-spaced">
+            {{prettyNumber ../publicAccess.trueTotal}} ({{../publicAccess.truePercent}}%) objects have been
+            made
+            public, {{prettyNumber ../publicAccess.falseTotal}} are still remaining.
+          </p>
 
           {{#each processingData}}
             {{#ifEven @index}}
