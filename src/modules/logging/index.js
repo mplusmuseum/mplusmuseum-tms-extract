@@ -224,6 +224,6 @@ exports.startCulling = () => {
   clearInterval(global.cullLogs)
   global.elasticsearchTmr = setInterval(() => {
     cullLogs()
-  }, 1000 * 60 * 20) // Once every 20 minutes
+  }, 1000 * 60 * 60) // Once every 60 minutes
   cullLogs()
 }
