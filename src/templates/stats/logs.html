@@ -153,7 +153,8 @@
       <hr />
 
       <h1 class="title">
-        <a name="graphql" class="hidename">Last 100 GraphQL queries</a>
+        <a name="graphql" class="hidename">Last 100 GraphQL queries {{#if totalLogRecords}} from a total of
+            {{prettyNumber totalLogRecords}}{{/if}}</a>
       </h1>
       <p>
         <table class="table is-striped is-fullwidth">

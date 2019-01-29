@@ -333,7 +333,11 @@ exports.logs = async (req, res) => {
       body
     })
   }
+  console.log(graphQLRecords)
 
+  if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.total) {
+    req.templateValues.totalLogRecords = graphQLRecords.hits.total
+  }
   if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.hits) {
     req.templateValues.graphQLRecords = graphQLRecords.hits.hits.map((record) => record._source).map((record) => {
       record.argsNice = JSON.stringify(record.args, null, 4)
