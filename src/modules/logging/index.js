@@ -147,7 +147,7 @@ const cullAPILogs = async () => {
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const index = `logs_${baseTMS}_graphql`
   const type = 'log'
-  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 20))
+  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 10))
   const body = {
     size: 100,
     sort: [{
@@ -183,6 +183,6 @@ exports.startCulling = () => {
   clearInterval(global.cullLogs)
   global.elasticsearchTmr = setInterval(() => {
     cullLogs()
-  }, 1000 * 60 * 15) // Once every 5 minutes
+  }, 1000 * 60 * 20) // Once every 20 minutes
   cullLogs()
 }
