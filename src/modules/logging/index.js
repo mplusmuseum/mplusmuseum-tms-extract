@@ -131,8 +131,52 @@ exports.createIndex = async () => {
   }
 }
 
+const cullAPILogs = async () => {
+  console.log('culling api logs')
+  const config = new Config()
+
+  //  See if we have a base TMS system set up yet, if not
+  //  then we get out here
+  const baseTMS = config.getRootTMS()
+  if (baseTMS === null) return
+
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null) {
+    return
+  }
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `logs_${baseTMS}_graphql`
+  const type = 'log'
+  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 30))
+  const body = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'asc'
+      }
+    }],
+    query: {
+      range: {
+        datetime: [{
+          lte: dayAgo
+        }]
+      }
+    }
+  }
+  const graphQLConfig = config.get('graphql')
+  let graphQLRecords = null
+  if (elasticsearchConfig !== null && baseTMS !== null && graphQLConfig !== null) {
+    graphQLRecords = await esclient.deleteByQuery({
+      index,
+      type,
+      body
+    })
+  }
+}
+
 const cullLogs = () => {
-  console.log('culling logs')
+  // Get the logs that are over 1 day old
+  cullAPILogs()
 }
 
 exports.startCulling = () => {
@@ -140,6 +184,6 @@ exports.startCulling = () => {
   clearInterval(global.cullLogs)
   global.elasticsearchTmr = setInterval(() => {
     cullLogs()
-  }, 1000 * 60 * 60 * 24) // Once a day, cull the old logs
+  }, 1000 * 60 * 15) // Once every 5 minutes
   cullLogs()
 }
