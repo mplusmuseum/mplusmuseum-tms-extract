@@ -333,7 +333,6 @@ exports.logs = async (req, res) => {
       body
     })
   }
-  console.log(graphQLRecords)
 
   if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.total) {
     req.templateValues.totalLogRecords = graphQLRecords.hits.total

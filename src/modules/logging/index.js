@@ -147,7 +147,7 @@ const cullAPILogs = async () => {
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const index = `logs_${baseTMS}_graphql`
   const type = 'log'
-  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 30))
+  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 20))
   const body = {
     size: 100,
     sort: [{
@@ -164,9 +164,8 @@ const cullAPILogs = async () => {
     }
   }
   const graphQLConfig = config.get('graphql')
-  let graphQLRecords = null
   if (elasticsearchConfig !== null && baseTMS !== null && graphQLConfig !== null) {
-    graphQLRecords = await esclient.deleteByQuery({
+    await esclient.deleteByQuery({
       index,
       type,
       body
