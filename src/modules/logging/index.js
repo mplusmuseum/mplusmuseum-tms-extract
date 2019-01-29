@@ -132,7 +132,6 @@ exports.createIndex = async () => {
 }
 
 const cullAPILogs = async () => {
-  console.log('culling api logs')
   const config = new Config()
 
   //  See if we have a base TMS system set up yet, if not
@@ -173,9 +172,51 @@ const cullAPILogs = async () => {
   }
 }
 
+const cullDashboardLogs = async () => {
+  const config = new Config()
+
+  //  See if we have a base TMS system set up yet, if not
+  //  then we get out here
+  const baseTMS = config.getRootTMS()
+  if (baseTMS === null) return
+
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null) {
+    return
+  }
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `logs_${baseTMS}_tmsextract`
+  const type = 'log'
+  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 80))
+  const body = {
+    size: 100,
+    sort: [{
+      timestamp: {
+        order: 'asc'
+      }
+    }],
+    query: {
+      range: {
+        datetime: [{
+          lte: dayAgo
+        }]
+      }
+    }
+  }
+  const graphQLConfig = config.get('graphql')
+  if (elasticsearchConfig !== null && baseTMS !== null && graphQLConfig !== null) {
+    await esclient.deleteByQuery({
+      index,
+      type,
+      body
+    })
+  }
+}
+
 const cullLogs = () => {
   // Get the logs that are over 1 day old
   cullAPILogs()
+  cullDashboardLogs()
 }
 
 exports.startCulling = () => {

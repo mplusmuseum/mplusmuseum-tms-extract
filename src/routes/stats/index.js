@@ -326,12 +326,24 @@ exports.logs = async (req, res) => {
 
   const graphQLConfig = config.get('graphql')
   let graphQLRecords = null
+  let dashboardRecords = null
+
   if (elasticsearchConfig !== null && baseTMS !== null && graphQLConfig !== null) {
     graphQLRecords = await esclient.search({
       index: `logs_${baseTMS}_graphql`,
       type,
       body
     })
+    dashboardRecords = await esclient.search({
+      index: `logs_${baseTMS}_tmsextract`,
+      type,
+      body: {
+        size: 1
+      }
+    })
+    if (dashboardRecords && dashboardRecords.hits && dashboardRecords.hits.total) {
+      req.templateValues.totalDashboardRecords = dashboardRecords.hits.total
+    }
   }
 
   if (graphQLRecords && graphQLRecords.hits && graphQLRecords.hits.total) {
