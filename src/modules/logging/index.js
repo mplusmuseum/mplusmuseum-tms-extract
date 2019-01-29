@@ -57,7 +57,7 @@ const tmsLogger = winston.createLogger({
 })
 
 class ESLogger {
-  object(name, data) {
+  object (name, data) {
     const config = new Config()
 
     //  See if we have a base TMS system set up yet, if not
@@ -187,7 +187,7 @@ const cullDashboardLogs = async () => {
   const esclient = new elasticsearch.Client(elasticsearchConfig)
   const index = `logs_${baseTMS}_tmsextract`
   const type = 'log'
-  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 60))
+  const dayAgo = new Date(new Date().getTime() - (1000 * 60 * 60 * 24 * 30))
   const body = {
     size: 100,
     sort: [{
