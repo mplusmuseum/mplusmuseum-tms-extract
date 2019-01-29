@@ -25,3 +25,4 @@ package-lock.json
 /*.old
 /*.old.*
 /lang/collection/strings.json
+/updating_kibana.txt
