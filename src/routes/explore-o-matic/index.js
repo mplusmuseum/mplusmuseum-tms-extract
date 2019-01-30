@@ -1227,7 +1227,12 @@ exports.factpedia = async (req, res) => {
         isArchive: (req.body.isArchive === 'true'),
         isColour: (req.body.isColour === 'true'),
         isRecommended: (req.body.isRecommended === 'true'),
-        isPopular: (req.body.isPopular === 'true')
+        isCollection: (req.body.isCollection === 'true'),
+        isPopular: (req.body.isPopular === 'true'),
+        keyword: []
+      }
+      if (req.body.keyword) {
+        body.keyword = req.body.keyword.split(',').map((word) => word.trim())
       }
       await esclient.index({
         index,
@@ -1267,7 +1272,9 @@ exports.factpedia = async (req, res) => {
               isArchive: false,
               isColour: false,
               isRecommended: false,
-              isPopular: false
+              isCollection: false,
+              isPopular: false,
+              keyword: []
             }
           }
           if (field === 'factoidEN') newFacts[id].fact.en = value
@@ -1279,7 +1286,11 @@ exports.factpedia = async (req, res) => {
           if (field === 'isArchive') newFacts[id].isArchive = true
           if (field === 'isColour') newFacts[id].isColour = true
           if (field === 'isRecommended') newFacts[id].isRecommended = true
+          if (field === 'isCollection') newFacts[id].isCollection = true
           if (field === 'isPopular') newFacts[id].isPopular = true
+          if (field === 'keyword') {
+            newFacts[id].keyword = value.split(',').map((word) => word.trim())
+          }
         }
       })
 

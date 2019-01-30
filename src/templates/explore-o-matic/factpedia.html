@@ -75,12 +75,26 @@
                               <label class="checkbox">
                                 <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
                                   checked{{/if}}> Recommended </label> </div> <div class="column">
+                                <label class="checkbox">
+                                  <input type="checkbox" name="{{id}}|isCollection" value=true {{#if isCollection}}
+                                    checked{{/if}}> Collection </label> </div> </div> <div class="has-text-right">
+
                 </div>
-              </div>
-              <div class="has-text-right">
-                <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete factoid</button>
-              </div>
-              <hr />
+                <div class="columns">
+                  <div class="column">
+                    <label class="text">
+                      Keywords (both languages separated by commas)
+                    </label>
+                    <input class="input" type="text" name="{{id}}|keyword" placeholder="Search pills" value="{{keyword}}">
+                  </div>
+                </div>
+                <div class="columns">
+                  <div class="column has-text-right">
+                    <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete
+                      factoid</button>
+                  </div>
+                </div>
+                <hr />
             {{/each}}
             <div class="control is-spaced">
               <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
@@ -158,6 +172,21 @@
                       <input type="checkbox" name="isRecommended" value=true>
                       Recommended
                     </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isCollection" value=true>
+                      Collection
+                    </label>
+                  </div>
+                </div>
+
+                <div class="columns">
+                  <div class="column">
+                    <label class="text">
+                      Keywords (both languages separated by commas)
+                    </label>
+                    <input class="input" type="text" name="keyword" placeholder="Search pills">
                   </div>
                 </div>
 
