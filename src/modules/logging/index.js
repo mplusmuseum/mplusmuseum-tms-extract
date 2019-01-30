@@ -4,7 +4,7 @@
  */
 const Config = require('../../classes/config')
 const path = require('path')
-const elasticsearch = require('elasticsearch')
+// const elasticsearch = require('elasticsearch')
 
 const rootDir = __dirname
 
@@ -58,6 +58,7 @@ const tmsLogger = winston.createLogger({
 
 class ESLogger {
   object (name, data) {
+    /*
     const config = new Config()
 
     //  See if we have a base TMS system set up yet, if not
@@ -69,14 +70,13 @@ class ESLogger {
     if (elasticsearchConfig === null) {
       return
     }
-    const esclient = new elasticsearch.Client(elasticsearchConfig)
-    const index = `logs_${baseTMS}_tmsextract`
+    // const esclient = new elasticsearch.Client(elasticsearchConfig)
+    // const index = `logs_${baseTMS}_tmsextract`
 
     data.name = name
     data.datetime = new Date()
     data.timestamp = data.datetime.getTime()
-    const id = `${data.timestamp}.${Math.random()}`
-
+    // const id = `${data.timestamp}.${Math.random()}`
     esclient.update({
       index,
       type: 'log',
@@ -86,6 +86,7 @@ class ESLogger {
         doc_as_upsert: true
       }
     })
+    */
   }
 }
 /**
@@ -108,6 +109,7 @@ exports.getTMSLogger = () => {
 }
 
 exports.createIndex = async () => {
+  /*
   const config = new Config()
 
   //  See if we have a base TMS system set up yet, if not
@@ -129,9 +131,11 @@ exports.createIndex = async () => {
       index
     })
   }
+  */
 }
 
 const cullAPILogs = async () => {
+  /*
   const config = new Config()
 
   //  See if we have a base TMS system set up yet, if not
@@ -170,9 +174,11 @@ const cullAPILogs = async () => {
       body
     })
   }
+  */
 }
 
 const cullDashboardLogs = async () => {
+  /*
   const config = new Config()
 
   //  See if we have a base TMS system set up yet, if not
@@ -211,6 +217,7 @@ const cullDashboardLogs = async () => {
       body
     })
   }
+  */
 }
 
 const cullLogs = () => {
