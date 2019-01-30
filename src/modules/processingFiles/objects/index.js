@@ -100,6 +100,24 @@ const getSortnumber = objectNumber => {
   return objectNumber
 }
 
+const getDepartment = department => {
+  if (department === undefined) return null
+  if (department === null) return null
+  return department
+}
+
+const getCollectionName = collectionName => {
+  if (collectionName === undefined) return null
+  if (collectionName === null) return null
+  return collectionName
+}
+
+const getStyle = style => {
+  if (style === undefined) return null
+  if (style === null) return null
+  return style
+}
+
 const getClassifications = classifications => {
   const classificationsObj = {}
   if (!Array.isArray(classifications)) {
@@ -282,6 +300,9 @@ const parseItem = item => {
     onView: parseInt(item.OnView, 10) === 1,
     objectNumber: item.ObjectNumber,
     sortNumber: getSortnumber(item.SortNumber),
+    department: getDepartment(item.Department),
+    collectionName: getCollectionName(item.CollectionName),
+    style: getStyle(item.Style),
     classification: getClassifications(item.AreaCat),
     consituents: getConstituents(item.ObjectRelatedConstituents),
     exhibition: {
