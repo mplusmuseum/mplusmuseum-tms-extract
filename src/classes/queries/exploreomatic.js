@@ -457,7 +457,9 @@ class Queries {
         isArchive
         isColour
         isRecommended
+        isCollection
         isPopular
+        keyword
       }
     }`
 
