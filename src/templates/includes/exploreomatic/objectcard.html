@@ -63,10 +63,40 @@
         </td>
       </tr>
       <tr>
+        <td class="has-text-weight-bold">collectionName</td>
+        <td>
+          {{#if collectionName}}
+            <a href="/explore-o-matic/collectionName/{{collectionName}}" class="button cardButton">{{collectionName}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
         <td class="has-text-weight-bold">archivalLevel</td>
         <td>
           {{#if classification.archivalLevel}}
             <a href="/explore-o-matic/archivalLevel/{{classification.archivalLevel.stub}}" class="button cardButton">{{classification.archivalLevel.title}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">department</td>
+        <td>
+          {{#if department}}
+            <a href="/explore-o-matic/department/{{department}}" class="button cardButton">{{department}}</a>
+          {{else}}
+            &nbsp;
+          {{/if}}
+        </td>
+      </tr>
+      <tr>
+        <td class="has-text-weight-bold">style</td>
+        <td>
+          {{#if style}}
+            <a href="/explore-o-matic/style/{{style}}" class="button cardButton">{{style}}</a>
           {{else}}
             &nbsp;
           {{/if}}

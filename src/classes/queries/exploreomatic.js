@@ -33,6 +33,9 @@ class Queries {
         baselineDescription
         collectionType
         collectionCode
+        collectionName
+        department
+        style
         allORC
         isRecommended
         recommendedBlurb
@@ -151,6 +154,9 @@ class Queries {
           displayDateOther
           collectionType
           collectionCode
+          collectionName
+          department
+          style
           objectStatus
           objectName
           popularCount
@@ -209,6 +215,9 @@ class Queries {
         objectStatus
         collectionType
         collectionCode
+        collectionName
+        department
+        style
         color {
           predominant {
             color
@@ -281,6 +290,9 @@ class Queries {
           objectStatus
           collectionType
           collectionCode
+          collectionName
+          department
+          style
           color {
             predominant {
               color
@@ -336,6 +348,9 @@ class Queries {
         objectStatus
         collectionType
         collectionCode
+        collectionName
+        department
+        style
         color {
           predominant {
             color
@@ -426,6 +441,27 @@ class Queries {
 
     this.collectionCodes = `query {
       collectionCodes[[]] {
+        title
+        count
+      }
+    }`
+
+    this.collectionNames = `query {
+      collectionNames[[]] {
+        title
+        count
+      }
+    }`
+
+    this.departments = `query {
+      departments[[]] {
+        title
+        count
+      }
+    }`
+
+    this.styles = `query {
+      styles[[]] {
         title
         count
       }
