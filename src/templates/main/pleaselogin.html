@@ -7,16 +7,14 @@
 
 <body class="cover" style="background-image: url({{design.cover}});">
 
-  {{> nav}}
-
-  <section class="hero is-primary is-bold">
+  <section class="hero is-primary is-bold is-medium">
     <div class="hero-body">
       <div class="container">
         <h1 class="title">
-          Welcome to the M+ Dashboard
+          Welcome to the M+ Dashboard, 歡迎來到 M+ 儀表板
         </h1>
         <h2 class="subtitle">
-          Before you can start you must login
+          Before you can start you must login, 在開始之前，您必須登錄
         </h2>
       </div>
     </div>
@@ -24,7 +22,9 @@
 
   <section>
     <div class="container">
-      &nbsp;
+      &nbsp;<br />
+      &nbsp;<br />
+      &nbsp;<br />
     </div>
   </section>
 
@@ -32,8 +32,12 @@
     <div class="container">
       <div class="notification is-size-1 has-text-centered">
         <p>
-          Please
-          <a href="/login">login</a> to get started
+          Please <a href="/login">login</a>, 請 <a href="/login">登錄</a>
+        </p>
+        <p>
+          <a class="is-size-6" href="/developer/terms">
+            {{i18n.nav.apiterms}}
+          </a>
         </p>
       </div>
     </div>
