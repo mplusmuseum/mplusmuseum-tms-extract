@@ -1,0 +1,47 @@
+<html>
+
+<head>
+  <title>Dashboard - explore-o-matic</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Explore-o-matic - Styles
+        </h1>
+        <h2 class="subtitle is-3">
+          Here are all the different styles.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  {{> exploreomatic/nav}}
+
+  {{#if styles}}
+    <section class="section">
+      <div class="container">
+        {{#each styles}}
+          <a href="/explore-o-matic/style/{{stub}}" class="button cardButton">{{title}} ({{count}})</a>
+        {{/each}}
+      </div>
+    </section>
+  {{/if}}
+
+  <section class="section">
+    <div class="container">
+      <hr />
+      <pre class="query language-graphql">{{{query}}}</pre>
+    </div>
+  </section>
+
+  {{> tail}}
+</body>
+
+</html>

@@ -493,6 +493,91 @@ exports.collectionCodes = async (req, res) => {
   return res.render('explore-o-matic/collectionCodes', req.templateValues)
 }
 
+exports.collectionNames = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('collectionNames', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.collectionNames) {
+    req.templateValues.collectionNames = results.data.collectionNames.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'collectionNames'
+  return res.render('explore-o-matic/collectionNames', req.templateValues)
+}
+exports.departments = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('departments', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.departments) {
+    req.templateValues.departments = results.data.departments.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'departments'
+  return res.render('explore-o-matic/departments', req.templateValues)
+}
+exports.styles = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000, sort_field:"title")`
+
+  //  Grab all the different maker types
+  const query = queries.get('styles', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.styles) {
+    req.templateValues.styles = results.data.styles.map((type) => {
+      type.stub = type.title.replace(/\//g, '_')
+      return type
+    })
+  }
+
+  req.templateValues.mode = 'styles'
+  return res.render('explore-o-matic/styles', req.templateValues)
+}
+
 exports.exhibitions = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
@@ -629,6 +714,27 @@ exports.getObjectsByThing = async (req, res) => {
     req.templateValues.title = `Collection Code: ${newFilter}`
     req.templateValues.subTitle = `A collection of objects for this collection code`
     searchFilter = `(per_page: ${perPage}, page: ${page}, collectionCode: "${newFilter}", lang:"${req.templateValues.dbLang}")`
+  }
+
+  if (req.params.thing === 'collectionName') {
+    req.templateValues.mode = 'collectionNames'
+    req.templateValues.title = `Collection Name: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this collection name`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, collectionName: "${newFilter}", lang:"${req.templateValues.dbLang}")`
+  }
+
+  if (req.params.thing === 'department') {
+    req.templateValues.mode = 'departments'
+    req.templateValues.title = `Department: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this department`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, department: "${newFilter}", lang:"${req.templateValues.dbLang}")`
+  }
+
+  if (req.params.thing === 'style') {
+    req.templateValues.mode = 'styles'
+    req.templateValues.title = `Style: ${newFilter}`
+    req.templateValues.subTitle = `A collection of objects for this style`
+    searchFilter = `(per_page: ${perPage}, page: ${page}, style: "${newFilter}", lang:"${req.templateValues.dbLang}")`
   }
 
   if (req.params.thing === 'constituent') {
