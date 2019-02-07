@@ -1334,6 +1334,7 @@ exports.factpedia = async (req, res) => {
         isColour: (req.body.isColour === 'true'),
         isRecommended: (req.body.isRecommended === 'true'),
         isCollection: (req.body.isCollection === 'true'),
+        isMain: (req.body.isMain === 'true'),
         isPopular: (req.body.isPopular === 'true'),
         keyword: []
       }
@@ -1379,6 +1380,7 @@ exports.factpedia = async (req, res) => {
               isColour: false,
               isRecommended: false,
               isCollection: false,
+              isMain: false,
               isPopular: false,
               keyword: []
             }
@@ -1393,6 +1395,7 @@ exports.factpedia = async (req, res) => {
           if (field === 'isColour') newFacts[id].isColour = true
           if (field === 'isRecommended') newFacts[id].isRecommended = true
           if (field === 'isCollection') newFacts[id].isCollection = true
+          if (field === 'isMain') newFacts[id].isMain = true
           if (field === 'isPopular') newFacts[id].isPopular = true
           if (field === 'keyword') {
             newFacts[id].keyword = value.split(',').map((word) => word.trim())
@@ -1419,7 +1422,7 @@ exports.factpedia = async (req, res) => {
           type,
           body: bulkThisArray
         })
-        // Note that we want to rebuld the constituents
+        // Note that we want to rebuld the facts
         //  Kill the cache
         await graphQL.fetch({
           query: queries.get('killCache', '')

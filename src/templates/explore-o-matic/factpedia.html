@@ -55,46 +55,57 @@
               <div class="columns">
                 <div class="column">
                   <label class="checkbox">
-                    <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}}>
-                      Constituent </label> </div> <div class="column">
-                    <label class="checkbox">
-                      <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}}> Area </label>
-                        </div> <div class="column">
-                      <label class="checkbox">
-                        <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}}>
-                          Category </label> </div> <div class="column">
-                        <label class="checkbox">
-                          <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}}>
-                            Medium </label> </div> <div class="column">
-                          <label class="checkbox">
-                            <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}}>
-                              Archive </label> </div> <div class="column">
-                            <label class="checkbox">
-                              <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}}>
-                                Colour </label> </div> <div class="column">
-                              <label class="checkbox">
-                                <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}}
-                                  checked{{/if}}> Recommended </label> </div> <div class="column">
-                                <label class="checkbox">
-                                  <input type="checkbox" name="{{id}}|isCollection" value=true {{#if isCollection}}
-                                    checked{{/if}}> Collection </label> </div> </div> <div class="has-text-right">
-
+                    <input type="checkbox" name="{{id}}|isConstituent" value=true {{#if isConstituent}} checked{{/if}} />
+                    Constituent </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isArea" value=true {{#if isArea}} checked{{/if}} /> Area
+                  </label>
                 </div>
-                <div class="columns">
-                  <div class="column">
-                    <label class="text">
-                      Keywords (both languages separated by commas)
-                    </label>
-                    <input class="input" type="text" name="{{id}}|keyword" placeholder="Search pills" value="{{keyword}}">
-                  </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isCategory" value=true {{#if isCategory}} checked{{/if}} />
+                    Category </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isMedium" value=true {{#if isMedium}} checked{{/if}} />
+                    Medium </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isArchive" value=true {{#if isArchive}} checked{{/if}} />
+                    Archive </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isColour" value=true {{#if isColour}} checked{{/if}} />
+                    Colour </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isRecommended" value=true {{#if isRecommended}} checked{{/if}} />
+                    Recommended </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isCollection" value=true {{#if isCollection}} checked{{/if}} />
+                    Collection </label> </div>
+                <div class="column">
+                  <label class="checkbox">
+                    <input type="checkbox" name="{{id}}|isMain" value=true {{#if isMain}} checked{{/if}} />
+                    Main </label> </div>
+              </div>
+              <div class="columns">
+                <div class="column">
+                  <label class="text">
+                    Keywords (both languages separated by commas)
+                  </label>
+                  <input class="input" type="text" name="{{id}}|keyword" placeholder="Search pills" value="{{keyword}}" />
                 </div>
-                <div class="columns">
-                  <div class="column has-text-right">
-                    <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete
-                      factoid</button>
-                  </div>
+              </div>
+              <div class="columns">
+                <div class="column has-text-right">
+                  <button class="button is-danger" name="action" value="deleteFactoid|{{id}}">Delete
+                    factoid</button>
                 </div>
-                <hr />
+              </div>
+              <hr />
             {{/each}}
             <div class="control is-spaced">
               <button class="button is-primary" name="action" value="updateFactoids">Update factoids</button>
@@ -177,6 +188,12 @@
                     <label class="checkbox">
                       <input type="checkbox" name="isCollection" value=true>
                       Collection
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="checkbox">
+                      <input type="checkbox" name="isMain" value=true>
+                      Main
                     </label>
                   </div>
                 </div>

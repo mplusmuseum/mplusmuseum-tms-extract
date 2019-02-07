@@ -494,6 +494,7 @@ class Queries {
         isColour
         isRecommended
         isCollection
+        isMain
         isPopular
         keyword
       }
