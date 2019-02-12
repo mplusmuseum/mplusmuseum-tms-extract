@@ -306,3 +306,32 @@ exports.importRecommended = async (req, res) => {
   }
   return res.render('admin/importRecommended', req.templateValues)
 }
+
+exports.redoColours = async (req, res) => {
+  console.log('resetting colours')
+  const config = new Config()
+  const tmsses = config.tms
+  const itemPath = path.join(rootDir, 'imports', 'Objects')
+  tmsses.forEach((tms) => {
+    const tmsDir = path.join(itemPath, tms.stub, 'perfect')
+    if (fs.existsSync(tmsDir)) {
+      const subFolders = fs.readdirSync(tmsDir)
+      subFolders.forEach((subFolder) => {
+        const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
+          const fileFragments = file.split('.')
+          if (fileFragments.length !== 2) return false
+          if (fileFragments[1] !== 'json') return false
+          return true
+        })
+        files.forEach((file) => {
+          const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
+          const perfectFile = JSON.parse(perfectFileRaw)
+          delete perfectFile.remote.colors
+          const perfectFileJSONPretty = JSON.stringify(perfectFile, null, 4)
+          fs.writeFileSync(path.join(tmsDir, subFolder, file), perfectFileJSONPretty, 'utf-8')
+        })
+      })
+    }
+  })
+  return res.redirect('/admin')
+}

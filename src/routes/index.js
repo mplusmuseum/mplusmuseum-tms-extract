@@ -255,6 +255,7 @@ router.get('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.post('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.get('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
 router.post('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
+router.post('/:lang/admin/redoColours', ensureLoggedIn, admin.redoColours)
 
 router.get('/:lang/admin/translations', ensureLoggedIn, admin.translations.index)
 router.get('/:lang/admin/translations/:site', ensureLoggedIn, admin.translations.site)
