@@ -93,6 +93,13 @@ exports.iflte = (v1, v2, options) => {
   return options.inverse(this)
 }
 
+exports.inArray = (value, array, options) => {
+  if (array.includes(value)) {
+    return options.fn(this)
+  }
+  return options.inverse(this)
+}
+
 exports.ifEqualNumbers = (v1, v2, options) => {
   if (parseInt(v1, 10) === parseInt(v2, 10)) {
     return options.fn(this)
@@ -338,6 +345,14 @@ exports.timeDiff = diff => {
 exports.timeAgo = diff => {
   if (diff === null || diff === undefined) return ''
   return moment(diff).fromNow()
+}
+
+exports.percent100 = (value, total) => {
+  return parseInt(value / total * 100, 10)
+}
+
+exports.percent = (value, total) => {
+  return value / total
 }
 
 //  Here we are going to be constucting a whole bunch of HTML

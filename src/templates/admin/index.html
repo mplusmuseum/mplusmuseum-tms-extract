@@ -45,6 +45,9 @@
           <a href="/admin/isMakers">isMakers</a>
         </li>
         <li>
+          <a href="/admin/colours">Show colour breakdown</a>
+        </li>
+        <li>
           <a href="/admin/importRecommended">import Recommended CSV</a>
         </li>
       </ul>
@@ -78,6 +81,11 @@
       <h2 class="title">Danger-ish</h2>
 
       <ul>
+        <li>
+          <form method="POST" action="/{{selectedLang}}/admin/redoColours">
+            <button class="button is-warning" type="submit">Reset the colours</button>
+          </form>
+        </li>
         <li>
           <form method="POST" action="/admin/aggregate/mplus">
             <button class="button is-warning" type="submit">Re-aggregate object fields</button>

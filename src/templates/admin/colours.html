@@ -1,0 +1,195 @@
+<html>
+
+<head>
+  <title>Dashboard - admin</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Admin - Colours
+        </h1>
+        <h2 class="subtitle is-3">
+          This is the breakdown of colours
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+      <h1 class="title">Google</h1>
+      <h2 class="subtitle">Colour totals by google colour palette</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Shades</th>
+            <td colspan="2">Tally</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each colours.google}}
+            {{#inArray @key ../bgw}}
+              <tr>
+                <td style="width: 10%">{{@key}}</td>
+                <td>
+                  <div style="width: 100%">
+                    <div style="padding: 4px; border-radius: 2px; width: {{percent100 ../tally ../../maxValues.google.tally.bgw}}%; background: {{@key}}; {{#ifEqual @key 'white'}}border: 1px solid gray{{/ifEqual}}">
+                      &nbsp;
+                    </div>
+                  </div>
+                </td>
+                <td style="width: 5%">
+                  {{../tally}}
+                </td>
+              </tr>
+            {{/inArray}}
+          {{/each}}
+        </tbody>
+      </table>
+
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Colours</th>
+            <td colspan="2">Tally</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each colours.google}}
+            {{#inArray @key ../bgw}}
+          {{else}}
+            <tr>
+              <td style="width: 10%">{{@key}}</td>
+              <td>
+                <div style="width: 100%">
+                  <div style="padding: 4px; border-radius: 2px; width: {{percent100 ../tally ../../maxValues.google.tally.colour}}%; background: {{@key}}; {{#ifEqual @key 'white'}}border: 1px solid gray{{/ifEqual}}">
+                    &nbsp;
+                  </div>
+                </div>
+              </td>
+              <td style="width: 5%">
+                {{../tally}}
+              </td>
+            </tr>
+            {{/inArray}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container documentation">
+      <h1 class="title">Cloudinary</h1>
+      <h2 class="subtitle">Colour totals by cloudinary colour palette</h2>
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Shades</th>
+            <td colspan="2">Tally</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each colours.cloudinary}}
+            {{#inArray @key ../bgw}}
+              <tr>
+                <td style="width: 10%">{{@key}}</td>
+                <td>
+                  <div style="width: 100%">
+                    <div style="padding: 4px; border-radius: 2px; width: {{percent100 ../tally ../../maxValues.cloudinary.tally.bgw}}%; background: {{@key}}; {{#ifEqual @key 'white'}}border: 1px solid gray{{/ifEqual}}">
+                      &nbsp;
+                    </div>
+                  </div>
+                </td>
+                <td style="width: 5%">
+                  {{../tally}}
+                </td>
+              </tr>
+            {{/inArray}}
+          {{/each}}
+        </tbody>
+      </table>
+
+      <table class="table is-fullwidth">
+        <thead>
+          <tr>
+            <th>Colours</th>
+            <td colspan="2">Tally</td>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each colours.cloudinary}}
+            {{#inArray @key ../bgw}}
+          {{else}}
+            <tr>
+              <td style="width: 10%">{{@key}}</td>
+              <td>
+                <div style="width: 100%">
+                  <div style="padding: 4px; border-radius: 2px; width: {{percent100 ../tally ../../maxValues.cloudinary.tally.colour}}%; background: {{@key}}; {{#ifEqual @key 'white'}}border: 1px solid gray{{/ifEqual}}">
+                    &nbsp;
+                  </div>
+                </div>
+              </td>
+              <td style="width: 5%">
+                {{../tally}}
+              </td>
+            </tr>
+            {{/inArray}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="colour" class="section">
+    <div class="container documentation">
+      <h1 class="title">Predominant Colours</h1>
+      <h2 class="subtitle">These are the most commonly found colours</h2>
+      <canvas id="palette_canvas" width="1440" height="1440" style="width:100%; height: 360px"></canvas>
+
+      <p>
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">Hex</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input id="rgb" class="input is-large" type="text" placeholder="Hex" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field is-horizontal">
+          <div class="field-label is-normal">
+            <label class="label">HSL</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <div class="control">
+                <input id="hsl" class="input is-large" type="text" placeholder="Hue, saturation and luminosity values"
+                  readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p>
+
+    </div>
+  </section>
+
+
+  {{> tail}}
+  <script src="/js/blockspalette.js"></script>
+  {{{pickedScript}}}
+</body>
+
+</html>
