@@ -362,6 +362,8 @@ const colorImage = (type, tms, id, imageId) => {
   const tmsLogger = logging.getTMSLogger()
   const startTime = new Date().getTime()
 
+  console.log(`In colorImage with tms: ${tms}, id: ${id} & imageId: ${imageId}`)
+
   tmsLogger.object(`Coloring ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
     action: 'started colorImage',
     status: 'info',
@@ -593,8 +595,7 @@ const checkImagesColor = () => {
     }
 
     //  Now we need to look through all the folders in the tms/[something]/perfect/[number]
-    //  folder looking for one that has an image that needs uploading, but hasn't been uploaded
-    //  yet.
+    //  folder looking for one that has been uploaded but doesn't have colour yet
     let foundImageToColor = false
     const tmsses = config.tms
     tmsses.forEach((tms) => {

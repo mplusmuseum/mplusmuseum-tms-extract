@@ -307,8 +307,115 @@ exports.importRecommended = async (req, res) => {
   return res.render('admin/importRecommended', req.templateValues)
 }
 
+exports.showColours = async (req, res) => {
+  const config = new Config()
+  const tmsses = config.tms
+  const itemPath = path.join(rootDir, 'imports', 'Objects')
+  const colours = {}
+  const maxValues = {}
+  const colourSources = ['google', 'cloudinary']
+  const [r, c] = [18, 5]
+  const blocks = Array(r).fill().map(() => Array(c).fill(0))
+  let maxBlocks = 0
+
+  tmsses.forEach((tms) => {
+    const tmsDir = path.join(itemPath, tms.stub, 'perfect')
+    if (fs.existsSync(tmsDir)) {
+      const subFolders = fs.readdirSync(tmsDir)
+      subFolders.forEach((subFolder) => {
+        const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
+          const fileFragments = file.split('.')
+          if (fileFragments.length !== 2) return false
+          if (fileFragments[1] !== 'json') return false
+          return true
+        })
+        files.forEach((file) => {
+          const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
+          const perfectFile = JSON.parse(perfectFileRaw)
+          if (perfectFile.remote && perfectFile.remote.colors && perfectFile.remote.colors.search) {
+            colourSources.forEach((source) => {
+              //  Grab the predefined colours
+              if (perfectFile.remote.colors.search[source]) {
+                // Make sure the source is in the colours and the maxValues
+                if (!colours[source]) colours[source] = {}
+                if (!maxValues[source]) {
+                  maxValues[source] = {
+                    tally: {
+                      colour: 0,
+                      bgw: 0,
+                      total: 0
+                    },
+                    total: {
+                      colour: 0,
+                      bgw: 0,
+                      total: 0
+                    }
+                  }
+                }
+
+                Object.entries(perfectFile.remote.colors.search[source]).forEach((colorRecord) => {
+                  const colour = colorRecord[0]
+                  const value = colorRecord[1]
+                  //  Make sure we have an entry for this colour
+                  if (!colours[source][colour]) {
+                    colours[source][colour] = {
+                      tally: 0,
+                      total: 0
+                    }
+                  }
+                  //  Update the tally if the value is >= 75
+                  if (value >= 75) colours[source][colour].tally++
+                  colours[source][colour].total += value
+
+                  //  Update the max values
+                  if (['black', 'gray', 'white'].includes(colour)) {
+                    if (colours[source][colour].total > maxValues[source].total.bgw) maxValues[source].total.bgw = colours[source][colour].total
+                    if (colours[source][colour].tally > maxValues[source].tally.bgw) maxValues[source].tally.bgw = colours[source][colour].tally
+                    if (colours[source][colour].total > maxValues[source].total.total) maxValues[source].total.total = colours[source][colour].total
+                    if (colours[source][colour].tally > maxValues[source].tally.total) maxValues[source].tally.total = colours[source][colour].tally
+                  } else {
+                    if (colours[source][colour].total > maxValues[source].total.colour) maxValues[source].total.colour = colours[source][colour].total
+                    if (colours[source][colour].tally > maxValues[source].tally.colour) maxValues[source].tally.colour = colours[source][colour].tally
+                    if (colours[source][colour].total > maxValues[source].total.total) maxValues[source].total.total = colours[source][colour].total
+                    if (colours[source][colour].tally > maxValues[source].tally.total) maxValues[source].tally.total = colours[source][colour].tally
+                  }
+                })
+              }
+
+              //  Grab the predefined colours
+              if (perfectFile.remote.colors.hslInt) {
+                const hue = Math.floor(perfectFile.remote.colors.hslInt.h / 20)
+                const lum = Math.floor(perfectFile.remote.colors.hslInt.l / 20)
+                if (perfectFile.remote.colors.hslInt.s >= 7) {
+                  blocks[hue][lum]++
+                  if (blocks[hue][lum] > maxBlocks) maxBlocks = blocks[hue][lum]
+                }
+              }
+            })
+          }
+        })
+      })
+    }
+  })
+
+  req.templateValues.googleColours = ['black', 'white', 'gray', 'red', 'orange', 'yellow', 'green', 'teal', 'blue', 'purple', 'pink', 'brown']
+  req.templateValues.cloudinaryColours = ['black', 'white', 'gray', 'red', 'orange', 'yellow', 'lime', 'green', 'olive', 'teal', 'cyan', 'lightblue', 'blue', 'purple', 'pink', 'brown']
+  req.templateValues.colours = colours
+  req.templateValues.maxValues = maxValues
+  req.templateValues.pickedScript = `<script>
+  var blocks = ${JSON.stringify(blocks)};
+  var maxBlocks = ${maxBlocks};
+  document.addEventListener("DOMContentLoaded", function (event) {    
+    var thisPalette = new palette();
+    thisPalette.draw();
+  });
+  </script>`
+
+  req.templateValues.bgw = ['black', 'white', 'gray']
+  return res.render('admin/colours', req.templateValues)
+}
+
 exports.redoColours = async (req, res) => {
-  console.log('resetting colours')
   const config = new Config()
   const tmsses = config.tms
   const itemPath = path.join(rootDir, 'imports', 'Objects')
@@ -326,7 +433,9 @@ exports.redoColours = async (req, res) => {
         files.forEach((file) => {
           const perfectFileRaw = fs.readFileSync(path.join(tmsDir, subFolder, file), 'utf-8')
           const perfectFile = JSON.parse(perfectFileRaw)
-          delete perfectFile.remote.colors
+          if (perfectFile.remote && perfectFile.remote.colors) {
+            delete perfectFile.remote.colors
+          }
           const perfectFileJSONPretty = JSON.stringify(perfectFile, null, 4)
           fs.writeFileSync(path.join(tmsDir, subFolder, file), perfectFileJSONPretty, 'utf-8')
         })
