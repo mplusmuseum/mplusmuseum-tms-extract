@@ -363,8 +363,8 @@ exports.showColours = async (req, res) => {
                       total: 0
                     }
                   }
-                  //  Update the tally if the value is >= 75
-                  if (value >= 75) colours[source][colour].tally++
+                  //  Update the tally if the value is >= 40
+                  if (value >= 40) colours[source][colour].tally++
                   colours[source][colour].total += value
 
                   //  Update the max values
@@ -386,7 +386,7 @@ exports.showColours = async (req, res) => {
               if (perfectFile.remote.colors.hslInt) {
                 const hue = Math.floor(perfectFile.remote.colors.hslInt.h / 20)
                 const lum = Math.floor(perfectFile.remote.colors.hslInt.l / 20)
-                if (perfectFile.remote.colors.hslInt.s >= 7) {
+                if (perfectFile.remote.colors.hslInt.s >= 15) {
                   blocks[hue][lum]++
                   if (blocks[hue][lum] > maxBlocks) maxBlocks = blocks[hue][lum]
                 }
