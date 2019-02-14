@@ -1,6 +1,6 @@
 // eslint-disable-next-line
 class palette {
-  hsv2rgb (hue, saturation, value) {
+  hsv2rgb(hue, saturation, value) {
     let chroma = value * saturation
     let hue1 = hue / 60
     let x = chroma * (1 - Math.abs((hue1 % 2) - 1))
@@ -28,8 +28,7 @@ class palette {
     return [255 * r, 255 * g, 255 * b]
   }
 
-  draw (picked) {
-    console.log('Drawing palette')
+  draw(picked) {
     var c = document.getElementById('palette_canvas')
     var ctx = c.getContext('2d')
     for (let y of [...Array(c.height).keys()]) {
