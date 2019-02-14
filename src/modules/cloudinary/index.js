@@ -20,6 +20,8 @@ const uploadImage = (stub, type, id) => {
   const tmsLogger = logging.getTMSLogger()
   const startTime = new Date().getTime()
 
+  console.log(`${new Date()}: starting uploading ${type} ${id} for ${stub}`)
+
   tmsLogger.object(`starting uploading ${type} ${id} for ${stub}`, {
     action: 'start uploadImage',
     status: 'info',
@@ -144,6 +146,7 @@ const uploadImage = (stub, type, id) => {
         source: imageSrc,
         ms: endTime - startTime
       })
+      const stats = fs.statSync(fullImagePath)
       perfectFileJSON.remote.images[imageSrc].status = 'ok'
       perfectFileJSON.remote.images[imageSrc].original_image_src = imageSrc
       perfectFileJSON.remote.images[imageSrc].public_id = result.public_id
@@ -152,6 +155,7 @@ const uploadImage = (stub, type, id) => {
       perfectFileJSON.remote.images[imageSrc].width = result.width
       perfectFileJSON.remote.images[imageSrc].height = result.height
       perfectFileJSON.remote.images[imageSrc].format = result.format
+      perfectFileJSON.remote.images[imageSrc].lastModified = parseInt(stats.mtimeMs, 10)
     }
     const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
     fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
@@ -316,21 +320,38 @@ const checkImages = () => {
                   //  If we don't even have a remote field in the perfect, then we need to
                   //  add the remote information
                   if (perfectFileJSON.remote && perfectFileJSON.remote.images) {
-                    let foundMissingImage = false
+                    let foundNewImage = false
                     Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
                       const id = remoteImage[0]
                       const imageObj = remoteImage[1]
-                      if (imageObj.status === 'missing') {
-                        const imagefilePath = path.join(imagePath, imageObj.src)
-                        if (fs.existsSync(imagefilePath)) {
-                          foundMissingImage = true
+                      const imagefilePath = path.join(imagePath, imageObj.src)
+
+                      //  If the file exists then we may
+                      if (fs.existsSync(imagefilePath)) {
+                        const stats = fs.statSync(imagefilePath)
+                        const lastModified = parseInt(stats.mtimeMs, 10)
+
+                        //  If we are missing the image and it exists then we need to upload it
+                        if (imageObj.status === 'missing') {
+                          foundNewImage = true
                           perfectFileJSON.remote.images[id].status = 'upload'
+                        }
+                        //  If we are missing the last modified date or the last midified date is old
+                        //  then we need to reupload the image, and remove the colour information
+                        //  if it's primary
+                        if (!imageObj.lastModified || imageObj.lastModified < lastModified) {
+                          foundNewImage = true
+                          perfectFileJSON.remote.images[id].status = 'upload'
+                          // If this is a primaryDisplay then we need to remove the colour information
+                          if (imageObj.primaryDisplay && imageObj.primaryDisplay === true) {
+                            if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
+                          }
                         }
                       }
                     })
                     //  If we found a missing image, then we need to save the file back out so it can
                     //  be found to be uploaded
-                    if (foundMissingImage) {
+                    if (foundNewImage) {
                       //  Now we need to check that the file exists in the processed folder
                       //  so we can move it back to the process folder
                       if (fs.existsSync(processedFilename) && !fs.existsSync(processFilename)) {
@@ -362,7 +383,7 @@ const colorImage = (type, tms, id, imageId) => {
   const tmsLogger = logging.getTMSLogger()
   const startTime = new Date().getTime()
 
-  console.log(`In colorImage with tms: ${tms}, id: ${id} & imageId: ${imageId}`)
+  console.log(`${new Date()}: In colorImage with tms: ${tms}, id: ${id} & imageId: ${imageId}`)
 
   tmsLogger.object(`Coloring ${type.parent} image ${id}, id: ${imageId} for ${tms}`, {
     action: 'started colorImage',
