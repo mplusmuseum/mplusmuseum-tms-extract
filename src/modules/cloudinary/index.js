@@ -134,8 +134,9 @@ const uploadImage = (stub, type, id) => {
     global.uploading = false
     if ('error' in result) {
       perfectFileJSON.remote.images[imageSrc].status = 'error'
-      perfectFileJSON.remote.images[imageSrc].status = result.error.message
-      perfectFileJSON.remote.images[imageSrc].status = result.error.https_code
+      if (result.error && result.error.message) perfectFileJSON.remote.images[imageSrc].status_error_message = result.error.message
+      if (result.error && result.error.http_code) perfectFileJSON.remote.images[imageSrc].status_error_code = result.error.http_code
+      if (result.error && result.error.https_code) perfectFileJSON.remote.images[imageSrc].status_message = result.error.https_code
       tmsLogger.object(`Failed uploading image for ${type} ${id} for ${stub}`, {
         action: 'finished upsertTheItem',
         status: 'error',
@@ -350,7 +351,7 @@ const checkImages = () => {
                         //  then we need to reupload the image, and remove the colour information
                         //  if it's primary
                         if (!imageObj.lastModified || imageObj.lastModified < lastModified) {
-                          if (imageObj.status !== 'too-big') {
+                          if (imageObj.status !== 'too-big' && imageObj.status !== 'error') {
                             foundNewImage = true
                             perfectFileJSON.remote.images[id].status = 'upload'
                             // If this is a primaryDisplay then we need to remove the colour information
