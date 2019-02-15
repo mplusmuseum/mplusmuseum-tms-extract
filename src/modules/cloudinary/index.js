@@ -93,6 +93,16 @@ const uploadImage = (stub, type, id) => {
     return
   }
 
+  // If the file is too big, we mark it as too-big
+  const stats = fs.statSync(fullImagePath)
+  if (stats.size > 100000000) {
+    perfectFileJSON.remote.images[imageSrc].status = 'too-big'
+    console.log(`Too big to upload: ${type} ${id} for ${stub}`)
+    const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+    fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+    return
+  }
+
   //  Set up cloudinary
   cloudinary.config(cloudinaryConfig)
 
@@ -340,11 +350,13 @@ const checkImages = () => {
                         //  then we need to reupload the image, and remove the colour information
                         //  if it's primary
                         if (!imageObj.lastModified || imageObj.lastModified < lastModified) {
-                          foundNewImage = true
-                          perfectFileJSON.remote.images[id].status = 'upload'
-                          // If this is a primaryDisplay then we need to remove the colour information
-                          if (imageObj.primaryDisplay && imageObj.primaryDisplay === true) {
-                            if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
+                          if (imageObj.status !== 'too-big') {
+                            foundNewImage = true
+                            perfectFileJSON.remote.images[id].status = 'upload'
+                            // If this is a primaryDisplay then we need to remove the colour information
+                            if (imageObj.primaryDisplay && imageObj.primaryDisplay === true) {
+                              if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
+                            }
                           }
                         }
                       }
