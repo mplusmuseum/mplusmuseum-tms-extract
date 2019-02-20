@@ -13,41 +13,20 @@ These are all the cool parse functions to get the data into the right format
 
 // #########################################################################
 /*
- * The actual concept parsing
+ * The actual bibiolographicData parsing
  */
 // #########################################################################
 
 const parseItem = item => {
   const newItem = {
-    conceptID: parseInt(item.ConceptID, 10),
-    conceptUse: 'ConceptUse' in item ? item.ConceptUse : null,
-    publicAccess: parseInt(item.PublicAccess, 10) === 1,
-    timeline: 'Timeline' in item ? item.Timeline : null,
-    title: {},
-    description: {},
-    displayDate: 'DateText' in item ? item.DateText : null,
-    beginDate: null,
-    endDate: null,
-    id: parseInt(item.ConceptID, 10)
+    referenceID: parseInt(item.ReferenceID, 10),
+    format: 'Format' in item ? item.Format : null,
+    title: 'Title' in item ? item.Title : null,
+    subTitle: 'SubTitle' in item ? item.SubTitle : null,
+    placePublished: 'PlacePublished' in item ? item.PlacePublished : null,
+    yearPublished: 'YearPublished' in item ? item.YearPublished : null,
+    id: parseInt(item.ReferenceID, 10)
   }
-
-  if ('DateBegSearch' in item) {
-    const newBeginDate = parseInt(item.DateBegSearch, 10)
-    if (!isNaN(newBeginDate) && newBeginDate !== 0) newItem.beginDate = newBeginDate
-  }
-
-  if ('DateEndSearch' in item) {
-    const newEndDate = parseInt(item.DateEndSearch, 10)
-    if (!isNaN(newEndDate) && newEndDate !== 0) newItem.endDate = newEndDate
-  }
-
-  if ('ConceptTitle' in item) newItem.title['en'] = item.ConceptTitle
-  if ('ConceptTitleTC' in item) newItem.title['zh-hant'] = item.ConceptTitleTC
-  if ('ConceptDescription' in item) newItem.description['en'] = item.ConceptDescription
-  if ('ConceptDescriptionTC' in item) newItem.description['zh-hant'] = item.ConceptDescriptionTC
-
-  if (Object.entries(newItem.title).length === 0) newItem.title = null
-  if (Object.entries(newItem.description).length === 0) newItem.description = null
 
   return newItem
 }
@@ -70,6 +49,7 @@ const processJsonFile = (tms, parentNode, childNode) => {
   })
 
   const filename = path.join(rootDir, 'imports', parentNode, tms, 'items.json')
+  console.log(filename)
   if (!fs.existsSync(filename)) {
     tmsLogger.object(`Failed processing ${parentNode} JSON file for ${childNode} ${tms}`, {
       action: `finished processJsonFile`,
@@ -241,8 +221,8 @@ const makePerfect = async () => {
 
   tmsses.forEach((tms) => {
     if (foundItemToUpload === true) return
-    const tmsProcessDir = path.join(rootDir, 'imports', 'Concepts', tms.stub, 'process')
-    const tmsPerfectDir = path.join(rootDir, 'imports', 'Concepts', tms.stub, 'perfect')
+    const tmsProcessDir = path.join(rootDir, 'imports', 'BibiolographicData', tms.stub, 'process')
+    const tmsPerfectDir = path.join(rootDir, 'imports', 'BibiolographicData', tms.stub, 'perfect')
     if (fs.existsSync(tmsProcessDir)) {
       if (foundItemToUpload === true) return
       const subFolders = fs.readdirSync(tmsProcessDir)
