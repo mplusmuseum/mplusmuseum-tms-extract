@@ -43,30 +43,30 @@ console.log(`server.js exists in this directory: ${rootDir}`.help)
  */
 const prompt = require('prompt-sync')()
 const argOptionDefinitions = [{
-  name: 'port',
-  alias: 'p',
-  type: Number
-},
-{
-  name: 'host',
-  alias: 'h',
-  type: String
-},
-{
-  name: 'env',
-  alias: 'e',
-  type: String
-},
-{
-  name: 'skipBuild',
-  alias: 's',
-  type: Boolean,
-  defaultOption: false
-},
-{
-  name: 'skipOpen',
-  type: Boolean
-}
+    name: 'port',
+    alias: 'p',
+    type: Number
+  },
+  {
+    name: 'host',
+    alias: 'h',
+    type: String
+  },
+  {
+    name: 'env',
+    alias: 'e',
+    type: String
+  },
+  {
+    name: 'skipBuild',
+    alias: 's',
+    type: Boolean,
+    defaultOption: false
+  },
+  {
+    name: 'skipOpen',
+    type: Boolean
+  }
 ]
 const commandLineArgs = require('command-line-args')
 const argOptions = commandLineArgs(argOptionDefinitions)
@@ -370,11 +370,11 @@ const auth0 = config.get('auth0')
 if (auth0 !== null) {
   // Configure Passport to use Auth0
   const strategy = new Auth0Strategy({
-    domain: auth0.AUTH0_DOMAIN,
-    clientID: auth0.AUTH0_CLIENT_ID,
-    clientSecret: auth0.AUTH0_SECRET,
-    callbackURL: auth0.AUTH0_CALLBACK_URL
-  },
+      domain: auth0.AUTH0_DOMAIN,
+      clientID: auth0.AUTH0_CLIENT_ID,
+      clientSecret: auth0.AUTH0_SECRET,
+      callbackURL: auth0.AUTH0_CALLBACK_URL
+    },
     (accessToken, refreshToken, extraParams, profile, done) => {
       return done(null, profile)
     }
@@ -424,6 +424,7 @@ if ('skipOpen' in argOptions && argOptions.skipOpen === true) {
   skipOpen = true
 }
 
+/*
 process.on('uncaughtException', err => {
   if (err.errno === 'EADDRINUSE') {
     console.log('')
@@ -442,6 +443,7 @@ process.on('uncaughtException', err => {
   }
   process.exit()
 })
+*/
 
 if (buildOnly === false) {
   http.createServer(app).listen(process.env.PORT)
@@ -507,6 +509,8 @@ if (buildOnly === false) {
   perfectExhibitions.startMakingPerfect()
   const perfectConcepts = require('./app/modules/processingFiles/concepts')
   perfectConcepts.startMakingPerfect()
+  const perfectBibiolographicData = require('./app/modules/processingFiles/bibiolographicData')
+  perfectBibiolographicData.startMakingPerfect()
 
   const processAll = require('./app/modules/processingFiles')
   processAll.startProcessingMainXml()

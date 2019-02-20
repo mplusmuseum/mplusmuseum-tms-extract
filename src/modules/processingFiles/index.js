@@ -6,6 +6,7 @@ const processObjects = require('./objects')
 const processConstituents = require('./constituents')
 const processExhibitions = require('./exhibitions')
 const processConcepts = require('./concepts')
+const processBibiolographicaData = require('./bibiolographicData')
 const rootDir = path.join(__dirname, '../../../data')
 const logging = require('../../modules/logging')
 const xml2js = require('xml2js')
@@ -200,6 +201,11 @@ const processFile = async (tms) => {
             if (element.parent === 'Constituents') {
               setTimeout(() => {
                 processConstituents.processJsonFile(tms, element.parent, element.child)
+              }, 200)
+            }
+            if (element.parent === 'BibiolographicData') {
+              setTimeout(() => {
+                processBibiolographicaData.processJsonFile(tms, element.parent, element.child)
               }, 200)
             }
             if (element.parent === 'Exhibitions') {
