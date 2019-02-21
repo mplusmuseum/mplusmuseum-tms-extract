@@ -54,6 +54,29 @@ const getConstituents = constituents => {
   return constituentsObj
 }
 
+const getReferences = refs => {
+  const references = {
+    ids: [],
+    idsToReference: {}
+  }
+  if (refs === null || refs === undefined) return null
+  if (!Array.isArray(refs)) refs = [refs]
+  refs.forEach((reference) => {
+    //  If we have a string then we just use it, if we have an object
+    //  then we need to break it down more
+    if (typeof (reference) === 'string') {
+      references.ids.push(parseInt(reference, 10))
+    } else {
+      if (reference._ && reference.pagenumber) {
+        references.ids.push(parseInt(reference._, 10))
+        references.idsToReference[parseInt(reference._, 10)] = reference.pagenumber
+      }
+    }
+  })
+  references.idsToReference = JSON.stringify(references.idsToReference)
+  return references
+}
+
 const getRelatedObjects = objects => {
   const relatedObjects = {
     ids: [],
@@ -312,6 +335,7 @@ const parseItem = item => {
     },
     relatedEventIds: forceIDArray(item.RelatedEventID),
     relatedConceptIds: forceIDArray(item.RelatedConceptID),
+    references: getReferences(item.ReferenceID),
     allORC: item.AllORC,
     title: {},
     objectStatus: {},
