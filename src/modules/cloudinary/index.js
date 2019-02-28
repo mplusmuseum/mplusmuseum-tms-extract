@@ -322,6 +322,12 @@ const checkImages = () => {
 
                   //  If we have a test JSON and a perfect file with remote images in then
                   //  we can start to do the double checking
+                  if (testJSON === null || !testJSON.images) {
+                    testJSON = {
+                      images: []
+                    }
+                  }
+
                   if (testJSON !== null && testJSON.images && perfectFileJSON.remote && perfectFileJSON.remote.images) {
                     const testMap = {}
                     testJSON.images.forEach((image) => {
