@@ -95,7 +95,7 @@ const uploadImage = (stub, type, id) => {
 
   // If the file is too big, we mark it as too-big
   const stats = fs.statSync(fullImagePath)
-  if (stats.size > 100000000) {
+  if (stats.size > 10485760) {
     perfectFileJSON.remote.images[imageSrc].status = 'too-big'
     console.log(`Too big to upload: ${type} ${id} for ${stub}`)
     const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
@@ -387,7 +387,7 @@ const checkImages = () => {
                           if (!imageObj.lastModified || imageObj.lastModified === null || imageObj.lastModified < lastModified) {
                             perfectFileJSON.remote.images[id].status = 'upload'
                             //  Unless it's too big
-                            if (stats.size > 100000000) {
+                            if (stats.size > 10485760) {
                               perfectFileJSON.remote.images[id].status = 'too-big'
                             }
                           } else {
