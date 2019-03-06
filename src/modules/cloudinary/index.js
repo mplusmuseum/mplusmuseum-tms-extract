@@ -244,16 +244,18 @@ const checkImages = () => {
                 const perfectFileJSON = JSON.parse(perfectFileRaw)
 
                 //  Now look through the remote, looking for an image to upload
-                Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
-                  const imageObj = remoteImage[1]
-                  if (imageObj.status === 'upload') {
-                    foundImageToUpload = {
-                      tms: tms.stub,
-                      type: type.parent,
-                      id: processFileJSON.id
+                if (perfectFileJSON.remote && perfectFileJSON.remote.images) {
+                  Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+                    const imageObj = remoteImage[1]
+                    if (imageObj.status === 'upload') {
+                      foundImageToUpload = {
+                        tms: tms.stub,
+                        type: type.parent,
+                        id: processFileJSON.id
+                      }
                     }
-                  }
-                })
+                  })
+                }
 
                 //  If we've gotten through all the remote images and still don't have one to
                 //  upload then we can mark it as 'ok'
