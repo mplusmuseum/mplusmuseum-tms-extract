@@ -6,7 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "body-parser": "^1.18.2",
     "bulma": "^0.7.1",
     "cli-progress": "^1.7.0",
@@ -39,7 +39,7 @@
     "pretty-data": "^0.40.0",
     "prismjs": "^1.13.0",
     "prompt-sync": "^4.1.6",
-    "request": "^2.83.0",
+    "request": "^2.88.0",
     "request-promise": "^4.2.2",
     "request-promise-native": "^1.0.5",
     "run-sequence": "^2.2.0",
@@ -56,7 +56,7 @@
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-react": "^7.7.0",
-    "nodemon": "^1.14.10",
+    "nodemon": "^1.18.10",
     "npm-run-all": "^4.1.2",
     "standard": "^10.0.3",
     "watch-run": "^1.2.5"
