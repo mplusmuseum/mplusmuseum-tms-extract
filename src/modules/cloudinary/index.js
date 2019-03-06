@@ -259,7 +259,7 @@ const checkImages = () => {
 
                 //  If we've gotten through all the remote images and still don't have one to
                 //  upload then we can mark it as 'ok'
-                if (foundImageToUpload === null) {
+                if (foundImageToUpload === null && perfectFileJSON.remote) {
                   perfectFileJSON.remote.status = 'ok'
                   const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
                   fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
