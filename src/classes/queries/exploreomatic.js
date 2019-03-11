@@ -266,7 +266,6 @@ class Queries {
         publicAccess
         rank
         isMaker
-        roles
         activeCity
         artInt
         birthCity
