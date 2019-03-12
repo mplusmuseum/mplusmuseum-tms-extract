@@ -58,6 +58,7 @@ const tmsLogger = winston.createLogger({
 
 class ESLogger {
   object (name, data) {
+    console.log(`${new Date()} - ${name}`)
     console.log(data)
     /*
     const config = new Config()
