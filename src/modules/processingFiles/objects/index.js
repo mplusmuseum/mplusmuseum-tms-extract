@@ -198,6 +198,46 @@ const getClassifications = classifications => {
   return classificationsObj
 }
 
+const getDimensionDetails = dimensionDetails => {
+  if (dimensionDetails === undefined || dimensionDetails === null) return null
+  if (!Array.isArray(dimensionDetails)) dimensionDetails = [dimensionDetails]
+  return dimensionDetails.map((details) => {
+    const newDetails = {
+      rank: null,
+      element: null,
+      unit: null,
+      height: null,
+      width: null
+    }
+    try {
+      newDetails.rank = parseInt(details.Rank)
+    } catch (er) {
+      newDetails.rank = null
+    }
+    try {
+      newDetails.element = details.Element.trim()
+    } catch (er) {
+      newDetails.element = null
+    }
+    try {
+      newDetails.unit = details.Unit.trim()
+    } catch (er) {
+      newDetails.unit = null
+    }
+    try {
+      newDetails.height = parseFloat(details.Height)
+    } catch (er) {
+      newDetails.height = null
+    }
+    try {
+      newDetails.width = parseFloat(details.Width)
+    } catch (er) {
+      newDetails.width = null
+    }
+    return newDetails
+  })
+}
+
 //  Turn the list of ids into an actual array
 const getExhibitionIds = ids => {
   if (ids === undefined || ids === null) return null
@@ -265,10 +305,16 @@ const getMedia = medias => {
       media.rank = media.Rank
       media.primaryDisplay = parseInt(media.PrimaryDisplay, 10) === 1
       media.publicAccess = parseInt(media.PublicAccess, 10) === 1
+      //  Turn the media use node into an array if we have it
+      if (media.MediaUse !== null && !Array.isArray(media.MediaUse)) {
+        media.MediaUse = [media.MediaUse]
+      }
+      media.mediaUse = media.MediaUse
       delete media._
       delete media.Rank
       delete media.PrimaryDisplay
       delete media.PublicAccess
+      delete media.MediaUse
       return media
     }
   }).filter(Boolean)
@@ -343,6 +389,7 @@ const parseItem = item => {
     beginDate: parseFloat(item.DateBegin),
     endDate: parseFloat(item.Dateend),
     dimension: {},
+    dimensionDetails: getDimensionDetails(item.DimensionDetails),
     medium: {},
     creditLine: {},
     inscription: {},
