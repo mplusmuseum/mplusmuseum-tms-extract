@@ -330,126 +330,131 @@ const checkImages = () => {
                     }
                   }
 
-                  if (testJSON !== null && testJSON.images && perfectFileJSON.remote && perfectFileJSON.remote.images) {
-                    const testMap = {}
-                    testJSON.images.forEach((image) => {
-                      testMap[image.src] = image
-                    })
-                    // 1. Images that we don't have a record entry for
-                    Object.entries(testMap).forEach((remoteImage) => {
-                      const id = remoteImage[0]
-                      const testImageObj = remoteImage[1]
-                      if (!perfectFileJSON.remote.images[id]) {
-                        //  Add the missing record to the perfect file
-                        perfectFileJSON.remote.images[id] = {}
-                        perfectFileJSON.remote.images[id].src = testImageObj.src
-                        perfectFileJSON.remote.images[id].rank = testImageObj.rank
-                        perfectFileJSON.remote.images[id].primaryDisplay = testImageObj.primaryDisplay
-                        perfectFileJSON.remote.images[id].publicAccess = testImageObj.publicAccess
-                        perfectFileJSON.remote.images[id].copyright = testImageObj.Copyright
-                        perfectFileJSON.remote.images[id].status = 'upload'
-                        perfectFileJSON.remote.images[id].public_id = null
-                        perfectFileJSON.remote.images[id].version = null
-                        perfectFileJSON.remote.images[id].signature = null
-                        perfectFileJSON.remote.images[id].width = null
-                        perfectFileJSON.remote.images[id].height = null
-                        perfectFileJSON.remote.images[id].format = null
-                        perfectFileJSON.remote.images[id].original_image_src = null
-                        perfectFileJSON.remote.images[id].lastModified = 0
-                        updateFile = true
+                  //  If the testJSON has images, but the perfect doesn't then we need to add the remote images to the
+                  //  perfect
+                  if (testJSON !== null && testJSON.images && (!perfectFileJSON.remote || !perfectFileJSON.remote.images)) {
+                    if (!perfectFileJSON.remote) perfectFileJSON.remote = {}
+                    if (!perfectFileJSON.remote.images) perfectFileJSON.remote.images = {}
+                  }
+
+                  const testMap = {}
+                  testJSON.images.forEach((image) => {
+                    testMap[image.src] = image
+                  })
+                  // 1. Images that we don't have a record entry for
+                  Object.entries(testMap).forEach((remoteImage) => {
+                    const id = remoteImage[0]
+                    const testImageObj = remoteImage[1]
+                    if (!perfectFileJSON.remote.images[id]) {
+                      //  Add the missing record to the perfect file
+                      perfectFileJSON.remote.images[id] = {}
+                      perfectFileJSON.remote.images[id].src = testImageObj.src
+                      perfectFileJSON.remote.images[id].rank = testImageObj.rank
+                      perfectFileJSON.remote.images[id].primaryDisplay = testImageObj.primaryDisplay
+                      perfectFileJSON.remote.images[id].publicAccess = testImageObj.publicAccess
+                      perfectFileJSON.remote.images[id].copyright = testImageObj.Copyright
+                      perfectFileJSON.remote.images[id].status = 'upload'
+                      perfectFileJSON.remote.images[id].public_id = null
+                      perfectFileJSON.remote.images[id].version = null
+                      perfectFileJSON.remote.images[id].signature = null
+                      perfectFileJSON.remote.images[id].width = null
+                      perfectFileJSON.remote.images[id].height = null
+                      perfectFileJSON.remote.images[id].format = null
+                      perfectFileJSON.remote.images[id].original_image_src = null
+                      perfectFileJSON.remote.images[id].lastModified = 0
+                      updateFile = true
+                    }
+                  })
+
+                  // 2. Images that we do have a record entry for but are missing
+                  // 3. Images that we do have a record entry for and has been updated since last time
+                  // 4. Images that we have a record entry for but is no longer in the orginal JSON
+                  const deleteList = []
+                  Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+                    const id = remoteImage[0]
+                    const imageObj = remoteImage[1]
+                    const imagefilePath = path.join(imagePath, imageObj.src)
+                    const originalStatus = imageObj.status
+
+                    if (!testMap[id]) {
+                      //  We need to remove it, but first, check to see if it's the primary and public
+                      //  image, if so we need to blow away the colors too
+                      if (imageObj.primaryDisplay && imageObj.primaryDisplay === true) {
+                        if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
+                        resyncFile = true
                       }
-                    })
+                      deleteList.push(id)
+                    } else {
+                      //  If the file isn't missing, then we need to check the last
+                      //  madified and decided to still upload it or not
+                      if (fs.existsSync(imagefilePath)) {
+                        const stats = fs.statSync(imagefilePath)
+                        const lastModified = parseInt(stats.mtimeMs, 10)
 
-                    // 2. Images that we do have a record entry for but are missing
-                    // 3. Images that we do have a record entry for and has been updated since last time
-                    // 4. Images that we have a record entry for but is no longer in the orginal JSON
-                    const deleteList = []
-                    Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
-                      const id = remoteImage[0]
-                      const imageObj = remoteImage[1]
-                      const imagefilePath = path.join(imagePath, imageObj.src)
-                      const originalStatus = imageObj.status
+                        //  If the image is new or modified then we need to mark it as 'upload'
+                        if (!imageObj.lastModified || imageObj.lastModified === null || imageObj.lastModified < lastModified) {
+                          perfectFileJSON.remote.images[id].status = 'upload'
+                          //  Unless it's too big
+                          if (stats.size > 10485760) {
+                            perfectFileJSON.remote.images[id].status = 'too-big'
+                          }
+                        } else {
+                          //  If the file isn't new, it hasn't been modified, then it's status is ok
+                          perfectFileJSON.remote.images[id].status = 'ok'
+                        }
+                      } else {
+                        //  If the image is missing, then we need to mark it asd missing
+                        perfectFileJSON.remote.images[id].status = 'missing'
+                      }
 
-                      if (!testMap[id]) {
-                        //  We need to remove it, but first, check to see if it's the primary and public
-                        //  image, if so we need to blow away the colors too
-                        if (imageObj.primaryDisplay && imageObj.primaryDisplay === true) {
+                      //  Check to see if the public access has changed
+                      if (testMap[id].primaryDisplay !== imageObj.primaryDisplay || testMap[id].publicAccess !== imageObj.publicAccess) {
+                        //  If the primary display has changed, then remove the colour information and start all over again
+                        if (perfectFileJSON.remote.images[id].primaryDisplay !== testMap[id].primaryDisplay) {
                           if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
                           resyncFile = true
                         }
-                        deleteList.push(id)
-                      } else {
-                        //  If the file isn't missing, then we need to check the last
-                        //  madified and decided to still upload it or not
-                        if (fs.existsSync(imagefilePath)) {
-                          const stats = fs.statSync(imagefilePath)
-                          const lastModified = parseInt(stats.mtimeMs, 10)
-
-                          //  If the image is new or modified then we need to mark it as 'upload'
-                          if (!imageObj.lastModified || imageObj.lastModified === null || imageObj.lastModified < lastModified) {
-                            perfectFileJSON.remote.images[id].status = 'upload'
-                            //  Unless it's too big
-                            if (stats.size > 10485760) {
-                              perfectFileJSON.remote.images[id].status = 'too-big'
-                            }
-                          } else {
-                            //  If the file isn't new, it hasn't been modified, then it's status is ok
-                            perfectFileJSON.remote.images[id].status = 'ok'
-                          }
-                        } else {
-                          //  If the image is missing, then we need to mark it asd missing
-                          perfectFileJSON.remote.images[id].status = 'missing'
-                        }
-
-                        //  Check to see if the public access has changed
-                        if (testMap[id].primaryDisplay !== imageObj.primaryDisplay || testMap[id].publicAccess !== imageObj.publicAccess) {
-                          //  If the primary display has changed, then remove the colour information and start all over again
-                          if (perfectFileJSON.remote.images[id].primaryDisplay !== testMap[id].primaryDisplay) {
-                            if (perfectFileJSON.remote.colors) delete perfectFileJSON.remote.colors
-                            resyncFile = true
-                          }
-                          perfectFileJSON.remote.images[id].primaryDisplay = testMap[id].primaryDisplay
-                          perfectFileJSON.remote.images[id].publicAccess = testMap[id].publicAccess
-                          updateFile = true
-                        }
+                        perfectFileJSON.remote.images[id].primaryDisplay = testMap[id].primaryDisplay
+                        perfectFileJSON.remote.images[id].publicAccess = testMap[id].publicAccess
+                        updateFile = true
                       }
+                    }
 
-                      if (originalStatus !== perfectFileJSON.remote.images[id].status) updateFile = true
+                    if (originalStatus !== perfectFileJSON.remote.images[id].status) updateFile = true
+                  })
+
+                  //  If we have been given any entries marked to be deleted, then do that here too
+                  if (deleteList.length > 0) {
+                    deleteList.forEach((id) => {
+                      delete perfectFileJSON.remote.images[id]
                     })
+                    resyncFile = true
+                  }
 
-                    //  If we have been given any entries marked to be deleted, then do that here too
-                    if (deleteList.length > 0) {
-                      deleteList.forEach((id) => {
-                        delete perfectFileJSON.remote.images[id]
-                      })
+                  //  Look through all the entries, if any of them are marked as upload
+                  //  then we mark the whole thing as upload
+                  //  If any of them are marked as delete we mark the whole thing as delete
+                  Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
+                    const imageObj = remoteImage[1]
+                    const originalStatus = imageObj.status
+                    if (originalStatus === 'upload' && perfectFileJSON.remote.status !== 'upload') {
+                      perfectFileJSON.remote.status = 'upload'
+                      updateFile = true
                       resyncFile = true
                     }
+                  })
 
-                    //  Look through all the entries, if any of them are marked as upload
-                    //  then we mark the whole thing as upload
-                    //  If any of them are marked as delete we mark the whole thing as delete
-                    Object.entries(perfectFileJSON.remote.images).forEach((remoteImage) => {
-                      const imageObj = remoteImage[1]
-                      const originalStatus = imageObj.status
-                      if (originalStatus === 'upload' && perfectFileJSON.remote.status !== 'upload') {
-                        perfectFileJSON.remote.status = 'upload'
-                        updateFile = true
-                        resyncFile = true
-                      }
-                    })
+                  //  Now write the file back out
+                  if (updateFile || resyncFile) {
+                    const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+                    fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+                  }
 
-                    //  Now write the file back out
-                    if (updateFile || resyncFile) {
-                      const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
-                      fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
-                    }
-
-                    //  If we have been told to resync the file and we only have a preossed version, then we need
-                    //  to move the process file over
-                    if (resyncFile && fs.existsSync(processedFilename) && !fs.existsSync(processFilename)) {
-                      fs.copyFileSync(processedFilename, processFilename)
-                      fs.unlinkSync(processedFilename)
-                    }
+                  //  If we have been told to resync the file and we only have a preossed version, then we need
+                  //  to move the process file over
+                  if (resyncFile && fs.existsSync(processedFilename) && !fs.existsSync(processFilename)) {
+                    fs.copyFileSync(processedFilename, processFilename)
+                    fs.unlinkSync(processedFilename)
                   }
                 }
               })

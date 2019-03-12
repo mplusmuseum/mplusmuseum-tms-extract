@@ -64,6 +64,11 @@ const argOptionDefinitions = [{
   defaultOption: false
 },
 {
+  name: 'buildOnly',
+  alias: 'b',
+  type: Boolean
+},
+{
   name: 'skipOpen',
   type: Boolean
 }
