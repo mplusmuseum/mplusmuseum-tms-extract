@@ -434,6 +434,9 @@ const parseItem = item => {
   if (Object.entries(newItem.medium).length === 0) newItem.medium = null
   if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
 
+  //  CollectionName
+  if (item.CollectionName) newItem.CollectionName = item.CollectionName
+
   //  Related objects
   if (item.RelatedObjectID) {
     newItem.relatedObjectIds = getRelatedObjects(item.RelatedObjectID)
