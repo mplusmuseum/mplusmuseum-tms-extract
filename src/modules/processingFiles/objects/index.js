@@ -234,6 +234,11 @@ const getDimensionDetails = dimensionDetails => {
     } catch (er) {
       newDetails.width = null
     }
+    try {
+      newDetails.depth = parseFloat(details.Depth)
+    } catch (er) {
+      details.Depth = null // do nothing
+    }
     return newDetails
   })
 }
