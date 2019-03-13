@@ -235,7 +235,10 @@ const getDimensionDetails = dimensionDetails => {
       newDetails.width = null
     }
     try {
-      newDetails.depth = parseFloat(details.Depth)
+      let newDepth = parseFloat(details.Depth)
+      if (newDepth !== null) {
+        newDetails.depth = parseFloat(details.Depth)
+      }
     } catch (er) {
       details.Depth = null // do nothing
     }
