@@ -26,3 +26,4 @@ package-lock.json
 /*.old.*
 /lang/collection/strings.json
 /updating_kibana.txt
+/dedupe.js

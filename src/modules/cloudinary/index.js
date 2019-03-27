@@ -921,8 +921,8 @@ exports.startColoring = () => {
   }
   global.cloudinaryColoringTmr = setInterval(() => {
     checkImagesColor()
-    checkImagesHSL()
+    // checkImagesHSL()
   }, interval)
   checkImagesColor()
-  checkImagesHSL()
+  // checkImagesHSL()
 }
