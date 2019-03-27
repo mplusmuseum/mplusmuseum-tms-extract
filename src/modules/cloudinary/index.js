@@ -843,41 +843,49 @@ const checkImagesHSL = () => {
               //  Grab the predominant colours
               const predoms = JSON.parse(perfectFileJSON.remote.colors.predominant)
               //  Grab the first one
-              const firstColour = Object.entries(predoms)[0][0]
-              //  Convert it to HSB
-              const hsl = utils.hexToHsl(firstColour)
-              //  Put it back into the JSON
-              perfectFileJSON.remote.colors.hslInt = {
-                h: parseInt(hsl[0] * 360, 10),
-                s: parseInt(hsl[1] * 100, 10),
-                l: parseInt(hsl[2] * 100, 10)
-              }
-              //  Write the perfect file back out
-              const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
-              fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
-              //  Create an upsert object so we can update the database
-              const id = parseInt(file.split('.')[0], 10)
-              const index = `${element.parent}_${tms.stub}`.toLowerCase()
-              const upsertItem = {
-                id,
-                colorHSLInt: {
+              try {
+                const firstColour = Object.entries(predoms)[0][0]
+                //  Convert it to HSB
+                const hsl = utils.hexToHsl(firstColour)
+                //  Put it back into the JSON
+                perfectFileJSON.remote.colors.hslInt = {
                   h: parseInt(hsl[0] * 360, 10),
                   s: parseInt(hsl[1] * 100, 10),
                   l: parseInt(hsl[2] * 100, 10)
                 }
-              }
-
-              //  But the data back into the database
-              const esclient = new elasticsearch.Client(elasticsearchConfig)
-              esclient.update({
-                index,
-                type: element.child.toLowerCase(),
-                id,
-                body: {
-                  doc: upsertItem,
-                  doc_as_upsert: true
+                //  Write the perfect file back out
+                const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+                fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+                //  Create an upsert object so we can update the database
+                const id = parseInt(file.split('.')[0], 10)
+                const index = `${element.parent}_${tms.stub}`.toLowerCase()
+                const upsertItem = {
+                  id,
+                  colorHSLInt: {
+                    h: parseInt(hsl[0] * 360, 10),
+                    s: parseInt(hsl[1] * 100, 10),
+                    l: parseInt(hsl[2] * 100, 10)
+                  }
                 }
-              })
+
+                //  But the data back into the database
+                const esclient = new elasticsearch.Client(elasticsearchConfig)
+                esclient.update({
+                  index,
+                  type: element.child.toLowerCase(),
+                  id,
+                  body: {
+                    doc: upsertItem,
+                    doc_as_upsert: true
+                  }
+                })
+              } catch (er) {
+                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                console.log(perfectFileJSON)
+                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+                console.log(perfectFileJSON.remote.colors)
+                console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+              }
             }
           })
         })
