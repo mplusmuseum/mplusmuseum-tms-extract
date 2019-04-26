@@ -371,7 +371,6 @@ const forceIDArray = ids => {
  */
 // #########################################################################
 const parseItem = item => {
-  console.log(item.ObjectID)
   const newItem = {
     objectID: parseInt(item.ObjectID, 10),
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
@@ -450,7 +449,7 @@ const parseItem = item => {
   if ('ScopeNContentTC' in item) {
     //  If we have languages within the baselineDescription then we need to handle it
     if (typeof (item.ScopeNContentTC) === 'string') {
-      newItem.scopeNContentTC['zh-hant'] = item.ScopeNContentTC
+      newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
     } else {
       //  If it's an object then we need to check for normal and HTML inside it
       if (typeof (item.ScopeNContentTC) === 'object') {
