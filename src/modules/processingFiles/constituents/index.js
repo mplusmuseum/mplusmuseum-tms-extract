@@ -14,9 +14,27 @@ const getBiography = biographies => {
   if (biographies === null || biographies === undefined) return null
   if (!Array.isArray(biographies)) biographies = [biographies]
   biographies = biographies.map((biography) => {
-    return {
-      purpose: biography.Purpose,
-      text: biography.LabelText
+    if (biography.Purpose && biography.LabelText) {
+      return {
+        purpose: biography.Purpose,
+        text: biography.LabelText
+      }
+    }
+    if (biography.Purpose && (biography.EB || biography.EBHTML)) {
+      const newThing = {
+        purpose: biography.Purpose
+      }
+      if (biography.EB) newThing.text = biography.EB
+      if (biography.EBHTML) newThing.html = biography.EBHTML
+      return newThing
+    }
+    if (biography.Purpose && (biography.EBTC || biography.EBTCHTML)) {
+      const newThing = {
+        purpose: biography.Purpose
+      }
+      if (biography.EBTC) newThing.text = biography.EBTC
+      if (biography.EBTCHTML) newThing.html = biography.EBTCHTML
+      return newThing
     }
   })
   return biographies
