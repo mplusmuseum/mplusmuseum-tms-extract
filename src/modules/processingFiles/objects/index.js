@@ -404,7 +404,9 @@ const parseItem = item => {
     archiveDescription: {},
     objectName: {},
     scopeNContent: {},
+    scopeNContentHTML: {},
     baselineDescription: {},
+    baselineDescriptionHTML: {},
     images: getMedia(item.Media),
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
@@ -430,10 +432,58 @@ const parseItem = item => {
   if ('ArchiveDescriptionTC' in item) newItem.archiveDescription['zh-hant'] = item.ArchiveDescriptionTC
   if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
   if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
-  if ('ScopeNContent' in item) newItem.scopeNContent['en'] = item.ScopeNContent
-  if ('ScopeNContentTC' in item) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
-  if ('BaselineDescription' in item) newItem.baselineDescription['en'] = item.BaselineDescription
-  if ('BaselineDescriptionTC' in item) newItem.baselineDescription['zh-hant'] = item.BaselineDescriptionTC
+
+  if ('ScopeNContent' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.ScopeNContent) === 'string') {
+      newItem.scopeNContent['en'] = item.ScopeNContent
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.ScopeNContent) === 'object') {
+        if (item.ScopeNContent.SNC) newItem.scopeNContent['en'] = item.ScopeNContent.SNC
+        if (item.ScopeNContent.SNCHTML) newItem.scopeNContentHTML['en'] = item.ScopeNContent.SNCHTML
+      }
+    }
+  }
+
+  if ('ScopeNContentTC' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.ScopeNContentTC) === 'string') {
+      newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.ScopeNContentTC) === 'object') {
+        if (item.ScopeNContentTC.SNCTC) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC.SNCTC
+        if (item.ScopeNContentTC.SNCTCHTML) newItem.scopeNContentHTML['zh-hant'] = item.ScopeNContentTC.SNCTCHTML
+      }
+    }
+  }
+
+  if ('BaselineDescription' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.BaselineDescription) === 'string') {
+      newItem.baselineDescription['en'] = item.BaselineDescription
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.BaselineDescription) === 'object') {
+        if (item.BaselineDescription.BLD) newItem.baselineDescription['en'] = item.BaselineDescription.BLD
+        if (item.BaselineDescription.BLDHTML) newItem.baselineDescriptionHTML['en'] = item.BaselineDescription.BLDHTML
+      }
+    }
+  }
+
+  if ('BaselineDescriptionTC' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.BaselineDescriptionTC) === 'string') {
+      newItem.baselineDescription['zh-hant'] = item.BaselineDescriptionTC
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.BaselineDescriptionTC) === 'object') {
+        if (item.BaselineDescriptionTC.BLDTC) newItem.baselineDescription['zh-hant'] = item.BaselineDescriptionTC.BLDTC
+        if (item.BaselineDescriptionTC.BLDTCHTML) newItem.baselineDescriptionHTML['zh-hant'] = item.BaselineDescriptionTC.BLDTCHTML
+      }
+    }
+  }
 
   if (Object.entries(newItem.title).length === 0) newItem.title = null
   if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
