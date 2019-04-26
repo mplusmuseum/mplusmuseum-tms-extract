@@ -292,10 +292,20 @@ const getExhibitionLabelText = labelText => {
         'text': label
       }
     }
-    if (typeof (label) === 'object' && '_' in label && 'Purpose' in label) {
-      return {
-        'purpose': label.Purpose,
-        'text': label._
+    if (typeof (label) === 'object') {
+      if ('_' in label && 'Purpose' in label) {
+        return {
+          'purpose': label.Purpose,
+          'text': label._
+        }
+      }
+      if ((label.EL || label.ELHTML) && label.Purpose) {
+        const newThing = {
+          'purpose': label.Purpose
+        }
+        if (label.EL) newThing.text = label.EL
+        if (label.ELHTML) newThing.html = label.ELHTML
+        return newThing
       }
     }
     return null
