@@ -50,6 +50,9 @@
         <li>
           <a href="/admin/importRecommended">import Recommended CSV</a>
         </li>
+        <li>
+          <a href="/admin/deleteObjectsByIds">delete ObjectsBy Ids</a>
+        </li>
       </ul>
 
       <hr />
@@ -66,7 +69,8 @@
           <li>
             <form method="POST" action="/{{../selectedLang}}/admin">
               <input type="hidden" name="tms" value="{{stub}}" />
-              <button class="button is-primary" type="submit" name="action" value="reimport">Reimport {{stub}} XML file</button>
+              <button class="button is-primary" type="submit" name="action" value="reimport">Reimport {{stub}} XML
+                file</button>
             </form>
           </li>
         {{/each}}

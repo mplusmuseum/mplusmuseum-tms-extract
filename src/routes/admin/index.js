@@ -444,3 +444,52 @@ exports.redoColours = async (req, res) => {
   })
   return res.redirect('/admin')
 }
+
+exports.deleteObjectsByIds = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  /*
+  const startTime = new Date().getTime()
+
+  const tmsLogger = logging.getTMSLogger()
+  */
+
+  //  Check to see that we have elasticsearch configured
+  const config = new Config()
+  const elasticsearchConfig = config.get('elasticsearch')
+  //  If there's no elasticsearch configured then we don't bother
+  //  to do anything
+  if (elasticsearchConfig === null) {
+    return res.redirect('/admin')
+  }
+  const baseTMS = config.getRootTMS()
+  if (baseTMS === null) return res.redirect('/admin')
+
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `objects_${baseTMS}`
+
+  if (req.body && req.body.deleteme) {
+    const ids = req.body.deleteme.split('\r\n').map((id) => parseInt(id, 10))
+    //  Now make up the bulk action
+    const bulkThisArray = []
+    console.log('About to delete these records')
+    console.log(ids)
+    ids.forEach((id) => {
+      bulkThisArray.push({
+        delete: {
+          _id: id
+        }
+      })
+    })
+    if (bulkThisArray.length > 0) {
+      const result = await esclient.bulk({
+        index,
+        type: 'object',
+        body: bulkThisArray
+      })
+      console.log(result)
+    }
+  }
+  return res.render('admin/deleteObjectsByIds', req.templateValues)
+}

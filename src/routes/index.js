@@ -255,6 +255,8 @@ router.get('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.post('/:lang/admin/isMakers', ensureLoggedIn, admin.isMakers)
 router.get('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
 router.post('/:lang/admin/importRecommended', ensureLoggedIn, admin.importRecommended)
+router.get('/:lang/admin/deleteObjectsByIds', ensureLoggedIn, admin.deleteObjectsByIds)
+router.post('/:lang/admin/deleteObjectsByIds', ensureLoggedIn, admin.deleteObjectsByIds)
 router.post('/:lang/admin/redoColours', ensureLoggedIn, admin.redoColours)
 router.get('/:lang/admin/colours', ensureLoggedIn, admin.showColours)
 
