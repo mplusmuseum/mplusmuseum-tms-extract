@@ -28,3 +28,8 @@ package-lock.json
 /updating_kibana.txt
 /dedupe.js
 /exampleObject.json
+/exampleBibiolographicData.json
+/exampleConstituents.json
+/exampleEvents.json
+/exampleConcepts.json
+/exampleExhibitions.json
