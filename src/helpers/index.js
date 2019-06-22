@@ -322,6 +322,10 @@ exports.prettyNumber = x => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
+exports.toPrecision = (n, p) => {
+  const newVal = parseFloat(`${n}`).toPrecision(p)
+  return newVal
+}
 exports.timePretty = t => {
   if (t === null || t === undefined) return ''
   return moment(t).format('dddd, MMMM Do YYYY, h:mm:ss a')
