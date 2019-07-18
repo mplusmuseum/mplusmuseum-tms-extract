@@ -16,7 +16,7 @@
           Bulk delete
         </h1>
         <h2 class="subtitle is-3">
-          This is where you can bulk delete objects
+          This is where you can bulk delete {{indexLower}}
         </h2>
       </div>
     </div>
@@ -29,12 +29,12 @@
 
         <div class="field is-horizontal">
           <div class="field-label is-normal">
-            <label class="label">TMS ids of objects to be deleted, one id per row.</label>
+            <label class="label">TMS ids of {{indexLower}} to be deleted, one id per row.</label>
           </div>
           <div class="field-body">
             <div class="field">
               <textarea class="textarea" rows="20" name="deleteme"
-                placeholder="Paste your ids here, one per row"></textarea>
+                placeholder="Paste your ids here, one per row">{{missingIds}}</textarea>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@
           <div class="level-right">
             <div class="level-item">
               <p class="control">
-                <button class="button is-primary" name="action" value="deleteObjectsByIds">Delete</button>
+                <button class="button is-primary" name="action" value="deleteIndexByIds">Delete</button>
               </p>
             </div>
           </div>

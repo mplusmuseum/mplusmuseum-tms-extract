@@ -141,6 +141,8 @@ const processFile = async (tms) => {
             return null
           }).filter(Boolean)
 
+        const idList = []
+
         //  Write out the XML files
         splitRaw.forEach((xml) => {
           const xmlSplit = xml.split('<')
@@ -149,6 +151,7 @@ const processFile = async (tms) => {
             if (idSplit[1] !== undefined) {
               const id = parseInt(idSplit[1], 10)
               if (!isNaN(id)) {
+                idList.push(id)
                 const subFolder = String(Math.floor(id / 1000) * 1000)
                 if (!fs.existsSync(path.join(rootDir, 'imports', element.parent, tms, 'xml', subFolder))) fs.mkdirSync(path.join(rootDir, 'imports', element.parent, tms, 'xml', subFolder))
                 const filename = path.join(rootDir, 'imports', element.parent, tms, 'xml', subFolder, `${id}.xml`)
@@ -157,6 +160,10 @@ const processFile = async (tms) => {
             }
           }
         })
+
+        const idsFilename = path.join(rootDir, 'imports', element.parent, tms, 'ids.json')
+        fs.writeFileSync(idsFilename, JSON.stringify(idList), 'utf-8')
+
         tmsLogger.object(`split XML for: ${element.parent}`, {
           action: `Splitting XML`,
           status: 'info',
