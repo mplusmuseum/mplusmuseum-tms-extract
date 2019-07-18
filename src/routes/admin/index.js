@@ -445,7 +445,7 @@ exports.redoColours = async (req, res) => {
   return res.redirect('/admin')
 }
 
-exports.deleteObjectsByIds = async (req, res) => {
+exports.deleteIndexByIds = async (req, res) => {
   //  Make sure we are an admin user
   if (req.user.roles.isAdmin !== true) return res.redirect('/')
 
@@ -454,6 +454,19 @@ exports.deleteObjectsByIds = async (req, res) => {
 
   const tmsLogger = logging.getTMSLogger()
   */
+
+  const indexMap = {
+    Objects: 'object',
+    Constituents: 'constituent',
+    Exhibitions: 'exhibition',
+    BibiolographicData: 'bibiolography',
+    Events: 'event',
+    Concepts: 'concept'
+  }
+
+  if (!req.params || !req.params.index || !(req.params.index in indexMap)) {
+    return res.redirect('/')
+  }
 
   //  Check to see that we have elasticsearch configured
   const config = new Config()
@@ -467,7 +480,7 @@ exports.deleteObjectsByIds = async (req, res) => {
   if (baseTMS === null) return res.redirect('/admin')
 
   const esclient = new elasticsearch.Client(elasticsearchConfig)
-  const index = `objects_${baseTMS}`
+  const index = `${req.params.index.toLowerCase()}_${baseTMS}`
 
   if (req.body && req.body.deleteme) {
     const ids = req.body.deleteme.split('\r\n').map((id) => parseInt(id, 10))
@@ -483,13 +496,52 @@ exports.deleteObjectsByIds = async (req, res) => {
       })
     })
     if (bulkThisArray.length > 0) {
-      const result = await esclient.bulk({
+      await esclient.bulk({
         index,
-        type: 'object',
+        type: indexMap[req.params.index],
         body: bulkThisArray
       })
-      console.log(result)
+
+      // Now delete those files
+      ids.forEach((id) => {
+        const subDirs = ['perfect', 'process', 'processed']
+        const subFolder = String(Math.floor(id / 1000) * 1000)
+        subDirs.forEach((subDir) => {
+          const idFilename = path.join(rootDir, 'imports', req.params.index, 'mplus', subDir, subFolder, `${id}.json`)
+          if (fs.existsSync(idFilename)) {
+            fs.unlinkSync(idFilename)
+          }
+        })
+      })
+      return res.redirect('/admin')
     }
   }
-  return res.render('admin/deleteObjectsByIds', req.templateValues)
+
+  //  Now we are here, we need to work out which ids we have a file for that we don't have an id for in the list
+  const idsFilename = path.join(rootDir, 'imports', req.params.index, 'mplus', 'ids.json')
+  const missingIds = []
+  if (fs.existsSync(idsFilename)) {
+    const ids = JSON.parse(fs.readFileSync(idsFilename, 'utf-8'))
+    //  Loop through all the possible directories to see if we have files that aren't in the missingIds
+    const subDirs = ['perfect', 'process', 'processed']
+    subDirs.forEach((subDir) => {
+      if (fs.existsSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir))) {
+        fs.readdirSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir)).forEach((subSubDir) => {
+          fs.readdirSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir, subSubDir)).forEach((file) => {
+            const fileSplit = file.split('.')
+            if (fileSplit.length === 2) {
+              const id = parseInt(fileSplit[0])
+              if (!isNaN(id)) {
+                if (!(ids.includes(id)) && !(missingIds.includes(id))) missingIds.push(id)
+              }
+            }
+          })
+        })
+      }
+    })
+  }
+
+  req.templateValues.missingIds = missingIds.join(',\n')
+  req.templateValues.indexLower = req.params.index.toLowerCase()
+  return res.render('admin/deleteIndexByIds', req.templateValues)
 }
