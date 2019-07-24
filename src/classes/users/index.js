@@ -6,10 +6,6 @@ class Users {
   async get (role = null, page = 0, perPage = 100) {
     const auth0Token = await auth0.getAuth0Token()
     const payload = {}
-    const qs = {
-      per_page: perPage,
-      page
-    }
 
     const config = new Config()
     const auth0info = config.get('auth0')
@@ -22,20 +18,33 @@ class Users {
       Authorization: `bearer ${auth0Token}`
     }
 
-    const users = await request({
-      url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
-      method: 'GET',
-      headers,
-      json: payload,
-      qs
-    })
-      .then(response => {
-        return response
+    let allUsers = []
+
+    const pages = [0, 1, 2]
+
+    for (const page of pages) {
+      const qs = {
+        per_page: perPage,
+        page
+      }
+      const users = await request({
+        url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
+        method: 'GET',
+        headers,
+        json: payload,
+        qs
       })
-      .catch(error => {
-        return [error]
-      })
-    return users
+        .then(response => {
+          return response
+        })
+        .catch(error => {
+          return [error]
+        })
+      if (users && Array.isArray(users) && users.length > 0 && users[0].user_id) {
+        allUsers = allUsers.concat(users)
+      }
+    }
+    return allUsers
   }
 }
 module.exports = Users

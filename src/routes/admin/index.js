@@ -54,7 +54,7 @@ exports.user = async (req, res) => {
         isDeveloper: 'developer' in req.body
       }
       await userObj.setRoles(selectedUser.user_id, roles)
-      return res.redirect(`/admin/user/${req.params.id}`)
+      return res.redirect(`/admin/users`)
     }
   }
 
