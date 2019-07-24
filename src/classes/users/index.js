@@ -3,7 +3,7 @@ const auth0 = require('../../modules/auth0')
 const Config = require('../config')
 
 class Users {
-  async get (role = null, page = 0, perPage = 200) {
+  async get (role = null, page = 0, perPage = 100) {
     const auth0Token = await auth0.getAuth0Token()
     const payload = {}
     const qs = {
