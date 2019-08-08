@@ -5,7 +5,7 @@
  * There is a lot of scripting at the top of this file, most of which
  * is to make sure the user has completed all the steps needed to
  * actually run the dashboard properly. This will be checking for
- * things like `yarn install` and the usual stuff having been run.
+ * things like `npm install` and the usual stuff having been run.
  *
  * You'll see!
  */
@@ -18,8 +18,8 @@ const rootDir = __dirname
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 console.log('Making sure we are up to date, please wait...')
 const spawnSync = require('child_process').spawnSync
-const yarn = spawnSync('yarn', ['install'])
-console.log(yarn.stdout.toString())
+const npm = spawnSync('npm', ['install'])
+console.log(npm.stdout.toString())
 
 const colours = require('colors')
 
@@ -43,35 +43,35 @@ console.log(`server.js exists in this directory: ${rootDir}`.help)
  */
 const prompt = require('prompt-sync')()
 const argOptionDefinitions = [{
-    name: 'port',
-    alias: 'p',
-    type: Number
-  },
-  {
-    name: 'host',
-    alias: 'h',
-    type: String
-  },
-  {
-    name: 'env',
-    alias: 'e',
-    type: String
-  },
-  {
-    name: 'skipBuild',
-    alias: 's',
-    type: Boolean,
-    defaultOption: false
-  },
-  {
-    name: 'buildOnly',
-    alias: 'b',
-    type: Boolean
-  },
-  {
-    name: 'skipOpen',
-    type: Boolean
-  }
+  name: 'port',
+  alias: 'p',
+  type: Number
+},
+{
+  name: 'host',
+  alias: 'h',
+  type: String
+},
+{
+  name: 'env',
+  alias: 'e',
+  type: String
+},
+{
+  name: 'skipBuild',
+  alias: 's',
+  type: Boolean,
+  defaultOption: false
+},
+{
+  name: 'buildOnly',
+  alias: 'b',
+  type: Boolean
+},
+{
+  name: 'skipOpen',
+  type: Boolean
+}
 ]
 const commandLineArgs = require('command-line-args')
 const argOptions = commandLineArgs(argOptionDefinitions)
@@ -376,11 +376,11 @@ const auth0 = config.get('auth0')
 if (auth0 !== null) {
   // Configure Passport to use Auth0
   const strategy = new Auth0Strategy({
-      domain: auth0.AUTH0_DOMAIN,
-      clientID: auth0.AUTH0_CLIENT_ID,
-      clientSecret: auth0.AUTH0_SECRET,
-      callbackURL: auth0.AUTH0_CALLBACK_URL
-    },
+    domain: auth0.AUTH0_DOMAIN,
+    clientID: auth0.AUTH0_CLIENT_ID,
+    clientSecret: auth0.AUTH0_SECRET,
+    callbackURL: auth0.AUTH0_CALLBACK_URL
+  },
     (accessToken, refreshToken, extraParams, profile, done) => {
       return done(null, profile)
     }
