@@ -14,7 +14,7 @@ objects.json
 
 *log
 
-package-lock.json
+yarn-lock.json
 .vscode
 
 !app/public/stylesheets/prism.css

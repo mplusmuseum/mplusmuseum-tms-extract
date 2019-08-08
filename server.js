@@ -5,7 +5,7 @@
  * There is a lot of scripting at the top of this file, most of which
  * is to make sure the user has completed all the steps needed to
  * actually run the dashboard properly. This will be checking for
- * things like `yarn install` and the usual stuff having been run.
+ * things like `npm install` and the usual stuff having been run.
  *
  * You'll see!
  */
@@ -18,8 +18,8 @@ const rootDir = __dirname
 console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 console.log('Making sure we are up to date, please wait...')
 const spawnSync = require('child_process').spawnSync
-const yarn = spawnSync('yarn', ['install'])
-console.log(yarn.stdout.toString())
+const npm = spawnSync('npm', ['install'])
+console.log(npm.stdout.toString())
 
 const colours = require('colors')
 
@@ -326,6 +326,7 @@ const hbs = exphbs.create({
 
 app.engine('html', hbs.engine)
 app.set('view engine', 'html')
+app.locals.layout = false
 app.set('views', `${__dirname}/app/templates`)
 app.use(
   express.static(`${__dirname}/app/public`, {
