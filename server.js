@@ -43,35 +43,35 @@ console.log(`server.js exists in this directory: ${rootDir}`.help)
  */
 const prompt = require('prompt-sync')()
 const argOptionDefinitions = [{
-  name: 'port',
-  alias: 'p',
-  type: Number
-},
-{
-  name: 'host',
-  alias: 'h',
-  type: String
-},
-{
-  name: 'env',
-  alias: 'e',
-  type: String
-},
-{
-  name: 'skipBuild',
-  alias: 's',
-  type: Boolean,
-  defaultOption: false
-},
-{
-  name: 'buildOnly',
-  alias: 'b',
-  type: Boolean
-},
-{
-  name: 'skipOpen',
-  type: Boolean
-}
+    name: 'port',
+    alias: 'p',
+    type: Number
+  },
+  {
+    name: 'host',
+    alias: 'h',
+    type: String
+  },
+  {
+    name: 'env',
+    alias: 'e',
+    type: String
+  },
+  {
+    name: 'skipBuild',
+    alias: 's',
+    type: Boolean,
+    defaultOption: false
+  },
+  {
+    name: 'buildOnly',
+    alias: 'b',
+    type: Boolean
+  },
+  {
+    name: 'skipOpen',
+    type: Boolean
+  }
 ]
 const commandLineArgs = require('command-line-args')
 const argOptions = commandLineArgs(argOptionDefinitions)
@@ -326,6 +326,7 @@ const hbs = exphbs.create({
 
 app.engine('html', hbs.engine)
 app.set('view engine', 'html')
+app.locals.layout = false
 app.set('views', `${__dirname}/app/templates`)
 app.use(
   express.static(`${__dirname}/app/public`, {
@@ -375,11 +376,11 @@ const auth0 = config.get('auth0')
 if (auth0 !== null) {
   // Configure Passport to use Auth0
   const strategy = new Auth0Strategy({
-    domain: auth0.AUTH0_DOMAIN,
-    clientID: auth0.AUTH0_CLIENT_ID,
-    clientSecret: auth0.AUTH0_SECRET,
-    callbackURL: auth0.AUTH0_CALLBACK_URL
-  },
+      domain: auth0.AUTH0_DOMAIN,
+      clientID: auth0.AUTH0_CLIENT_ID,
+      clientSecret: auth0.AUTH0_SECRET,
+      callbackURL: auth0.AUTH0_CALLBACK_URL
+    },
     (accessToken, refreshToken, extraParams, profile, done) => {
       return done(null, profile)
     }
