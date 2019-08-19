@@ -313,6 +313,8 @@ router.get('/:lang/explore-o-matic/:thing/:filter', ensureLoggedIn, exploreomati
 router.get('/:lang/explore-o-matic/archives', ensureLoggedIn, exploreomatic.getObjectsByThing)
 router.get('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
 router.post('/:lang/explore-o-matic/factpedia', ensureLoggedIn, exploreomatic.factpedia)
+router.get('/:lang/explore-o-matic/randomizer', ensureLoggedIn, exploreomatic.randomizer)
+router.post('/:lang/explore-o-matic/randomizer', ensureLoggedIn, exploreomatic.randomizer)
 router.get('/:lang/explore-o-matic/popularSearches', ensureLoggedIn, exploreomatic.factpedia)
 router.post('/:lang/explore-o-matic/popularSearches', ensureLoggedIn, exploreomatic.factpedia)
 

@@ -499,6 +499,14 @@ class Queries {
       }
     }`
 
+    this.randoms = `query {
+      randoms[[]] {
+        id
+        text
+        textTC
+      }
+    }`
+
     this.exhibition = `query {
       exhibition[[]] {
         id
