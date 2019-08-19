@@ -1,0 +1,192 @@
+<html>
+
+<head>
+  <title>Dashboard - explore-o-matic</title>
+  {{> head}}
+</head>
+
+<body>
+
+  {{> nav}}
+
+  <section class="hero is-primary is-bold">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title capitalise is-1">
+          Explore-o-matic - Randomizer
+        </h1>
+        <h2 class="subtitle is-3">
+          Here is the list of facts that can be added to the random card.
+        </h2>
+      </div>
+    </div>
+  </section>
+
+  {{> exploreomatic/nav}}
+
+  <section class="section">
+    <div class="container">
+      <a name="admintools"></a>
+
+      {{#if baseTMS}}
+        {{#if randoms}}
+          <form method="POST">
+            {{#each randoms}}
+              <div class="columns">
+                <div class="column">
+                  <label class="is-spaced">
+                    <h1 class="title is-5">Random in EN</h1>
+                    <div class="notification">
+                      {{{convertShortCode text}}}
+                    </div>
+                    <textarea class="textarea" placeholder="Enter your random info here"
+                      name="{{id}}|randomEN">{{text}}</textarea>
+                  </label>
+                </div>
+                <div class="column">
+                  <label class="is-spaced">
+                    <h1 class="title is-5">Random in TC</h1>
+                    <div class="notification">
+                      {{{convertShortCode textTC}}}
+                    </div>
+                    <textarea class="textarea" placeholder="Enter your random in here"
+                      name="{{id}}|randomTC">{{textTC}}</textarea>
+                  </label>
+                </div>
+              </div>
+
+              <div class="columns">
+                <div class="column has-text-right">
+                  <button class="button is-danger" name="action" value="deleteRandom|{{id}}">Delete
+                    random</button>
+                </div>
+              </div>
+              <hr />
+            {{/each}}
+            <div class="control is-spaced">
+              <button class="button is-primary" name="action" value="updateRandoms">Update randoms</button>
+            </div>
+
+            <hr />
+          </form>
+        {{/if}}
+
+        <div class="tile is-ancestor">
+          <div class="tile is-parent">
+            <article class="tile is-child box">
+              <h1 class="title">Add new random info</h1>
+              <hr />
+              <form method="POST">
+                <div class="columns">
+                  <div class="column">
+                    <label class="is-spaced">
+                      <h1 class="title is-5">Random in EN</h1>
+                      <textarea class="textarea" placeholder="Enter your random info here" name="randomEN"></textarea>
+                    </label>
+                  </div>
+                  <div class="column">
+                    <label class="is-spaced">
+                      <h1 class="title is-5">Random in TC</h1>
+                      <textarea class="textarea" placeholder="Enter your random info here" name="randomTC"></textarea>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="control is-spaced">
+                  <button class="button is-primary" name="action" value="addRandom">Add random</button>
+                </div>
+
+                <div class="notification">
+                  <h1 class="title is-5">Short Codes</h1>
+                  <h2 class="subtitle is-6">These are used to allow you to make links that function correctly in the
+                    site. If you use the Explore-O-Matic to find objects you'll see related short codes below them. You
+                    can also construct short codes using the following format...</h2>
+                  <p>
+                    A short code is made up of three parts, separated with the "pipe" character "|" and then wrapped in
+                    <em>double</em> square brackets "[[]]". The parts are, <code>type of thing</code>, <code>display
+                      name
+                      of thing</code>, <code>id or stub of thing</code>. So <code>[[thing|title|id]]</code>, here are
+                    some examples...
+                  </p>
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Short Code</th>
+                        <th>example</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[object|Lanwei 19/
+                          The
+                          Beasts / Taipei|865]]</td>
+                        <td>{{{convertShortCode '[[object|Lanwei 19/ The Beasts / Taipei|865]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[constituent|Stanley
+                          Wong|17]]</td>
+                        <td>{{{convertShortCode '[[constituent|Stanley Wong|17]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|Visual
+                          Art|Visual
+                          Art]]</td>
+                        <td>{{{convertShortCode '[[area|Visual Art|Visual Art]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[area|視覺藝術|視覺藝術]]</td>
+                        <td>{{{convertShortCode '[[area|視覺藝術|視覺藝術]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">
+                          [[category|Photography|Photography]]</td>
+                        <td>{{{convertShortCode '[[category|Photography|Photography]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[category|攝影|攝影]]</td>
+                        <td>{{{convertShortCode '[[category|攝影|攝影]]'}}}</td>
+                      </tr>
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">
+                          [[colour|Blue|238,100,46]]</td>
+                        <td>{{{convertShortCode '[[colour|Blue|238,100,46]]'}}}</td>
+                      </tr>
+
+                      <tr>
+                        <td class="is-family-monospace is-size-5" style="font-family: monospace">[[medium|archival
+                          inkjet
+                          print|archival inkjet print]]</td>
+                        <td>{{{convertShortCode '[[medium|archival inkjet print|archival inkjet print]]'}}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+
+                  </p>
+                </div>
+              </form>
+            </article>
+          </div>
+        </div>
+      {{else}}
+        <p class="notification is-warning">
+          No TMS systems have been configured yet. {{#if user.roles.isAdmin}}You can
+            <a href="/config#tms">configure that now</a> if you wish.
+          {{else}}You should ask the admin user to set that up
+            now.{{/if}}
+        </p>
+      {{/if}}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <hr />
+      <pre class="query language-graphql">{{{query}}}</pre>
+    </div>
+  </section>
+
+  {{> tail}}
+</body>
+
+</html>

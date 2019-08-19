@@ -1456,3 +1456,170 @@ exports.factpedia = async (req, res) => {
 
   return res.render(`explore-o-matic/${template}`, req.templateValues)
 }
+
+exports.randomizer = async (req, res) => {
+  //  Make sure we are an admin user
+  if (req.user.roles.isAdmin !== true) return res.redirect('/')
+
+  //  Work out if we are on the randomizer or popularSearches, 'cause
+  //  we'll be needing to know this
+  const isRandomizer = (req.path.indexOf('randomizer') >= 0)
+  let returnUrl = '/explore-o-matic/randomizer'
+  let template = 'randomizer'
+
+  if (isRandomizer) {
+    req.templateValues.mode = 'randomizer'
+  } else {
+    req.templateValues.mode = 'popularSearches'
+    returnUrl = '/explore-o-matic/popularSearches'
+    template = 'popularSearches'
+  }
+
+  if (req.body.action) {
+    //  Get all the elastic search stuff
+    const config = new Config()
+
+    const baseTMS = config.getRootTMS()
+    if (baseTMS === null) {
+      return res.render('explore-o-matic/randomizer', req.templateValues)
+    }
+
+    const elasticsearchConfig = config.get('elasticsearch')
+    if (elasticsearchConfig === null) {
+      return res.render('explore-o-matic/randomizer', req.templateValues)
+    }
+    const esclient = new elasticsearch.Client(elasticsearchConfig)
+    const index = `randoms_${baseTMS}`
+    const type = 'random'
+
+    const graphQL = new GraphQL()
+    const queries = new Queries()
+
+    if (req.body.action.indexOf('deleteRandom') >= 0) {
+      const splitAction = req.body.action.split('|')
+      if (splitAction.length === 2) {
+        const id = splitAction[1]
+        await esclient.delete({
+          index,
+          type,
+          id
+        })
+        //  Kill the cache
+        await graphQL.fetch({
+          query: queries.get('killCache', '')
+        })
+        return setTimeout(() => {
+          res.redirect(returnUrl)
+        }, 2000)
+      }
+    }
+
+    if (req.body.action === 'addRandom') {
+      //  Build a new record to enter
+      //  Create the index if we need to
+      const exists = await esclient.indices.exists({
+        index
+      })
+      if (exists === false) {
+        await esclient.indices.create({
+          index
+        })
+      }
+
+      const body = {
+        random: {
+          en: req.body.randomEN,
+          'zh-hant': req.body.randomTC
+        }
+      }
+      await esclient.index({
+        index,
+        type,
+        body
+      })
+      //  Kill the cache
+      await graphQL.fetch({
+        query: queries.get('killCache', '')
+      })
+      return setTimeout(() => {
+        res.redirect(returnUrl)
+      }, 2000)
+    }
+
+    if (req.body.action === 'updateRandoms') {
+      const bulkThisArray = []
+      const newRandoms = {}
+      Object.entries(req.body).forEach((thing) => {
+        const key = thing[0]
+        const value = thing[1]
+        const keySplit = key.split('|')
+        const id = keySplit[0]
+        let field = null
+        if (keySplit.length === 2) {
+          field = keySplit[1]
+          if (!newRandoms[id]) {
+            newRandoms[id] = {
+              random: {
+                en: null,
+                'zh-hant': null
+              }
+            }
+          }
+          if (field === 'randomEN') newRandoms[id].random.en = value
+          if (field === 'randomTC') newRandoms[id].random['zh-hant'] = value
+        }
+      })
+
+      Object.entries(newRandoms).forEach((randomThing) => {
+        const _id = randomThing[0]
+        const doc = randomThing[1]
+        bulkThisArray.push({
+          update: {
+            _id
+          }
+        })
+        bulkThisArray.push({
+          doc
+        })
+      })
+
+      if (bulkThisArray.length > 0) {
+        await esclient.bulk({
+          index,
+          type,
+          body: bulkThisArray
+        })
+        // Note that we want to rebuld the randoms
+        //  Kill the cache
+        await graphQL.fetch({
+          query: queries.get('killCache', '')
+        })
+        return setTimeout(() => {
+          res.redirect(returnUrl)
+        }, 2000)
+      }
+    }
+  }
+
+  //  Go and get the randoms
+  const queries = new Queries()
+  const graphQL = new GraphQL()
+
+  //  This is the initial search query we are going to use to grab all the constituents
+  let searchFilter = `(per_page: 5000)`
+  if (!isRandomizer) {
+    searchFilter = `(per_page: 5000)`
+  }
+
+  //  Grab all the different maker types
+  const query = queries.get('randoms', searchFilter)
+  const payload = {
+    query
+  }
+  req.templateValues.query = query
+
+  const results = await graphQL.fetch(payload)
+  if (results.data && results.data.randoms) req.templateValues.randoms = results.data.randoms
+
+  return res.render(`explore-o-matic/${template}`, req.templateValues)
+}
