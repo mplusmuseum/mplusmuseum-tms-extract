@@ -507,7 +507,11 @@ exports.deleteIndexByIds = async (req, res) => {
         const subDirs = ['perfect', 'process', 'processed']
         const subFolder = String(Math.floor(id / 1000) * 1000)
         subDirs.forEach((subDir) => {
-          const idFilename = path.join(rootDir, 'imports', req.params.index, 'mplus', subDir, subFolder, `${id}.json`)
+          let idFilename = path.join(rootDir, 'imports', req.params.index, 'mplus', subDir, subFolder, `${id}.json`)
+          if (fs.existsSync(idFilename)) {
+            fs.unlinkSync(idFilename)
+          }
+          idFilename = path.join(rootDir, 'imports', req.params.index, 'mplus_staging', subDir, subFolder, `${id}.json`)
           if (fs.existsSync(idFilename)) {
             fs.unlinkSync(idFilename)
           }
@@ -518,8 +522,10 @@ exports.deleteIndexByIds = async (req, res) => {
   }
 
   //  Now we are here, we need to work out which ids we have a file for that we don't have an id for in the list
-  let checkDirectory = path.join(rootDir, 'imports', req.params.index, 'mplus')
-  if (!fs.existsSync(checkDirectory)) checkDirectory = path.join(rootDir, 'imports', req.params.index, 'mplus_staging')
+  let dirname = 'mplus'
+  let checkDirectory = path.join(rootDir, 'imports', req.params.index, dirname)
+  dirname = 'mplus_staging'
+  if (!fs.existsSync(checkDirectory)) checkDirectory = path.join(rootDir, 'imports', req.params.index, dirname)
   let idsFilename = path.join(checkDirectory, 'ids.json')
   const missingIds = []
   if (fs.existsSync(idsFilename)) {
@@ -527,9 +533,9 @@ exports.deleteIndexByIds = async (req, res) => {
     //  Loop through all the possible directories to see if we have files that aren't in the missingIds
     const subDirs = ['perfect', 'process', 'processed']
     subDirs.forEach((subDir) => {
-      if (fs.existsSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir))) {
-        fs.readdirSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir)).forEach((subSubDir) => {
-          fs.readdirSync(path.join(rootDir, 'imports', req.params.index, 'mplus', subDir, subSubDir)).forEach((file) => {
+      if (fs.existsSync(path.join(rootDir, 'imports', req.params.index, dirname, subDir))) {
+        fs.readdirSync(path.join(rootDir, 'imports', req.params.index, dirname, subDir)).forEach((subSubDir) => {
+          fs.readdirSync(path.join(rootDir, 'imports', req.params.index, dirname, subDir, subSubDir)).forEach((file) => {
             const fileSplit = file.split('.')
             if (fileSplit.length === 2) {
               const id = parseInt(fileSplit[0])
