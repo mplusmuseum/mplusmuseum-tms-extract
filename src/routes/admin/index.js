@@ -518,7 +518,9 @@ exports.deleteIndexByIds = async (req, res) => {
   }
 
   //  Now we are here, we need to work out which ids we have a file for that we don't have an id for in the list
-  const idsFilename = path.join(rootDir, 'imports', req.params.index, 'mplus', 'ids.json')
+  let checkDirectory = path.join(rootDir, 'imports', req.params.index, 'mplus')
+  if (!fs.existsSync(checkDirectory)) checkDirectory = path.join(rootDir, 'imports', req.params.index, 'mplus_staging')
+  let idsFilename = path.join(checkDirectory, 'ids.json')
   const missingIds = []
   if (fs.existsSync(idsFilename)) {
     const ids = JSON.parse(fs.readFileSync(idsFilename, 'utf-8'))
