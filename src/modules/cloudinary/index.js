@@ -887,6 +887,165 @@ const checkImagesHSL = () => {
 }
 exports.checkImagesHSL = checkImagesHSL
 
+/**
+ * This function looks for images that have colour information but don't
+ * have HSL data yet
+ */
+const checkImageStatus = () => {
+  const config = new Config()
+  const tmsLogger = logging.getTMSLogger()
+  const startTime = new Date().getTime()
+
+  tmsLogger.object(`Looking for images to HBL convert`, {
+    action: 'started checkImageStatus',
+    status: 'info'
+  })
+
+  const elements = [{
+    parent: 'Objects',
+    child: 'Object'
+  }]
+
+  const elasticsearchConfig = config.get('elasticsearch')
+  if (elasticsearchConfig === null || elasticsearchConfig === undefined) {
+    tmsLogger.object(`No elasticsearch defined`, {
+      action: 'finished checkImageStatus',
+      status: 'info',
+      ms: new Date().getTime() - startTime
+    })
+    return
+  }
+
+  elements.forEach((element) => {
+    //  Only carry on if we have a data and tms directory
+    const itemPath = path.join(rootDir, 'imports', element.parent)
+    if (!fs.existsSync(itemPath)) {
+      tmsLogger.object(`looking for: ${element.parent}`, {
+        action: 'finished checkImageStatus',
+        status: 'error',
+        element: element.parent,
+        itemPath,
+        ms: new Date().getTime() - startTime
+      })
+      return
+    }
+    let foundImageToCheck = false
+    const tmsses = config.tms
+    tmsses.forEach((tms) => {
+      if (foundImageToCheck === true) return
+      //  Check to see if a 'perfect' directory exists
+      const tmsDir = path.join(itemPath, tms.stub, 'perfect')
+      if (fs.existsSync(tmsDir)) {
+        if (foundImageToCheck === true) return
+        const subFolders = fs.readdirSync(tmsDir)
+        //  Loop through the subFolders
+        subFolders.forEach((subFolder) => {
+          if (foundImageToCheck === true) return
+          const files = fs.readdirSync(path.join(tmsDir, subFolder)).filter(file => {
+            const fileFragments = file.split('.')
+            if (fileFragments.length !== 2) return false
+            if (fileFragments[1] !== 'json') return false
+            return true
+          })
+          //  Loop through the files
+          files.forEach((file) => {
+            if (foundImageToCheck === true) return
+            const perfectFilename = path.join(tmsDir, subFolder, file)
+            const perfectFileRaw = fs.readFileSync(perfectFilename, 'utf-8')
+            const perfectFileJSON = JSON.parse(perfectFileRaw)
+
+            let saveFile = false
+            let imageSortScore = 0
+            let hasMainImage = false
+            let mainImageIsPublic = false
+            let mainImageIsMissing = true
+            let withOtherImages = false
+            let withImage = false
+            //  If the status is ok, then we can check the next part.
+            if (perfectFileJSON.remote && perfectFileJSON.remote.status && perfectFileJSON.remote.status === 'ok') {
+              if (perfectFileJSON.remote.images) {
+                Object.entries(perfectFileJSON.remote.images).forEach((image) => {
+                  const data = image[1]
+                  //  If we have a primary image
+                  if ('primaryDisplay' in data && data.primaryDisplay === true) {
+                    hasMainImage = true
+                    imageSortScore += 2
+                    //  If it's public, then we note that
+                    if ('publicAccess' in data && data.publicAccess === true) {
+                      mainImageIsPublic = true
+                      imageSortScore += 4
+                    }
+                    //  Most important it is valid, this marks it as with image
+                    if ('status' in data && data.status === 'ok' && data.public_id) {
+                      withImage = true
+                      mainImageIsMissing = false
+                      imageSortScore += 8
+                    }
+                  } else {
+                    //  If we havent already noted that there are other images, do that now.
+                    if (withOtherImages === false) imageSortScore += 1
+                    withOtherImages = true
+                  }
+                })
+              }
+
+              //  If we don't have any of the data then we need to make it
+              if (!('hasMainImage' in perfectFileJSON)) {
+                saveFile = true // Cause we need to add all these
+              } else {
+                // Check to see if anything has changed
+                if (perfectFileJSON.imageSortScore !== imageSortScore) saveFile = true
+                if (perfectFileJSON.hasMainImage !== hasMainImage) saveFile = true
+                if (perfectFileJSON.mainImageIsPublic !== mainImageIsPublic) saveFile = true
+                if (perfectFileJSON.mainImageIsMissing !== mainImageIsMissing) saveFile = true
+                if (perfectFileJSON.withOtherImages !== withOtherImages) saveFile = true
+                if (perfectFileJSON.withImage !== withImage) saveFile = true
+              }
+            }
+
+            //  But the data back into the database
+            if (saveFile === true) {
+              foundImageToCheck = true // Don't keep blasting through, just one at a time
+
+              perfectFileJSON.imageSortScore = imageSortScore
+              perfectFileJSON.hasMainImage = hasMainImage
+              perfectFileJSON.mainImageIsPublic = mainImageIsPublic
+              perfectFileJSON.mainImageIsMissing = mainImageIsMissing
+              perfectFileJSON.withOtherImages = withOtherImages
+              perfectFileJSON.withImage = withImage
+              const perfectFileJSONPretty = JSON.stringify(perfectFileJSON, null, 4)
+              fs.writeFileSync(perfectFilename, perfectFileJSONPretty, 'utf-8')
+
+              const id = parseInt(file.split('.')[0], 10)
+              const index = `${element.parent}_${tms.stub}`.toLowerCase()
+              const upsertItem = {
+                id,
+                imageSortScore,
+                hasMainImage,
+                mainImageIsPublic,
+                mainImageIsMissing,
+                withOtherImages,
+                withImage
+              }
+              const esclient = new elasticsearch.Client(elasticsearchConfig)
+              esclient.update({
+                index,
+                type: element.child.toLowerCase(),
+                id,
+                body: {
+                  doc: upsertItem,
+                  doc_as_upsert: true
+                }
+              })
+            }
+          })
+        })
+      }
+    })
+  })
+}
+exports.checkImageStatus = checkImageStatus
+
 exports.startUploading = () => {
   //  Remove the old interval timer
   clearInterval(global.cloudinaryTmr)
@@ -925,4 +1084,23 @@ exports.startColoring = () => {
   }, interval)
   checkImagesColor()
   checkImagesHSL()
+}
+
+exports.startChecking = () => {
+  //  Remove the old interval timer
+  clearInterval(global.checkStatusTmr)
+
+  //  See if we have an interval timer setting in the
+  //  timers part of the config, if not use the default
+  //  of 20,000 (20 seconds)
+  const config = new Config()
+  const timers = config.get('timers')
+  let interval = 20000
+  if (timers !== null && 'checkStatusTmr' in timers) {
+    interval = parseInt(timers.checkStatusTmr, 5000)
+  }
+  global.checkStatusTmr = setInterval(() => {
+    checkImageStatus()
+  }, interval)
+  checkImageStatus()
 }
