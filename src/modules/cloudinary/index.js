@@ -896,7 +896,7 @@ const checkImageStatus = () => {
   const tmsLogger = logging.getTMSLogger()
   const startTime = new Date().getTime()
 
-  tmsLogger.object(`Looking for images to HBL convert`, {
+  tmsLogger.object(`Looking for images to check the status of`, {
     action: 'started checkImageStatus',
     status: 'info'
   })
@@ -1027,6 +1027,13 @@ const checkImageStatus = () => {
                 withOtherImages,
                 withImage
               }
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
+              console.log(upsertItem)
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
+              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
               const esclient = new elasticsearch.Client(elasticsearchConfig)
               esclient.update({
                 index,
