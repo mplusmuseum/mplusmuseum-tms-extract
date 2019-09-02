@@ -198,6 +198,35 @@ const getClassifications = classifications => {
   return classificationsObj
 }
 
+const getArchivalLevelScore = classifications => {
+  let score = 0
+  if (!Array.isArray(classifications)) {
+    classifications = [classifications]
+  }
+  classifications.forEach((cat) => {
+    //  Get the area or category
+    if ('Classification' in cat) {
+      const catSplit = cat.Classification.split('-')[0]
+      //  If we have an category then put it there
+      if (catSplit === 'Archival Level') {
+        //  Add the languages if we have them
+        if ('Classification' in cat) {
+          const level = cat.Classification.replace('Archival Level-', '')
+          if (level === 'Fonds') score = 50
+          if (level === 'Sub-fonds') score = 46
+          if (level === 'Series') score = 42
+          if (level === 'Subseries') score = 38
+          if (level === 'Sub-subseries') score = 34
+          if (level === 'Piece') score = 30
+          if (level === 'File') score = 26
+          if (level === 'Item') score = 22
+        }
+      }
+    }
+  })
+  return score
+}
+
 const getDimensionDetails = dimensionDetails => {
   if (dimensionDetails === undefined || dimensionDetails === null) return null
   if (!Array.isArray(dimensionDetails)) dimensionDetails = [dimensionDetails]
@@ -391,6 +420,7 @@ const parseItem = item => {
     collectionName: getCollectionName(item.CollectionName),
     style: getStyle(item.Style),
     classification: getClassifications(item.AreaCat),
+    archivalLevelScore: getArchivalLevelScore(item.AreaCat),
     consituents: getConstituents(item.ObjectRelatedConstituents),
     exhibition: {
       ids: getExhibitionIds(item.RelatedExhibitionID),
