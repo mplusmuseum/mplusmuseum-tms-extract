@@ -4,6 +4,7 @@ const path = require('path')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../logging')
 const artisanalints = require('../../artisanalints')
+const utils = require('../../../modules/utils')
 
 // #########################################################################
 /*
@@ -196,6 +197,57 @@ const getClassifications = classifications => {
     }
   })
   return classificationsObj
+}
+
+const getThings = (classifications, thing) => {
+  const thingsObj = {
+    lang: {}
+  }
+  if (!Array.isArray(classifications)) {
+    classifications = [classifications]
+  }
+
+  classifications.forEach((cat) => {
+    let node = null
+    let lang = null
+    let title = null
+    let catSplit = null
+
+    //  Get the area or category
+
+    //  If we have an area then put it there
+    if ('Classification' in cat) {
+      node = 'Classification'
+      catSplit = cat[node].split('-')[0]
+      if (catSplit === thing) {
+        lang = 'en'
+        if (!(lang in thingsObj.lang)) {
+          thingsObj.lang[lang] = {
+            slug: [],
+            title: []
+          }
+        }
+        title = cat[node].replace(`${thing}-`, '')
+        thingsObj.lang[lang].title.push(title)
+        thingsObj.lang[lang].slug.push(utils.slugify(title))
+
+        if ('ClassificationTC' in cat) {
+          node = 'ClassificationTC'
+          lang = 'zh-hant'
+          if (!(lang in thingsObj.lang)) {
+            thingsObj.lang[lang] = {
+              slug: [],
+              title: []
+            }
+          }
+          title = cat[node]
+          thingsObj.lang[lang].title.push(title)
+          thingsObj.lang[lang].slug.push(title)
+        }
+      }
+    }
+  })
+  return thingsObj
 }
 
 const getArchivalLevelScore = classifications => {
@@ -415,11 +467,15 @@ const parseItem = item => {
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
     onView: parseInt(item.OnView, 10) === 1,
     objectNumber: item.ObjectNumber,
+    objectNumberSlug: utils.slugify(item.ObjectNumber),
     sortNumber: getSortnumber(item.SortNumber),
     department: getDepartment(item.Department),
     collectionName: getCollectionName(item.CollectionName),
     style: getStyle(item.Style),
     classification: getClassifications(item.AreaCat),
+    areas: getThings(item.AreaCat, 'Area'),
+    category: getThings(item.AreaCat, 'Category'),
+    archivalLevel: getThings(item.AreaCat, 'Archival Level'),
     archivalLevelScore: getArchivalLevelScore(item.AreaCat),
     consituents: getConstituents(item.ObjectRelatedConstituents),
     exhibition: {
@@ -432,17 +488,21 @@ const parseItem = item => {
     references: getReferences(item.ReferenceID),
     allORC: item.AllORC,
     title: {},
+    titleSlug: {},
     objectStatus: {},
+    objectStatusSlug: {},
     displayDate: {},
     beginDate: parseFloat(item.DateBegin),
     endDate: parseFloat(item.Dateend),
     dimension: {},
     dimensionDetails: getDimensionDetails(item.DimensionDetails),
     medium: {},
+    mediumSlug: {},
     creditLine: {},
     inscription: {},
     archiveDescription: {},
     objectName: {},
+    objectNameSlug: {},
     scopeNContent: {},
     scopeNContentHTML: {},
     baselineDescription: {},
@@ -451,17 +511,24 @@ const parseItem = item => {
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
   }
+
   //  Now drop in all the languages
   if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
   if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
+  if ('TitleEN' in item) newItem.titleSlug['en'] = utils.slugify(item.TitleEN)
+  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = item.TitleTC
   if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
   if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
+  if ('Objectstatus' in item) newItem.objectStatusSlug['en'] = utils.slugify(item.Objectstatus)
+  if ('ObjectstatusTC' in item) newItem.objectStatusSlug['zh-hant'] = item.ObjectstatusTC
   if ('Dated' in item) newItem.displayDate['en'] = item.Dated
   if ('DateTC' in item) newItem.displayDate['zh-hant'] = item.DateTC
   if ('Dimensions' in item) newItem.dimension['en'] = item.Dimensions
   if ('DimensionTC' in item) newItem.dimension['zh-hant'] = item.DimensionTC
   if ('Medium' in item) newItem.medium['en'] = item.Medium
   if ('MediumTC' in item) newItem.medium['zh-hant'] = item.MediumTC
+  if ('Medium' in item) newItem.mediumSlug['en'] = utils.slugify(item.Medium)
+  if ('MediumTC' in item) newItem.mediumSlug['zh-hant'] = item.MediumTC
   if ('CreditLine' in item) newItem.creditLine['en'] = item.CreditLine
   if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
   if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
@@ -472,6 +539,8 @@ const parseItem = item => {
   if ('ArchiveDescriptionTC' in item) newItem.archiveDescription['zh-hant'] = item.ArchiveDescriptionTC
   if ('ObjectName' in item) newItem.objectName['en'] = item.ObjectName
   if ('ObjectNameTC' in item) newItem.objectName['zh-hant'] = item.ObjectNameTC
+  if ('ObjectName' in item) newItem.objectNameSlug['en'] = utils.slugify(item.ObjectName)
+  if ('ObjectNameTC' in item) newItem.objectNameSlug['zh-hant'] = item.ObjectNameTC
 
   if ('ScopeNContent' in item) {
     //  If we have languages within the baselineDescription then we need to handle it
