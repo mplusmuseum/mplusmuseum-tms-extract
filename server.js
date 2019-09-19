@@ -538,8 +538,10 @@ if (buildOnly === false) {
   //  Make the lookup tables we'll need
   const makeLookups = require('./app/modules/makeLookups')
   makeLookups.constituentRoles.startFindConstituentRoles()
+  makeLookups.constituentMakers.startUpdateConstituentsAsMakers()
   makeLookups.randomObjects.startCreatingRandomSelection()
   makeLookups.autocomplete.startMakeAutocomplete()
+  makeLookups.objectExtraDetails.startExtraDetails()
 
   console.log('')
   console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)

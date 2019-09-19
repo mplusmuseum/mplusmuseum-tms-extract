@@ -5,7 +5,7 @@ const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../../modules/logging')
 const elasticsearch = require('elasticsearch')
 
-exports.updateConstituentsAsMakers = async (tms) => {
+const updateConstituentsAsMakers = async (tms) => {
   //  Start the logger
   const tmsLogger = logging.getTMSLogger()
 
@@ -97,11 +97,12 @@ exports.updateConstituentsAsMakers = async (tms) => {
               constituents[role.id] = {
                 isMaker: false,
                 objectCount: 0,
+                objectCountPublic: 0,
                 roles: []
               }
             }
             constituents[role.id].objectCount++ // Tally up the number of objects "made" by this constituent
-
+            if ('publicAccess' in objectJSON && objectJSON.publicAccess === true) constituents[role.id].objectCountPublic++
             if (role.roles) {
               Object.entries(role.roles).forEach((langRole) => {
                 const thisRole = langRole[1]
@@ -133,6 +134,7 @@ exports.updateConstituentsAsMakers = async (tms) => {
       doc: {
         isMaker: data.isMaker,
         objectCount: data.objectCount,
+        objectCountPublic: data.objectCountPublic,
         roles: data.roles
       }
     })
@@ -144,4 +146,23 @@ exports.updateConstituentsAsMakers = async (tms) => {
       body: bulkThisArray
     })
   }
+}
+exports.updateConstituentsAsMakers = updateConstituentsAsMakers
+
+exports.startUpdateConstituentsAsMakers = () => {
+  //  Remove the old interval timer
+  // clearInterval(global.findConstituentRoles)
+  //  See if we have an interval timer setting in the
+  //  timers part of the config, if not use the default
+  //  of 20,000 (20 seconds)
+  const config = new Config()
+  if (!config) return
+  if (!config.tms) return
+  const interval = 1000 * 60 * 60 * 6 // Every 6 hours
+  config.tms.forEach((tms) => {
+    updateConstituentsAsMakers(tms.stub)
+    setTimeout(() => {
+      updateConstituentsAsMakers(tms.stub)
+    }, interval)
+  })
 }

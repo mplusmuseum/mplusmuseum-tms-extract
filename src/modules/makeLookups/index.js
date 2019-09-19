@@ -1,3 +1,5 @@
 exports.constituentRoles = require('./constituentRoles')
+exports.constituentMakers = require('./constituentMakers')
+exports.objectExtraDetails = require('./objectExtraDetails')
 exports.randomObjects = require('./randomObjects')
 exports.autocomplete = require('./autocomplete')
