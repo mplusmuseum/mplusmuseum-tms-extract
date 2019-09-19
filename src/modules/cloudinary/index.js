@@ -1027,13 +1027,6 @@ const checkImageStatus = () => {
                 withOtherImages,
                 withImage
               }
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
-              console.log(upsertItem)
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
-              console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=---=-=-=-=-=-=-=-=-=-=-')
               const esclient = new elasticsearch.Client(elasticsearchConfig)
               esclient.update({
                 index,

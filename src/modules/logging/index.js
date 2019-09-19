@@ -63,7 +63,7 @@ class ESLogger {
       datetime: new Date(),
       data: data
     }
-    console.log(logData)
+    // console.log(logData)
     /*
     const config = new Config()
 
