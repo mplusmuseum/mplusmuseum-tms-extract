@@ -3,6 +3,7 @@ const path = require('path')
 const Config = require('../../../classes/config')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../../modules/logging')
+const utils = require('../../../modules/utils')
 // const elasticsearch = require('elasticsearch')
 
 const getMakers = async (tms) => {
@@ -69,9 +70,27 @@ const getMakers = async (tms) => {
       const objectJSON = JSON.parse(objectRaw)
       if (objectJSON.publicAccess) {
         langs.forEach((lang) => {
-          if (objectJSON.classification && objectJSON.classification.area && objectJSON.classification.area.areacat && objectJSON.classification.area.areacat[lang] && objectJSON.classification.area.areacat[lang] !== '' && !dict.areas.includes(`${objectJSON.classification.area.areacat[lang]}:${objectJSON.classification.area.areacat[lang]}`)) dict.areas.push(`${objectJSON.classification.area.areacat[lang]}:${objectJSON.classification.area.areacat[lang]}`)
-          if (objectJSON.classification && objectJSON.classification.category && objectJSON.classification.category.areacat && objectJSON.classification.category.areacat[lang] && objectJSON.classification.category.areacat[lang] !== '' && !dict.categories.includes(`${objectJSON.classification.category.areacat[lang]}:${objectJSON.classification.category.areacat[lang]}`)) dict.categories.push(`${objectJSON.classification.category.areacat[lang]}:${objectJSON.classification.category.areacat[lang]}`)
-          if (objectJSON.objectName && objectJSON.objectName[lang] && objectJSON.objectName[lang] !== '' && !dict.objectNames.includes(objectJSON.objectName[lang])) dict.objectNames.push(objectJSON.objectName[lang])
+          if (objectJSON.areas && objectJSON.areas.lang[lang] && objectJSON.areas.lang[lang].title) {
+            if (!Array.isArray(objectJSON.areas.lang[lang].title)) objectJSON.areas.lang[lang].title = [objectJSON.areas.lang[lang].title]
+            objectJSON.areas.lang[lang].title.forEach((title) => {
+              let slug = utils.slugify(title)
+              if (slug === '') slug = title
+              if (!dict.areas.includes(`${title}:${slug}`)) dict.areas.push(`${title}:${slug}`)
+            })
+          }
+          if (objectJSON.category && objectJSON.category.lang[lang] && objectJSON.category.lang[lang].title) {
+            if (!Array.isArray(objectJSON.category.lang[lang].title)) objectJSON.category.lang[lang].title = [objectJSON.category.lang[lang].title]
+            objectJSON.category.lang[lang].title.forEach((title) => {
+              let slug = utils.slugify(title)
+              if (slug === '') slug = title
+              if (!dict.categories.includes(`${title}:${slug}`)) dict.categories.push(`${title}:${slug}`)
+            })
+          }
+          if (objectJSON.objectName && objectJSON.objectName[lang] && objectJSON.objectName[lang] !== '') {
+            let slug = utils.slugify(objectJSON.objectName[lang])
+            if (slug === '') slug = objectJSON.objectName[lang]
+            if (!dict.objectNames.includes(`${objectJSON.objectName[lang]}:${slug}`)) dict.objectNames.push(`${objectJSON.objectName[lang]}:${slug}`)
+          }
           let wordArray = null
           topLevelNodes.forEach((node) => {
             if (objectJSON[node] && objectJSON[node][lang] && objectJSON[node][lang] !== '') {
@@ -156,7 +175,7 @@ const getMakers = async (tms) => {
     }
   })
   dict.keywords = newKeywords
-  fs.writeFileSync(path.join(rootDir, 'autocomplete.json'), JSON.stringify(dict), 'utf-8')
+  fs.writeFileSync(path.join(rootDir, 'autocomplete.json'), JSON.stringify(dict, null, 4), 'utf-8')
 }
 
 exports.startMakeAutocomplete = () => {
