@@ -69,28 +69,61 @@ const getMakers = async (tms) => {
       const objectRaw = fs.readFileSync(path.join(tmsProcessedDir, subFolder, file), 'utf-8')
       const objectJSON = JSON.parse(objectRaw)
       if (objectJSON.publicAccess) {
+        //  Do the classifications
+        if (objectJSON.classification) {
+          //  Areas
+          if (objectJSON.classification.area) {
+            if (!Array.isArray(objectJSON.classification.area)) objectJSON.classification.area = [objectJSON.classification.area]
+            objectJSON.classification.area.forEach((thing) => {
+              if (thing.areacat.en) {
+                let slug = utils.slugify(thing.areacat['en'])
+                if (!dict.areas.includes(`${thing.areacat['en']}:${slug}`)) dict.areas.push(`${thing.areacat['en']}:${slug}`)
+                if ('zh-hant' in thing.areacat) {
+                  if (!dict.areas.includes(`${thing.areacat['zh-hant']}:${slug}`)) dict.areas.push(`${thing.areacat['zh-hant']}:${slug}`)
+                }
+              }
+            })
+          }
+          //  category
+          if (objectJSON.classification.category) {
+            if (!Array.isArray(objectJSON.classification.category)) objectJSON.classification.category = [objectJSON.classification.category]
+            objectJSON.classification.category.forEach((thing) => {
+              if (thing.areacat.en) {
+                let slug = utils.slugify(thing.areacat['en'])
+                if (!dict.categories.includes(`${thing.areacat['en']}:${slug}`)) dict.categories.push(`${thing.areacat['en']}:${slug}`)
+                if ('zh-hant' in thing.areacat) {
+                  if (!dict.categories.includes(`${thing.areacat['zh-hant']}:${slug}`)) dict.categories.push(`${thing.areacat['zh-hant']}:${slug}`)
+                }
+              }
+            })
+          }
+        }
+        /*
+        if (objectJSON.areas && objectJSON.areas.lang[lang] && objectJSON.areas.lang[lang].title) {
+          if (!Array.isArray(objectJSON.areas.lang[lang].title)) objectJSON.areas.lang[lang].title = [objectJSON.areas.lang[lang].title]
+          objectJSON.areas.lang[lang].title.forEach((title) => {
+            let slug = utils.slugify(title)
+            if (slug === '') slug = title
+            if (!dict.areas.includes(`${title}:${slug}`)) dict.areas.push(`${title}:${slug}`)
+          })
+        }
+        if (objectJSON.category && objectJSON.category.lang[lang] && objectJSON.category.lang[lang].title) {
+          if (!Array.isArray(objectJSON.category.lang[lang].title)) objectJSON.category.lang[lang].title = [objectJSON.category.lang[lang].title]
+          objectJSON.category.lang[lang].title.forEach((title) => {
+            let slug = utils.slugify(title)
+            if (slug === '') slug = title
+            if (!dict.categories.includes(`${title}:${slug}`)) dict.categories.push(`${title}:${slug}`)
+          })
+        }
+        */
+
         langs.forEach((lang) => {
-          if (objectJSON.areas && objectJSON.areas.lang[lang] && objectJSON.areas.lang[lang].title) {
-            if (!Array.isArray(objectJSON.areas.lang[lang].title)) objectJSON.areas.lang[lang].title = [objectJSON.areas.lang[lang].title]
-            objectJSON.areas.lang[lang].title.forEach((title) => {
-              let slug = utils.slugify(title)
-              if (slug === '') slug = title
-              if (!dict.areas.includes(`${title}:${slug}`)) dict.areas.push(`${title}:${slug}`)
-            })
-          }
-          if (objectJSON.category && objectJSON.category.lang[lang] && objectJSON.category.lang[lang].title) {
-            if (!Array.isArray(objectJSON.category.lang[lang].title)) objectJSON.category.lang[lang].title = [objectJSON.category.lang[lang].title]
-            objectJSON.category.lang[lang].title.forEach((title) => {
-              let slug = utils.slugify(title)
-              if (slug === '') slug = title
-              if (!dict.categories.includes(`${title}:${slug}`)) dict.categories.push(`${title}:${slug}`)
-            })
-          }
           if (objectJSON.objectName && objectJSON.objectName[lang] && objectJSON.objectName[lang] !== '') {
             let slug = utils.slugify(objectJSON.objectName[lang])
             if (slug === '') slug = objectJSON.objectName[lang]
             if (!dict.objectNames.includes(`${objectJSON.objectName[lang]}:${slug}`)) dict.objectNames.push(`${objectJSON.objectName[lang]}:${slug}`)
           }
+
           let wordArray = null
           topLevelNodes.forEach((node) => {
             if (objectJSON[node] && objectJSON[node][lang] && objectJSON[node][lang] !== '') {
