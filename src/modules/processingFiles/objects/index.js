@@ -154,45 +154,52 @@ const getClassifications = classifications => {
 
       //  If we have an area then put it there
       if (catSplit === 'Area') {
-        classificationsObj.area = {
+        const areaObj = {
           rank: parseInt(cat.Displayorder, 10),
           areacat: {}
         }
         //  Add the languages if we have them
         if ('Classification' in cat) {
-          classificationsObj.area.areacat['en'] = cat.Classification.replace('Area-', '')
+          areaObj.areacat['en'] = cat.Classification.replace('Area-', '')
         }
         if ('ClassificationTC' in cat) {
-          classificationsObj.area.areacat['zh-hant'] = cat.ClassificationTC
+          areaObj.areacat['zh-hant'] = cat.ClassificationTC
         }
+        if (!classificationsObj.area) classificationsObj.area = []
+        classificationsObj.area.push(areaObj)
       }
+
       //  If we have an category then put it there
       if (catSplit === 'Category') {
-        classificationsObj.category = {
+        const categoryObj = {
           rank: parseInt(cat.Displayorder, 10),
           areacat: {}
         }
         //  Add the languages if we have them
         if ('Classification' in cat) {
-          classificationsObj.category.areacat['en'] = cat.Classification.replace('Category-', '')
+          categoryObj.areacat['en'] = cat.Classification.replace('Category-', '')
         }
         if ('ClassificationTC' in cat) {
-          classificationsObj.category.areacat['zh-hant'] = cat.ClassificationTC
+          categoryObj.areacat['zh-hant'] = cat.ClassificationTC
         }
+        if (!classificationsObj.category) classificationsObj.category = []
+        classificationsObj.category.push(categoryObj)
       }
       //  If we have an category then put it there
       if (catSplit === 'Archival Level') {
-        classificationsObj.archivalLevel = {
+        const archivalLevelObj = {
           rank: parseInt(cat.Displayorder, 10),
           areacat: {}
         }
         //  Add the languages if we have them
         if ('Classification' in cat) {
-          classificationsObj.archivalLevel.areacat['en'] = cat.Classification.replace('Archival Level-', '')
+          archivalLevelObj.areacat['en'] = cat.Classification.replace('Archival Level-', '')
         }
         if ('ClassificationTC' in cat) {
-          classificationsObj.archivalLevel.areacat['zh-hant'] = cat.ClassificationTC
+          archivalLevelObj.areacat['zh-hant'] = cat.ClassificationTC
         }
+        if (!classificationsObj.archivalLevel) classificationsObj.archivalLevel = []
+        classificationsObj.archivalLevel.push(archivalLevelObj)
       }
     }
   })
