@@ -4,6 +4,7 @@ const path = require('path')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../logging')
 const artisanalints = require('../../artisanalints')
+const utils = require('../../utils')
 
 // #########################################################################
 /*
@@ -60,6 +61,7 @@ const parseItem = item => {
     constituentID: parseInt(item.AuthorID, 10),
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
     name: {},
+    slug: null,
     type: 'ConstituentType' in item ? item.ConstituentType : null,
     gender: {},
     displayBio: {},
@@ -90,6 +92,7 @@ const parseItem = item => {
 
   // Grab extra name information
   if ('Name' in item) {
+    newItem.slug = utils.slugify(item.Name)
     newItem.name['en'] = {
       'displayName': item.Name
     }

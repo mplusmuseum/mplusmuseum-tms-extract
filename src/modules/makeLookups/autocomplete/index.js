@@ -6,7 +6,7 @@ const logging = require('../../../modules/logging')
 const utils = require('../../../modules/utils')
 // const elasticsearch = require('elasticsearch')
 
-const getMakers = async (tms) => {
+const makeAutocomplete = async (tms) => {
   const tmsLogger = logging.getTMSLogger()
 
   tmsLogger.object(`starting getAreas`, {
@@ -222,11 +222,9 @@ exports.startMakeAutocomplete = () => {
   if (!config.tms) return
   // const interval = 1000 * 60 * 60 * 24 // 24 hours
   config.tms.forEach((tms) => {
-    getMakers(tms.stub)
-    /*
+    makeAutocomplete(tms.stub)
     setTimeout(() => {
-      createRandomSelection(tms.stub)
-    }, 1000 * 60 * 6)
-    */
+      makeAutocomplete(tms.stub)
+    }, 1000 * 60 * 60 * 5.8)
   })
 }

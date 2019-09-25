@@ -542,6 +542,7 @@ if (buildOnly === false) {
   makeLookups.randomObjects.startCreatingRandomSelection()
   makeLookups.autocomplete.startMakeAutocomplete()
   makeLookups.objectExtraDetails.startExtraDetails()
+  makeLookups.makerByCategory.startMakersByCategory()
 
   console.log('')
   console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
