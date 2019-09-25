@@ -5,7 +5,8 @@
   <article class="tile is-child box" style="color: {{predominant.foreground}}; background:{{predominant.background}}">
     {{#if mainImage}}
       <figure class="image">
-        <a href="/explore-o-matic/object/{{id}}"><img src="http://res.cloudinary.com/{{cloudname}}/image/upload/v{{mainImage.version}}/{{mainImage.public_id}}.jpg"></a>
+        <a href="/explore-o-matic/object/{{id}}"><img
+            src="http://res.cloudinary.com/{{cloudname}}/image/upload/v{{mainImage.version}}/{{mainImage.public_id}}.jpg"></a>
       </figure>
       <br />
     {{/if}}
@@ -14,7 +15,8 @@
         <a href="/explore-o-matic/constituent/{{id}}" class="button cardButton" style="background: white">{{name}}</a>
       {{/each}}
     </p>
-    <h1 class="title" style="color: inherit"><a href="/explore-o-matic/object/{{id}}" style="color: inherit">{{#if title}}{{title}}
+    <h1 class="title" style="color: inherit"><a href="/explore-o-matic/object/{{id}}"
+        style="color: inherit">{{#if title}}{{title}}
         {{else}}&nbsp;{{/if}}{{#if displayDate}},
           {{displayDate}}{{/if}}</a></h1>
     <table class="table is-hoverable is-fullwidth is-striped">
@@ -46,7 +48,8 @@
         <td class="has-text-weight-bold">collectionType</td>
         <td>
           {{#if collectionType}}
-            <a href="/explore-o-matic/collectionType/{{collectionType}}" class="button cardButton">{{collectionType}}</a>
+            <a href="/explore-o-matic/collectionType/{{collectionType}}"
+              class="button cardButton">{{collectionType}}</a>
           {{else}}
             &nbsp;
           {{/if}}
@@ -56,7 +59,8 @@
         <td class="has-text-weight-bold">collectionCode</td>
         <td>
           {{#if collectionCode}}
-            <a href="/explore-o-matic/collectionCode/{{collectionCode}}" class="button cardButton">{{collectionCode}}</a>
+            <a href="/explore-o-matic/collectionCode/{{collectionCode}}"
+              class="button cardButton">{{collectionCode}}</a>
           {{else}}
             &nbsp;
           {{/if}}
@@ -66,7 +70,8 @@
         <td class="has-text-weight-bold">collectionName</td>
         <td>
           {{#if collectionName}}
-            <a href="/explore-o-matic/collectionName/{{collectionName}}" class="button cardButton">{{collectionName}}</a>
+            <a href="/explore-o-matic/collectionName/{{collectionName}}"
+              class="button cardButton">{{collectionName}}</a>
           {{else}}
             &nbsp;
           {{/if}}
@@ -76,7 +81,10 @@
         <td class="has-text-weight-bold">archivalLevel</td>
         <td>
           {{#if classification.archivalLevel}}
-            <a href="/explore-o-matic/archivalLevel/{{classification.archivalLevel.stub}}" class="button cardButton">{{classification.archivalLevel.title}}</a>
+            {{#each classification.archivalLevel}}
+
+              <a href="/explore-o-matic/archivalLevel/{{stub}}" class="button cardButton">{{title}}</a>
+            {{/each}}
           {{else}}
             &nbsp;
           {{/if}}
@@ -106,7 +114,8 @@
         <td class="has-text-weight-bold">objectStatus</td>
         <td>
           {{#if objectStatus}}
-            <a href="/explore-o-matic/objectStatus/{{objectStatus.stub}}" class="button cardButton">{{objectStatus.title}}</a>
+            <a href="/explore-o-matic/objectStatus/{{objectStatus.stub}}"
+              class="button cardButton">{{objectStatus.title}}</a>
           {{else}}
             &nbsp;
           {{/if}}
@@ -136,7 +145,9 @@
         <td class="has-text-weight-bold">area</td>
         <td>
           {{#if classification.area}}
-            <a href="/explore-o-matic/area/{{classification.area.stub}}" class="button cardButton">{{classification.area.title}}</a>
+            {{#each classification.area}}
+              <a href="/explore-o-matic/area/{{stub}}" class="button cardButton">{{title}}</a>
+            {{/each}}
           {{else}}
             &nbsp;
           {{/if}}
@@ -146,7 +157,9 @@
         <td class="has-text-weight-bold">category</td>
         <td>
           {{#if classification.category}}
-            <a href="/explore-o-matic/category/{{classification.category.stub}}" class="button cardButton">{{classification.category.title}}</a>
+            {{#each classification.category}}
+              <a href="/explore-o-matic/category/{{stub}}" class="button cardButton">{{title}}</a>
+            {{/each}}
           {{else}}
             &nbsp;
           {{/if}}

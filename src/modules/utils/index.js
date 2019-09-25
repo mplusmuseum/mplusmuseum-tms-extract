@@ -4,7 +4,7 @@ exports.slugify = (string) => {
   const b = 'aaaaaaaaceeeeghiiiimnnnoooooprssstuuuuuwxyz------'
   const p = new RegExp(a.split('').join('|'), 'g')
 
-  return string.toString().toLowerCase()
+  let newString = string.toString().toLowerCase()
     .replace(/\s+/g, '-') // Replace spaces with -
     .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
     .replace(/&/g, '-and-') // Replace & with 'and'
@@ -12,6 +12,10 @@ exports.slugify = (string) => {
     .replace(/\-\-+/g, '-') // Replace multiple - with single -
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, '') // Trim - from end of text
+  if (newString === null || newString.trim() === '') {
+    newString = string.toString().replace(/\//g, '-').replace(/\\/g, '-')
+  }
+  return newString
 }
 
 function hexToRgb (hex) {

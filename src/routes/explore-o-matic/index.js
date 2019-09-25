@@ -75,23 +75,40 @@ const stubObjects = (objects) => {
       }
     }
     if (object.classification) {
-      if (object.classification.area && !object.classification.area.stub) {
-        object.classification.area = {
-          title: object.classification.area,
-          stub: object.classification.area.replace(/\//g, '_')
-        }
+      if (object.classification.area) {
+        if (!Array.isArray(object.classification.area)) object.classification.area = [object.classification.area]
+        const newResults = []
+        object.classification.area.forEach((title) => {
+          newResults.push({
+            title,
+            stub: utils.slugify(title)
+          })
+        })
+        object.classification.area = newResults
       }
-      if (object.classification.category && !object.classification.category.stub) {
-        object.classification.category = {
-          title: object.classification.category,
-          stub: object.classification.category.replace(/\//g, '_')
-        }
+
+      if (object.classification.category) {
+        if (!Array.isArray(object.classification.category)) object.classification.category = [object.classification.category]
+        const newResults = []
+        object.classification.category.forEach((title) => {
+          newResults.push({
+            title,
+            stub: utils.slugify(title)
+          })
+        })
+        object.classification.category = newResults
       }
-      if (object.classification.archivalLevel && !object.classification.archivalLevel.stub) {
-        object.classification.archivalLevel = {
-          title: object.classification.archivalLevel,
-          stub: object.classification.archivalLevel.replace(/\//g, '_')
-        }
+
+      if (object.classification.archivalLevel) {
+        if (!Array.isArray(object.classification.archivalLevel)) object.classification.archivalLevel = [object.classification.archivalLevel]
+        const newResults = []
+        object.classification.archivalLevel.forEach((title) => {
+          newResults.push({
+            title,
+            stub: utils.slugify(title)
+          })
+        })
+        object.classification.archivalLevel = newResults
       }
     }
     return object

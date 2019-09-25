@@ -249,7 +249,7 @@ const getThings = (classifications, thing) => {
           }
           title = cat[node]
           thingsObj.lang[lang].title.push(title)
-          thingsObj.lang[lang].slug.push(title)
+          thingsObj.lang[lang].slug.push(utils.slugify(title))
         }
       }
     }
@@ -520,14 +520,15 @@ const parseItem = item => {
   }
 
   //  Now drop in all the languages
+  if ('TitleEN' in item && 'ObjectNumber' in item) newItem.slug = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
   if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
   if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
-  if ('TitleEN' in item) newItem.titleSlug['en'] = utils.slugify(item.TitleEN)
-  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = item.TitleTC
+  if ('TitleEN' in item) newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
+  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
   if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
   if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
   if ('Objectstatus' in item) newItem.objectStatusSlug['en'] = utils.slugify(item.Objectstatus)
-  if ('ObjectstatusTC' in item) newItem.objectStatusSlug['zh-hant'] = item.ObjectstatusTC
+  if ('ObjectstatusTC' in item) newItem.objectStatusSlug['zh-hant'] = utils.slugify(item.ObjectstatusTC)
   if ('Dated' in item) newItem.displayDate['en'] = item.Dated
   if ('DateTC' in item) newItem.displayDate['zh-hant'] = item.DateTC
   if ('Dimensions' in item) newItem.dimension['en'] = item.Dimensions
@@ -535,7 +536,7 @@ const parseItem = item => {
   if ('Medium' in item) newItem.medium['en'] = item.Medium
   if ('MediumTC' in item) newItem.medium['zh-hant'] = item.MediumTC
   if ('Medium' in item) newItem.mediumSlug['en'] = utils.slugify(item.Medium)
-  if ('MediumTC' in item) newItem.mediumSlug['zh-hant'] = item.MediumTC
+  if ('MediumTC' in item) newItem.mediumSlug['zh-hant'] = utils.slugify(item.MediumTC)
   if ('CreditLine' in item) newItem.creditLine['en'] = item.CreditLine
   if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
   if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
