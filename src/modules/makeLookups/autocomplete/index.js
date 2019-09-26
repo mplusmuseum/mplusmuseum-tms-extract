@@ -4,7 +4,7 @@ const Config = require('../../../classes/config')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../../modules/logging')
 const utils = require('../../../modules/utils')
-// const elasticsearch = require('elasticsearch')
+const elasticsearch = require('elasticsearch')
 
 const makeAutocomplete = async (tms) => {
   const tmsLogger = logging.getTMSLogger()
@@ -208,7 +208,33 @@ const makeAutocomplete = async (tms) => {
     }
   })
   dict.keywords = newKeywords
+  //  Put the data into the database
   fs.writeFileSync(path.join(rootDir, 'autocomplete.json'), JSON.stringify(dict, null, 4), 'utf-8')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `lookups_${tms}`
+  const type = 'lookup'
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists !== true) {
+    await esclient.indices.create({
+      index
+    })
+  }
+
+  const data = {
+    id: 'autocomplete',
+    data: JSON.stringify(dict)
+  }
+  esclient.update({
+    index,
+    type,
+    id: 'autocomplete',
+    body: {
+      doc: data,
+      doc_as_upsert: true
+    }
+  })
 }
 
 exports.startMakeAutocomplete = () => {

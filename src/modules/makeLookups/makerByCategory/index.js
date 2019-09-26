@@ -4,8 +4,7 @@ const Config = require('../../../classes/config')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../logging')
 const utils = require('../../../modules/utils')
-
-// const elasticsearch = require('elasticsearch')
+const elasticsearch = require('elasticsearch')
 
 const getMakersByCategory = async (tms) => {
   const tmsLogger = logging.getTMSLogger()
@@ -122,6 +121,31 @@ const getMakersByCategory = async (tms) => {
 
   //  Put the data into the database
   fs.writeFileSync(path.join(rootDir, 'makersByCategory.json'), JSON.stringify(dict, null, 4), 'utf-8')
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  const index = `lookups_${tms}`
+  const type = 'lookup'
+  const exists = await esclient.indices.exists({
+    index
+  })
+  if (exists !== true) {
+    await esclient.indices.create({
+      index
+    })
+  }
+
+  const data = {
+    id: 'makersByCategory',
+    data: JSON.stringify(dict)
+  }
+  esclient.update({
+    index,
+    type,
+    id: 'makersByCategory',
+    body: {
+      doc: data,
+      doc_as_upsert: true
+    }
+  })
 }
 
 exports.startMakersByCategory = () => {
