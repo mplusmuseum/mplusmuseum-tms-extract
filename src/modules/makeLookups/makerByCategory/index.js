@@ -56,6 +56,37 @@ const getMakersByCategory = async (tms) => {
   }
 
   const constituentProcessedDir = path.join(rootDir, 'imports', 'Constituents', tms, 'processed')
+  if (!fs.existsSync(constituentProcessedDir)) {
+    tmsLogger.object(`No elasticsearch constituentProcessedDir for tms ${tms}`, {
+      action: 'finished createRandomSelection',
+      tms,
+      status: 'info',
+      ms: new Date().getTime() - startTime
+    })
+    return
+  }
+
+  //  Grab all the type of things that are valid makers
+  let records = null
+  const esclient = new elasticsearch.Client(elasticsearchConfig)
+  try {
+    records = await esclient.search({
+      index: `config_ismakers_${tms}`,
+      type: 'config_isMaker',
+      body: {
+        size: 100
+      }
+    })
+  } catch (er) {
+    records = null
+  }
+  const validMakers = []
+  if (records !== null && records.hits && records.hits.hits) {
+    const dbMakers = records.hits.hits.map((record) => record._source)
+    dbMakers.forEach((type) => {
+      if (type.value === 'true') validMakers.push(type.id)
+    })
+  }
 
   const subFolders = fs.readdirSync(tmsProcessedDir)
   subFolders.forEach((subFolder) => {
@@ -86,10 +117,17 @@ const getMakersByCategory = async (tms) => {
                     }
                   }
                   //  Now push the constituent IDs onto the stack
-                  if (objectJSON.consituents && objectJSON.consituents.ids) {
+                  if (objectJSON.consituents && objectJSON.consituents.ids && objectJSON.consituents.idsToRoleRank) {
+                    const idsToRoleRank = JSON.parse(objectJSON.consituents.idsToRoleRank)
                     if (!Array.isArray(objectJSON.consituents.ids)) objectJSON.consituents.ids = [objectJSON.consituents.ids]
+                    const idsToRoleMap = {}
+                    if (Array.isArray(idsToRoleRank)) {
+                      idsToRoleRank.forEach((row) => {
+                        idsToRoleMap[row.id] = row
+                      })
+                    }
                     objectJSON.consituents.ids.forEach((id) => {
-                      if (!dict.categories.lang[lang][thing.areacat[lang]].ids.includes(id)) {
+                      if (!dict.categories.lang[lang][thing.areacat[lang]].ids.includes(id) && idsToRoleMap[id] && idsToRoleMap[id].roles && ((idsToRoleMap[id].roles['en'] && validMakers.includes(idsToRoleMap[id].roles['en'])) || (idsToRoleMap[id].roles['zh-hant'] && validMakers.includes(idsToRoleMap[id].roles['zh-hant'])))) {
                         //  Now go and read in the constituent and see if we can add them
                         const constituentFilename = path.join(constituentProcessedDir, String(Math.floor(id / 1000) * 1000), `${id}.json`)
                         if (fs.existsSync(constituentFilename)) {
@@ -121,7 +159,6 @@ const getMakersByCategory = async (tms) => {
 
   //  Put the data into the database
   fs.writeFileSync(path.join(rootDir, 'makersByCategory.json'), JSON.stringify(dict, null, 4), 'utf-8')
-  const esclient = new elasticsearch.Client(elasticsearchConfig)
   const index = `lookups_${tms}`
   const type = 'lookup'
   const exists = await esclient.indices.exists({
