@@ -543,6 +543,7 @@ if (buildOnly === false) {
   makeLookups.autocomplete.startMakeAutocomplete()
   makeLookups.objectExtraDetails.startExtraDetails()
   makeLookups.makerByCategory.startMakersByCategory()
+  makeLookups.makerByStory.startMakeMakerByStory()
 
   console.log('')
   console.log('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-'.rainbow)
