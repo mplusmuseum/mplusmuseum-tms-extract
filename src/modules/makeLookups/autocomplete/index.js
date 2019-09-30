@@ -193,7 +193,7 @@ const makeAutocomplete = async (tms) => {
       const constituentJSON = JSON.parse(constituentRaw)
       if (constituentJSON.publicAccess) {
         langs.forEach((lang) => {
-          if (constituentJSON.name && constituentJSON.name[lang] && constituentJSON.name[lang].displayName && constituentJSON.name[lang].displayName !== '' && !dict.constituents.includes(`${constituentJSON.constituentID}:${constituentJSON.name[lang].displayName}`)) dict.constituents.push(`${constituentJSON.constituentID}:${constituentJSON.name[lang].displayName}`)
+          if (constituentJSON.name && constituentJSON.name[lang] && constituentJSON.name[lang].displayName && constituentJSON.name[lang].displayName !== '' && !dict.constituents.includes(`${constituentJSON.name[lang].displayName}:${utils.slugify(constituentJSON.name['en'].displayName)}`)) dict.constituents.push(`${constituentJSON.name[lang].displayName}:${utils.slugify(constituentJSON.name['en'].displayName)}`)
         })
       }
     })
