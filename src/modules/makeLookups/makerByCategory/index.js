@@ -139,7 +139,7 @@ const getMakersByCategory = async (tms) => {
                               dict.categories.lang[lang][thing.areacat[lang]].full.push({
                                 id: id,
                                 name: constituentJSON.name[lang].displayName,
-                                slug: utils.slugify(constituentJSON.name[lang].displayName),
+                                slug: utils.slugify(constituentJSON.name['en'].displayName),
                                 type: constituentJSON.type
                               })
                             }
