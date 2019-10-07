@@ -512,6 +512,8 @@ const parseItem = item => {
     objectNameSlug: {},
     scopeNContent: {},
     scopeNContentHTML: {},
+    randomFact: {},
+    randomFactHTML: {},
     baselineDescription: {},
     baselineDescriptionHTML: {},
     images: getMedia(item.Media),
@@ -572,6 +574,32 @@ const parseItem = item => {
       if (typeof (item.ScopeNContentTC) === 'object') {
         if (item.ScopeNContentTC.SNCTC) newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC.SNCTC
         if (item.ScopeNContentTC.SNCTCHTML) newItem.scopeNContentHTML['zh-hant'] = item.ScopeNContentTC.SNCTCHTML
+      }
+    }
+  }
+
+  if ('RandomFact' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.RandomFact) === 'string') {
+      newItem.randomFact['en'] = item.RandomFact
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.RandomFact) === 'object') {
+        if (item.RandomFact.RF) newItem.randomFact['en'] = item.RandomFact.RF
+        if (item.RandomFact.RFHTML) newItem.randomFactHTML['en'] = item.RandomFact.RFHTML
+      }
+    }
+  }
+
+  if ('RandomFactTC' in item) {
+    //  If we have languages within the baselineDescription then we need to handle it
+    if (typeof (item.RandomFactTC) === 'string') {
+      newItem.randomFact['zh-hant'] = item.RandomFactTC
+    } else {
+      //  If it's an object then we need to check for normal and HTML inside it
+      if (typeof (item.RandomFactTC) === 'object') {
+        if (item.RandomFactTC.RFTC) newItem.randomFact['zh-hant'] = item.RandomFactTC.RFTC
+        if (item.RandomFactTC.RFTCHTML) newItem.randomFactHTML['zh-hant'] = item.RandomFactTC.RFTCHTML
       }
     }
   }
