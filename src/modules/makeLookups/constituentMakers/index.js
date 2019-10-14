@@ -145,7 +145,7 @@ const updateConstituentsAsMakers = async (tms) => {
                       if (category.areacat['en']) {
                         if (!constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']]) {
                           constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']] = {
-                            title: category,
+                            title: category.areacat['en'],
                             slug: utils.slugify(category.areacat['en']),
                             count: 0
                           }
@@ -155,7 +155,7 @@ const updateConstituentsAsMakers = async (tms) => {
                         if (category.areacat['zh-hant']) {
                           if (!constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']]) {
                             constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']] = {
-                              title: category,
+                              title: category.areacat['zh-hant'],
                               slug: utils.slugify(category.areacat['en']),
                               count: 0
                             }
@@ -174,7 +174,7 @@ const updateConstituentsAsMakers = async (tms) => {
                       if (area.areacat['en']) {
                         if (!constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']]) {
                           constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']] = {
-                            title: area,
+                            title: area.areacat['en'],
                             slug: utils.slugify(area.areacat['en']),
                             count: 0
                           }
@@ -184,7 +184,7 @@ const updateConstituentsAsMakers = async (tms) => {
                         if (area.areacat['zh-hant']) {
                           if (!constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']]) {
                             constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']] = {
-                              title: area,
+                              title: area.areacat['zh-hant'],
                               slug: utils.slugify(area.areacat['en']),
                               count: 0
                             }
