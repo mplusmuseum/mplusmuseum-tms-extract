@@ -201,7 +201,7 @@ const updateConstituentsAsMakers = async (tms) => {
                   if (!constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName]) {
                     constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName] = {
                       title: objectJSON.collectionName,
-                      slug: utils.slugify(objectJSON.collectionName),
+                      slug: objectJSON.collectionName,
                       count: 0
                     }
                   }
@@ -210,7 +210,7 @@ const updateConstituentsAsMakers = async (tms) => {
                   if (!constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName]) {
                     constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName] = {
                       title: objectJSON.collectionName,
-                      slug: utils.slugify(objectJSON.collectionName),
+                      slug: objectJSON.collectionName,
                       count: 0
                     }
                   }
