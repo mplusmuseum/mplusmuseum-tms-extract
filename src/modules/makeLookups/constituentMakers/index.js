@@ -4,6 +4,7 @@ const Config = require('../../../classes/config')
 const rootDir = path.join(__dirname, '../../../../data')
 const logging = require('../../../modules/logging')
 const elasticsearch = require('elasticsearch')
+const utils = require('../../../modules/utils')
 
 const updateConstituentsAsMakers = async (tms) => {
   //  Start the logger
@@ -98,22 +99,124 @@ const updateConstituentsAsMakers = async (tms) => {
                 isMaker: false,
                 objectCount: 0,
                 objectCountPublic: 0,
-                roles: []
+                roles: [],
+                aggregateCounts: {
+                  lang: {
+                    'en': {
+                      categoriesAgg: {},
+                      areasAgg: {},
+                      collectionAgg: {}
+                    },
+                    'zh-hant': {
+                      categoriesAgg: {},
+                      areasAgg: {},
+                      collectionAgg: {}
+
+                    }
+                  }
+                }
               }
             }
+
             constituents[role.id].objectCount++ // Tally up the number of objects "made" by this constituent
             if ('publicAccess' in objectJSON && objectJSON.publicAccess === true) constituents[role.id].objectCountPublic++
+            let isMakerOfObject = false
             if (role.roles) {
               Object.entries(role.roles).forEach((langRole) => {
                 const thisRole = langRole[1]
                 if (thisRole in records && records[thisRole] === true) {
                   constituents[role.id].isMaker = true // Mark the constituent as a "maker"
+                  isMakerOfObject = true
                 }
                 //  If this role isn't in the list of roles yet, then add it
                 if (!constituents[role.id].roles.includes(thisRole)) {
                   constituents[role.id].roles.push(thisRole)
                 }
               })
+            }
+
+            //  If we are the maker of this object then we need to update the agg counts at the same time
+            if (objectJSON.publicAccess === true && isMakerOfObject === true) {
+              if (objectJSON.classification) {
+                //  Categories
+                if (objectJSON.classification.category && Array.isArray(objectJSON.classification.category)) {
+                  objectJSON.classification.category.forEach((category) => {
+                    if (category.areacat) {
+                      if (category.areacat['en']) {
+                        if (!constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']]) {
+                          constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']] = {
+                            title: category,
+                            slug: utils.slugify(category.areacat['en']),
+                            count: 0
+                          }
+                        }
+                        constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']].count++
+
+                        if (category.areacat['zh-hant']) {
+                          if (!constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']]) {
+                            constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']] = {
+                              title: category,
+                              slug: utils.slugify(category.areacat['en']),
+                              count: 0
+                            }
+                          }
+                          constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']].count++
+                        }
+                      }
+                    }
+                  })
+                }
+
+                //  Areas
+                if (objectJSON.classification.area && Array.isArray(objectJSON.classification.area)) {
+                  objectJSON.classification.area.forEach((area) => {
+                    if (area.areacat) {
+                      if (area.areacat['en']) {
+                        if (!constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']]) {
+                          constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']] = {
+                            title: area,
+                            slug: utils.slugify(area.areacat['en']),
+                            count: 0
+                          }
+                        }
+                        constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']].count++
+
+                        if (area.areacat['zh-hant']) {
+                          if (!constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']]) {
+                            constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']] = {
+                              title: area,
+                              slug: utils.slugify(area.areacat['en']),
+                              count: 0
+                            }
+                          }
+                          constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']].count++
+                        }
+                      }
+                    }
+                  })
+                }
+
+                //  collectionAgg
+                if (objectJSON.collectionName) {
+                  if (!constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName]) {
+                    constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName] = {
+                      title: objectJSON.collectionName,
+                      slug: utils.slugify(objectJSON.collectionName),
+                      count: 0
+                    }
+                  }
+                  constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName].count++
+
+                  if (!constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName]) {
+                    constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName] = {
+                      title: objectJSON.collectionName,
+                      slug: utils.slugify(objectJSON.collectionName),
+                      count: 0
+                    }
+                  }
+                  constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName].count++
+                }
+              }
             }
           })
         }
@@ -135,7 +238,8 @@ const updateConstituentsAsMakers = async (tms) => {
         isMaker: data.isMaker,
         objectCount: data.objectCount,
         objectCountPublic: data.objectCountPublic,
-        roles: data.roles
+        roles: data.roles,
+        aggregateCounts: JSON.stringify(data.aggregateCounts)
       }
     })
   })
