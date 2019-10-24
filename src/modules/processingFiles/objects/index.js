@@ -639,6 +639,11 @@ const parseItem = item => {
 
   //  CollectionName
   if (item.CollectionName) newItem.CollectionName = item.CollectionName
+  if (newItem.CollectionName === null || newItem.CollectionName === undefined || newItem.CollectionName === '') {
+    if (!['Fonds', 'Sub-fonds', 'Series', 'Subseries', 'Sub-subseries'].includes(newItem.archivalLevel)) {
+      newItem.CollectionName = 'M+ Collection”'
+    }
+  }
 
   //  Related objects
   if (item.RelatedObjectID) {
