@@ -637,14 +637,6 @@ const parseItem = item => {
   if (Object.entries(newItem.medium).length === 0) newItem.medium = null
   if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
 
-  //  CollectionName
-  if (item.CollectionName) newItem.CollectionName = item.CollectionName
-  if (newItem.CollectionName === null || newItem.CollectionName === undefined || newItem.CollectionName === '') {
-    if (!['Fonds', 'Sub-fonds', 'Series', 'Subseries', 'Sub-subseries'].includes(newItem.archivalLevel)) {
-      newItem.CollectionName = 'M+ Collection”'
-    }
-  }
-
   //  Related objects
   if (item.RelatedObjectID) {
     newItem.relatedObjectIds = getRelatedObjects(item.RelatedObjectID)
@@ -659,6 +651,14 @@ const parseItem = item => {
     if (possibleCollectionType === 'CA') {
       const collectionCodeSplit = item.ObjectNumber.split('/')
       newItem.collectionCode = collectionCodeSplit[0]
+    }
+  }
+
+  //  CollectionName
+  if (item.CollectionName) newItem.CollectionName = item.CollectionName
+  if (newItem.CollectionName === null || newItem.CollectionName === undefined || newItem.CollectionName === '') {
+    if (newItem.collectionType !== 'CA' && newItem.collectionType !== 'CL') {
+      newItem.CollectionName = 'M+ Collection”'
     }
   }
 
