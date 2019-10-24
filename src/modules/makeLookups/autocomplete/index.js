@@ -249,7 +249,7 @@ exports.startMakeAutocomplete = () => {
   // const interval = 1000 * 60 * 60 * 24 // 24 hours
   config.tms.forEach((tms) => {
     makeAutocomplete(tms.stub)
-    setTimeout(() => {
+    setInterval(() => {
       makeAutocomplete(tms.stub)
     }, 1000 * 60 * 60 * 5.8)
   })

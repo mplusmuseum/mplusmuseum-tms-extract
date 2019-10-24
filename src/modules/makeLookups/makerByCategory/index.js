@@ -197,7 +197,7 @@ exports.startMakersByCategory = () => {
   // const interval = 1000 * 60 * 60 * 24 // 24 hours
   config.tms.forEach((tms) => {
     getMakersByCategory(tms.stub)
-    setTimeout(() => {
+    setInterval(() => {
       getMakersByCategory(tms.stub)
     }, 1000 * 60 * 60 * 6)
   })

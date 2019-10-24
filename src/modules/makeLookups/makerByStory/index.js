@@ -146,11 +146,8 @@ exports.startMakeMakerByStory = () => {
   if (!config.tms) return
   // const interval = 1000 * 60 * 60 * 24 // 24 hours
   config.tms.forEach((tms) => {
-    makeMakerByStory(tms.stub)
-    /*
-    setTimeout(() => {
+    setInterval(() => {
       makeMakerByStory(tms.stub)
     }, 1000 * 60 * 60 * 6.1)
-    */
   })
 }

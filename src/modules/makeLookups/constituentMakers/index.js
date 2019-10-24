@@ -265,7 +265,7 @@ exports.startUpdateConstituentsAsMakers = () => {
   const interval = 1000 * 60 * 60 * 6 // Every 6 hours
   config.tms.forEach((tms) => {
     updateConstituentsAsMakers(tms.stub)
-    setTimeout(() => {
+    setInterval(() => {
       updateConstituentsAsMakers(tms.stub)
     }, interval)
   })
