@@ -655,10 +655,10 @@ const parseItem = item => {
   }
 
   //  CollectionName
-  if (item.CollectionName) newItem.CollectionName = item.CollectionName
-  if (newItem.CollectionName === null || newItem.CollectionName === undefined || newItem.CollectionName === '') {
+  if (item.CollectionName) newItem.collectionName = item.CollectionName
+  if (newItem.collectionName === null || newItem.collectionName === undefined || newItem.collectionName === '') {
     if (newItem.collectionType !== 'CA' && newItem.collectionType !== 'CL') {
-      newItem.CollectionName = 'M+ Collection'
+      newItem.collectionName = 'M+ Collection'
     }
   }
 
