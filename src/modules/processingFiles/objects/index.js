@@ -23,25 +23,38 @@ const getConstituents = constituents => {
   //  We are going to make an array of id/rank/role objects so we can match them
   //  up again on the other side
   constituents.forEach((constituent) => {
+    //  MAP FROM NEW TO OLD
+    if ('Constituent' in constituent) constituent = constituent.Constituent
     const newConstituentObj = {}
 
+    //  ConstituentID
     const constituentId = parseInt(constituent.ConstituentID, 10)
     if (!constituentsObj.ids.includes(constituentId)) constituentsObj.ids.push(constituentId)
 
+    //  DisplayOrder
     newConstituentObj.id = constituentId
+    //  OLD
     if ('Displayorder' in constituent) {
       const rank = parseInt(constituent.Displayorder, 10)
       newConstituentObj.rank = rank
+      newConstituentObj.DisplayOrder = rank
     }
-    if ('Role' in constituent || 'RoleTC' in constituent) {
-      newConstituentObj.roles = {}
+    //  NEW
+    if ('DisplayOrder' in constituent) {
+      const rank = parseInt(constituent.DisplayOrder, 10)
+      newConstituentObj.rank = rank
+      newConstituentObj.DisplayOrder = rank
     }
 
-    if ('Role' in constituent) {
-      newConstituentObj.roles['en'] = constituent.Role
-    }
-    if ('RoleTC' in constituent) {
-      newConstituentObj.roles['zh-hant'] = constituent.RoleTC
+    //   Role & RoleTC
+    if ('Role' in constituent || 'RoleTC' in constituent) {
+      newConstituentObj.roles = {}
+      if ('Role' in constituent) {
+        newConstituentObj.roles['en'] = constituent.Role
+      }
+      if ('RoleTC' in constituent) {
+        newConstituentObj.roles['zh-hant'] = constituent.RoleTC
+      }
     }
     //  Add the object to the array of id/rank/roles
     constituentsObj.idsToRoleRank.push(newConstituentObj)
@@ -53,6 +66,25 @@ const getConstituents = constituents => {
   constituentsObj.idsToRoleRank = JSON.stringify(constituentsObj.idsToRoleRank)
 
   return constituentsObj
+}
+
+const getEvents = events => {
+  if (events === null || events === undefined) return null
+  //   OLD, grab all the ids
+  let ids = forceIDArray(events)
+  // NEW
+  if (ids === null) {
+    ids = []
+    if (!Array.isArray(events)) events = [events]
+    events.forEach((event) => {
+      if ('Event' in event) {
+        const id = parseInt(event.Event, 10)
+        if (!isNaN(id) && !ids.includes(id)) ids.push(id)
+      }
+    })
+    if (ids.length === 0) return null
+  }
+  return ids
 }
 
 const getReferences = refs => {
@@ -361,6 +393,41 @@ const getExhibitionSections = ids => {
   }).filter(Boolean))
 }
 
+const getExhibitions = exhibitions => {
+  const exhibitionsObj = {
+    ids: [],
+    sections: {}
+  }
+  if (exhibitions === null || exhibitions === undefined) return null
+  if (!Array.isArray(exhibitions)) exhibitions = [exhibitions]
+
+  //  We are going to make an array of id/rank/role objects so we can match them
+  //  up again on the other side
+  exhibitions.forEach((exhibition) => {
+    if ('Exhibition' in exhibition) exhibition = exhibition.Exhibition
+
+    //  ExhibitionID
+    if ('ExhibitionID' in exhibition) {
+      const exhibitionId = parseInt(exhibition.ExhibitionID, 10)
+      if (!exhibitionsObj.ids.includes(exhibitionId)) {
+        exhibitionsObj.ids.push(exhibitionId)
+        if ('Section' in exhibition) {
+          exhibitionsObj.sections[exhibitionId] = exhibition.Section
+        }
+      }
+    }
+  })
+
+  if (exhibitionsObj.ids.length === 0) {
+    return {
+      ids: null,
+      sections: null
+    }
+  }
+  exhibitionsObj.sections = JSON.stringify(exhibitionsObj.sections)
+  return exhibitionsObj
+}
+
 //  Grab the label text
 const getExhibitionLabelText = labelText => {
   if (labelText === undefined || labelText === null) return null
@@ -459,7 +526,8 @@ const forceIDArray = ids => {
   if (!Array.isArray(ids)) ids = [ids]
   ids = ids.map((id) => {
     return parseInt(id, 10)
-  })
+  }).filter((id) => !isNaN(id))
+  if (ids.length === 0) return null
   return ids
 }
 
@@ -471,6 +539,19 @@ const forceIDArray = ids => {
 const parseItem = item => {
   const newItem = {
     objectID: parseInt(item.ObjectID, 10),
+    //  ****************
+    //
+    //  RELATIONSHIPS
+    //
+
+    consituents: null, //  Related ConstituentID
+    relatedEventIds: null, // Related Events
+    exhibition: {
+      ids: [],
+      sections: getExhibitionSections(item.RelatedExhibitionID),
+      exhibitionLabelText: {}
+    },
+
     publicAccess: parseInt(item.PublicAccess, 10) === 1,
     onView: parseInt(item.OnView, 10) === 1,
     objectNumber: item.ObjectNumber,
@@ -484,18 +565,11 @@ const parseItem = item => {
     category: getThings(item.AreaCat, 'Category'),
     archivalLevel: getThings(item.AreaCat, 'Archival Level'),
     archivalLevelScore: getArchivalLevelScore(item.AreaCat),
-    consituents: getConstituents(item.ObjectRelatedConstituents),
-    exhibition: {
-      ids: getExhibitionIds(item.RelatedExhibitionID),
-      sections: getExhibitionSections(item.RelatedExhibitionID),
-      exhibitionLabelText: {}
-    },
-    relatedEventIds: forceIDArray(item.RelatedEventID),
     relatedConceptIds: forceIDArray(item.RelatedConceptID),
     references: getReferences(item.ReferenceID),
     allORC: item.AllORC,
-    title: {},
-    titleSlug: {},
+    title: null,
+    titleSlug: null,
     objectStatus: {},
     objectStatusSlug: {},
     displayDate: {},
@@ -520,13 +594,99 @@ const parseItem = item => {
     objectRights: getObjectRights(item.MplusRights),
     id: parseInt(item.ObjectID, 10)
   }
+  console.log(newItem.id)
 
-  //  Now drop in all the languages
-  if ('TitleEN' in item && 'ObjectNumber' in item) newItem.slug = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
-  if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
-  if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
-  if ('TitleEN' in item) newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
-  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
+  //  ****************
+  //
+  //  RELATIONSHIPS
+  //
+  if ('ObjectRelatedConstituents' in item) newItem.consituents = getConstituents(item.ObjectRelatedConstituents)
+  if ('RelatedConstituent' in item) newItem.consituents = getConstituents(item.RelatedConstituent)
+
+  if ('RelatedEventID' in item) newItem.relatedEventIds = getEvents(item.relatedEventIds)
+  if ('RelatedEvent' in item) newItem.relatedEventIds = getEvents(item.RelatedEvent)
+
+  //  OLD
+  if ('RelatedExhibitionID' in item) {
+    newItem.exhibition = {
+      ids: getExhibitionIds(item.RelatedExhibitionID),
+      sections: getExhibitionSections(item.RelatedExhibitionID),
+      exhibitionLabelText: {}
+    }
+    if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
+    if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
+  }
+  //  NEW
+  if ('RelatedExhibition' in item) {
+    newItem.exhibition = getExhibitions(item.RelatedExhibition)
+    if ('ExhibitionLabelText' in item || 'ExhibitionLabelTextTC' in item) {
+      newItem.exhibition.exhibitionLabelText = {}
+      newItem.exhibition.exhibitionLabelDetails = null
+    }
+
+    if ('ExhibitionLabelText' in item) {
+      let labelText = item.ExhibitionLabelText
+      if (!Array.isArray(labelText)) labelText = [labelText]
+      //  Do this for the sake of the old format
+      labelText.forEach((label) => {
+        if (label.EL) newItem.exhibition.exhibitionLabelText['en'] = label.EL
+        //  Now do the rest of the details
+        let detailsObj = null
+        if (label.Purpose || label.ExhibitionID || label.Date || label.EL || label.ELHTML) {
+          detailsObj = {}
+          if (label.Purpose) detailsObj.Purpose = label.Purpose
+          if (label.ExhibitionID) detailsObj.ExhibitionID = parseInt(label.ExhibitionID, 10)
+          if (label.Date) detailsObj.Date = label.Date
+          if (label.EL) detailsObj.Text = label.EL
+          if (label.ELHTML) detailsObj.HTML = label.ELHTML
+          if (label.ExhibitionID) {
+            if (newItem.exhibition.exhibitionLabelDetails === null) newItem.exhibition.exhibitionLabelDetails = {}
+            if (!newItem.exhibition.exhibitionLabelDetails['en']) newItem.exhibition.exhibitionLabelDetails['en'] = {}
+            newItem.exhibition.exhibitionLabelDetails['en'][label.ExhibitionID] = detailsObj
+          }
+        }
+      })
+    }
+
+    if ('ExhibitionLabelTextTC' in item) {
+      let labelText = item.ExhibitionLabelTextTC
+      if (!Array.isArray(labelText)) labelText = [labelText]
+      //  Do this for the sake of the old format
+      labelText.forEach((label) => {
+        if (label.ELTC) newItem.exhibition.exhibitionLabelText['zh-hant'] = label.ELTC
+        //  Now do the rest of the details
+        let detailsObj = null
+        if (label.Purpose || label.ExhibitionID || label.Date || label.ELTC || label.ELTCHTML) {
+          detailsObj = {}
+          if (label.Purpose) detailsObj.Purpose = label.Purpose
+          if (label.ExhibitionID) detailsObj.ExhibitionID = parseInt(label.ExhibitionID, 10)
+          if (label.Date) detailsObj.Date = label.Date
+          if (label.ELTC) detailsObj.Text = label.ELTC
+          if (label.ELTCHTML) detailsObj.HTML = label.ELTCHTML
+          if (label.ExhibitionID) {
+            if (newItem.exhibition.exhibitionLabelDetails === null) newItem.exhibition.exhibitionLabelDetails = {}
+            if (!newItem.exhibition.exhibitionLabelDetails['zh-hant']) newItem.exhibition.exhibitionLabelDetails['zh-hant'] = {}
+            newItem.exhibition.exhibitionLabelDetails['zh-hant'][label.ExhibitionID] = detailsObj
+          }
+        }
+      })
+    }
+
+    if (newItem.exhibition.exhibitionLabelDetails && newItem.exhibition.exhibitionLabelDetails !== null) {
+      newItem.exhibition.exhibitionLabelDetails = JSON.stringify(newItem.exhibition.exhibitionLabelDetails)
+    }
+  }
+
+  //  Do the title
+  if ('TitleEN' in item || 'TitleTC' in item) {
+    newItem.title = {}
+    newItem.titleSlug = {}
+    if ('TitleEN' in item && 'ObjectNumber' in item) newItem.slug = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
+    if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
+    if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
+    if ('TitleEN' in item) newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
+    if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
+  }
   if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
   if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
   if ('Objectstatus' in item) newItem.objectStatusSlug['en'] = utils.slugify(item.Objectstatus)
@@ -541,8 +701,6 @@ const parseItem = item => {
   if ('MediumTC' in item) newItem.mediumSlug['zh-hant'] = utils.slugify(item.MediumTC)
   if ('CreditLine' in item) newItem.creditLine['en'] = item.CreditLine
   if ('CreditlineTC' in item) newItem.creditLine['zh-hant'] = item.CreditlineTC
-  if ('ExhibitionLabelText' in item) newItem.exhibition.exhibitionLabelText['en'] = getExhibitionLabelText(item.ExhibitionLabelText)
-  if ('ExhibitionLabelTextTC' in item) newItem.exhibition.exhibitionLabelText['zh-hant'] = getExhibitionLabelText(item.ExhibitionLabelTextTC)
   if ('Inscription' in item) newItem.inscription['en'] = item.Inscription
   if ('InscriptionTC' in item) newItem.inscription['zh-hant'] = item.InscriptionTC
   if ('ArchiveDescription' in item) newItem.archiveDescription['en'] = item.ArchiveDescription
@@ -630,12 +788,11 @@ const parseItem = item => {
     }
   }
 
-  if (Object.entries(newItem.title).length === 0) newItem.title = null
-  if (Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
-  if (Object.entries(newItem.displayDate).length === 0) newItem.displayDate = null
-  if (Object.entries(newItem.dimension).length === 0) newItem.dimension = null
-  if (Object.entries(newItem.medium).length === 0) newItem.medium = null
-  if (Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
+  if (newItem.objectStatus && Object.entries(newItem.objectStatus).length === 0) newItem.objectStatus = null
+  if (newItem.displayDate && Object.entries(newItem.displayDate).length === 0) newItem.displayDate = null
+  if (newItem.dimension && Object.entries(newItem.dimension).length === 0) newItem.dimension = null
+  if (newItem.medium && Object.entries(newItem.medium).length === 0) newItem.medium = null
+  if (newItem.creditLine && Object.entries(newItem.creditLine).length === 0) newItem.creditLine = null
 
   //  Related objects
   if (item.RelatedObjectID) {
