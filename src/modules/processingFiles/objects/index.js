@@ -408,13 +408,18 @@ const getExhibitions = exhibitions => {
 
     //  ExhibitionID
     if ('ExhibitionID' in exhibition) {
-      const exhibitionId = parseInt(exhibition.ExhibitionID, 10)
-      if (!exhibitionsObj.ids.includes(exhibitionId)) {
-        exhibitionsObj.ids.push(exhibitionId)
-        if ('Section' in exhibition) {
-          exhibitionsObj.sections[exhibitionId] = exhibition.Section
+      if (!Array.isArray(exhibition.ExhibitionID)) exhibition.ExhibitionID = [exhibition.ExhibitionID]
+      exhibition.ExhibitionID.forEach((e) => {
+        let exhibitionId = null
+        if (e.ExhibitionID) exhibitionId = parseInt(e.ExhibitionID, 10)
+        if (exhibitionId === null) exhibitionId = parseInt(e, 10)
+        if (exhibitionId && !exhibitionsObj.ids.includes(exhibitionId)) {
+          exhibitionsObj.ids.push(exhibitionId)
+          if (typeof (e) === 'object' && 'Section' in e) {
+            exhibitionsObj.sections[exhibitionId] = exhibition.Section
+          }
         }
-      }
+      })
     }
   })
 
@@ -548,7 +553,7 @@ const parseItem = item => {
     relatedEventIds: null, // Related Events
     exhibition: {
       ids: [],
-      sections: getExhibitionSections(item.RelatedExhibitionID),
+      sections: [],
       exhibitionLabelText: {}
     },
 
@@ -627,10 +632,28 @@ const parseItem = item => {
     if ('ExhibitionLabelText' in item) {
       let labelText = item.ExhibitionLabelText
       if (!Array.isArray(labelText)) labelText = [labelText]
-      //  Do this for the sake of the old format
+
+      //  Format the data for the old style
+      const purposes = []
+      const labels = []
       labelText.forEach((label) => {
-        if (label.EL) newItem.exhibition.exhibitionLabelText['en'] = label.EL
-        //  Now do the rest of the details
+        const labelObj = {}
+        if (label.Purpose) {
+          purposes.push(label.Purpose)
+          labelObj.purpose = label.Purpose
+        }
+        if (label.EL) labelObj.text = label.EL
+        if (label.ELHTML) labelObj.text = label.ELHTML
+        if (label.Date) labelObj.date = label.Date
+        if (label.ExhibitionID) labelObj.ExhibitionID = parseInt(label.ExhibitionID, 10)
+        labels.push(labelObj)
+      })
+      newItem.exhibition.exhibitionLabelText['en'] = {}
+      newItem.exhibition.exhibitionLabelText['en'].purposes = purposes
+      newItem.exhibition.exhibitionLabelText['en'].labels = labels
+
+      //  Format the data for the new style
+      labelText.forEach((label) => {
         let detailsObj = null
         if (label.Purpose || label.ExhibitionID || label.Date || label.EL || label.ELHTML) {
           detailsObj = {}
@@ -651,10 +674,28 @@ const parseItem = item => {
     if ('ExhibitionLabelTextTC' in item) {
       let labelText = item.ExhibitionLabelTextTC
       if (!Array.isArray(labelText)) labelText = [labelText]
-      //  Do this for the sake of the old format
+
+      //  Format the data for the old style
+      const purposes = []
+      const labels = []
       labelText.forEach((label) => {
-        if (label.ELTC) newItem.exhibition.exhibitionLabelText['zh-hant'] = label.ELTC
-        //  Now do the rest of the details
+        const labelObj = {}
+        if (label.Purpose) {
+          purposes.push(label.Purpose)
+          labelObj.purpose = label.Purpose
+        }
+        if (label.ELTC) labelObj.text = label.ELTC
+        if (label.ELTCHTML) labelObj.text = label.ELTCHTML
+        if (label.Date) labelObj.date = label.Date
+        if (label.ExhibitionID) labelObj.ExhibitionID = parseInt(label.ExhibitionID, 10)
+        labels.push(labelObj)
+      })
+      newItem.exhibition.exhibitionLabelText['zh-hant'] = {}
+      newItem.exhibition.exhibitionLabelText['zh-hant'].purposes = purposes
+      newItem.exhibition.exhibitionLabelText['zh-hant'].labels = labels
+
+      //  Format the data for the new style
+      labelText.forEach((label) => {
         let detailsObj = null
         if (label.Purpose || label.ExhibitionID || label.Date || label.ELTC || label.ELTCHTML) {
           detailsObj = {}

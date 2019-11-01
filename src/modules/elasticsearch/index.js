@@ -8,6 +8,7 @@ const elasticsearch = require('elasticsearch')
 const upsertTheItem = async (type, tms, id) => {
   const startTime = new Date().getTime()
 
+  console.log(`starting upserting ${type.child} ${id} for ${tms}`)
   const tmsLogger = logging.getTMSLogger()
   tmsLogger.object(`starting upserting ${type.child} ${id} for ${tms}`, {
     action: 'start upsertTheItem',
