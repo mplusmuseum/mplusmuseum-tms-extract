@@ -100,6 +100,9 @@ const updateConstituentsAsMakers = async (tms) => {
                 objectCount: 0,
                 objectCountPublic: 0,
                 roles: [],
+                categories: [],
+                areas: [],
+                collections: [],
                 aggregateCounts: {
                   lang: {
                     'en': {
@@ -151,6 +154,10 @@ const updateConstituentsAsMakers = async (tms) => {
                           }
                         }
                         constituents[role.id].aggregateCounts.lang['en'].categoriesAgg[category.areacat['en']].count++
+                        if (!constituents[role.id].categories.includes(category.areacat['en'])) {
+                          constituents[role.id].categories.push(category.areacat['en'])
+                          constituents[role.id].categories.push(utils.slugify(category.areacat['en']))
+                        }
 
                         if (category.areacat['zh-hant']) {
                           if (!constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']]) {
@@ -161,6 +168,9 @@ const updateConstituentsAsMakers = async (tms) => {
                             }
                           }
                           constituents[role.id].aggregateCounts.lang['zh-hant'].categoriesAgg[category.areacat['zh-hant']].count++
+                          if (!constituents[role.id].categories.includes(category.areacat['zh-hant'])) {
+                            constituents[role.id].categories.push(category.areacat['zh-hant'])
+                          }
                         }
                       }
                     }
@@ -180,6 +190,10 @@ const updateConstituentsAsMakers = async (tms) => {
                           }
                         }
                         constituents[role.id].aggregateCounts.lang['en'].areasAgg[area.areacat['en']].count++
+                        if (!constituents[role.id].areas.includes(area.areacat['en'])) {
+                          constituents[role.id].areas.push(area.areacat['en'])
+                          constituents[role.id].areas.push(utils.slugify(area.areacat['en']))
+                        }
 
                         if (area.areacat['zh-hant']) {
                           if (!constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']]) {
@@ -190,6 +204,9 @@ const updateConstituentsAsMakers = async (tms) => {
                             }
                           }
                           constituents[role.id].aggregateCounts.lang['zh-hant'].areasAgg[area.areacat['zh-hant']].count++
+                          if (!constituents[role.id].areas.includes(area.areacat['zh-hant'])) {
+                            constituents[role.id].areas.push(area.areacat['zh-hant'])
+                          }
                         }
                       }
                     }
@@ -206,6 +223,9 @@ const updateConstituentsAsMakers = async (tms) => {
                     }
                   }
                   constituents[role.id].aggregateCounts.lang['en'].collectionAgg[objectJSON.collectionName].count++
+                  if (!constituents[role.id].collections.includes(objectJSON.collectionName)) {
+                    constituents[role.id].collections.push(objectJSON.collectionName)
+                  }
 
                   if (!constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName]) {
                     constituents[role.id].aggregateCounts.lang['zh-hant'].collectionAgg[objectJSON.collectionName] = {
@@ -239,6 +259,9 @@ const updateConstituentsAsMakers = async (tms) => {
         objectCount: data.objectCount,
         objectCountPublic: data.objectCountPublic,
         roles: data.roles,
+        categories: data.categories,
+        areas: data.areas,
+        collections: data.collections,
         aggregateCounts: JSON.stringify(data.aggregateCounts)
       }
     })
