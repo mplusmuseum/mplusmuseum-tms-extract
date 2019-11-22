@@ -665,10 +665,14 @@ const parseItem = item => {
   //  CollectionName
   if (item.CollectionName) newItem.collectionName = item.CollectionName
   if (newItem.collectionName === null || newItem.collectionName === undefined || newItem.collectionName === '') {
-    if (newItem.collectionType !== 'CA' && newItem.collectionType !== 'CL') {
-      newItem.collectionName = 'M+ Collection'
-    }
+    if (newItem.department === 'Archives') newItem.collectionName = 'M+ Collection Archives'
+    if (newItem.department === 'Library') newItem.collectionName = 'M+  Library Special Collection'
+    if (newItem.department === 'Collection') newItem.collectionName = 'M+ Collection'
   }
+
+  newItem.departmentSlug = utils.slugify(newItem.department)
+  newItem.collectionNameSlug = utils.slugify(newItem.collectionName)
+  newItem.styleSlug = utils.slugify(newItem.style)
 
   return newItem
 }
