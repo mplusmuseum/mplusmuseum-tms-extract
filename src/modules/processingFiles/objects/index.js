@@ -673,7 +673,6 @@ const parseItem = item => {
   newItem.departmentSlug = utils.slugify(newItem.department)
   newItem.collectionNameSlug = utils.slugify(newItem.collectionName)
   newItem.styleSlug = utils.slugify(newItem.style)
-
   return newItem
 }
 

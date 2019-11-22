@@ -1,5 +1,6 @@
 /* eslint no-useless-escape: 0 */
 exports.slugify = (string) => {
+  if (string === null || string === '') return ''
   const a = 'àáäâãåăæçèéëêǵḧìíïîḿńǹñòóöôœṕŕßśșțùúüûǘẃẍÿź·/_,:;'
   const b = 'aaaaaaaaceeeeghiiiimnnnoooooprssstuuuuuwxyz------'
   const p = new RegExp(a.split('').join('|'), 'g')

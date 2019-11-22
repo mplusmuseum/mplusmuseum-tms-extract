@@ -497,7 +497,6 @@ if (process.env.NODE_ENV === 'development') {
 if (buildOnly === false) {
   //  Now we kick off the regular tasks that do things periodically
   //  kinda like cron jobs
-
   const pingtools = require('./app/modules/pingtools')
   pingtools.startPingingGraphQL()
   pingtools.startPingingES()

@@ -49,7 +49,6 @@ const processJsonFile = (tms, parentNode, childNode) => {
   })
 
   const filename = path.join(rootDir, 'imports', parentNode, tms, 'items.json')
-  console.log(filename)
   if (!fs.existsSync(filename)) {
     tmsLogger.object(`Failed processing ${parentNode} JSON file for ${childNode} ${tms}`, {
       action: `finished processJsonFile`,
