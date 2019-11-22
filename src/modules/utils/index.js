@@ -15,7 +15,7 @@ exports.slugify = (string) => {
   if (newString === null || newString.trim() === '') {
     newString = string.toString().replace(/\//g, '-').replace(/\\/g, '-')
   }
-  return newString
+  return newString.substr(0, 128)
 }
 
 function hexToRgb (hex) {
