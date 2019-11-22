@@ -525,8 +525,16 @@ const parseItem = item => {
   if ('TitleEN' in item && 'ObjectNumber' in item) newItem.slug = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
   if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
   if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
-  if ('TitleEN' in item) newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
-  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
+  if ('TitleEN' in item) {
+    newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
+  } else {
+    newItem.titleSlug['en'] = `${utils.slugify(item.ObjectNumber)}`
+  }
+  if ('TitleTC' in item) {
+    newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
+  } else {
+    newItem.titleSlug['zh-hant'] = `${utils.slugify(item.ObjectNumber)}`
+  }
   if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
   if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
   if ('Objectstatus' in item) newItem.objectStatusSlug['en'] = utils.slugify(item.Objectstatus)
@@ -657,10 +665,14 @@ const parseItem = item => {
   //  CollectionName
   if (item.CollectionName) newItem.collectionName = item.CollectionName
   if (newItem.collectionName === null || newItem.collectionName === undefined || newItem.collectionName === '') {
-    if (newItem.collectionType !== 'CA' && newItem.collectionType !== 'CL') {
-      newItem.collectionName = 'M+ Collection'
-    }
+    if (newItem.department === 'Archives') newItem.collectionName = 'M+ Collection Archives'
+    if (newItem.department === 'Library') newItem.collectionName = 'M+  Library Special Collection'
+    if (newItem.department === 'Collection') newItem.collectionName = 'M+ Collection'
   }
+
+  newItem.departmentSlug = utils.slugify(newItem.department)
+  newItem.collectionNameSlug = utils.slugify(newItem.collectionName)
+  newItem.styleSlug = utils.slugify(newItem.style)
 
   return newItem
 }
