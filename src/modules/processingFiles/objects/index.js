@@ -673,6 +673,14 @@ const parseItem = item => {
   newItem.departmentSlug = utils.slugify(newItem.department)
   newItem.collectionNameSlug = utils.slugify(newItem.collectionName)
   newItem.styleSlug = utils.slugify(newItem.style)
+
+  //  Clean up empty fields
+  const emptyJSON = '{}'
+  const fieldsToScrub = ['scopeNContent', 'scopeNContentHTML']
+  fieldsToScrub.forEach((field) => {
+    if (newItem[field] && JSON.stringify(newItem[field]) === emptyJSON) newItem[field] = null
+  })
+
   return newItem
 }
 
