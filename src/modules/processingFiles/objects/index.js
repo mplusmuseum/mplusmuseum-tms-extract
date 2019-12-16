@@ -666,7 +666,7 @@ const parseItem = item => {
   if (item.CollectionName) newItem.collectionName = item.CollectionName
   if (newItem.collectionName === null || newItem.collectionName === undefined || newItem.collectionName === '') {
     if (newItem.department === 'Archives') newItem.collectionName = 'M+ Collection Archives'
-    if (newItem.department === 'Library') newItem.collectionName = 'M+  Library Special Collection'
+    if (newItem.department === 'Library') newItem.collectionName = 'M+ Library Special Collection'
     if (newItem.department === 'Collection') newItem.collectionName = 'M+ Collection'
   }
 
