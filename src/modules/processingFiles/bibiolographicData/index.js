@@ -25,6 +25,7 @@ const parseItem = item => {
     subTitle: 'SubTitle' in item ? item.SubTitle : null,
     placePublished: 'PlacePublished' in item ? item.PlacePublished : null,
     yearPublished: 'YearPublished' in item ? item.YearPublished : null,
+    altNumURL: 'AltNumURL' in item ? item.AltNumURL : null,
     id: parseInt(item.ReferenceID, 10)
   }
 

@@ -76,6 +76,7 @@ const parseItem = item => {
       biographies: {},
       purpose: {}
     },
+    biography: null,
     id: parseInt(item.AuthorID, 10)
   }
 
@@ -130,6 +131,15 @@ const parseItem = item => {
   if ('ExhibitionBiography' in item) newItem.exhibitions.purpose['en'] = getBiographyPurpose(item.ExhibitionBiography)
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.biographies['zh-hant'] = getBiography(item.ExhibitionBiographyTC)
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.purpose['zh-hant'] = getBiographyPurpose(item.ExhibitionBiographyTC)
+
+  if ('BiographyEN' in item || 'BiographyTC' in item) {
+    newItem.biography = {
+      en: null,
+      'zh-hant': null
+    }
+    if ('BiographyEN' in item) newItem.biography['en'] = item.BiographyEN
+    if ('BiographyTC' in item) newItem.biography['zh-hant'] = item.BiographyEN
+  }
 
   if (Object.entries(newItem.name).length === 0) newItem.name = null
   if (Object.entries(newItem.gender).length === 0) newItem.gender = null

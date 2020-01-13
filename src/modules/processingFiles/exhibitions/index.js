@@ -65,7 +65,37 @@ const parseItem = item => {
     beginDateStr: 'ExhibitionBeginDate' in item ? item.ExhibitionBeginDate : null,
     endDate: 'ExhibitonEndDate' in item ? new Date(item.ExhibitonEndDate) : null,
     endDateStr: 'ExhibitonEndDate' in item ? item.ExhibitonEndDate : null,
-    id: parseInt(item.ExhibitionID, 10)
+    exhCitation: 'ExhCitation' in item ? item.ExhCitation : null,
+    exhCitationOnline: null,
+    id: parseInt(item.ExhibitionID, 10),
+    relatedEvents: []
+  }
+
+  //  Grab the related event ids
+  if ('RelatedEvent' in item) {
+    if (!(Array.isArray(item.RelatedEvent))) item.RelatedEvent = [item.RelatedEvent]
+    item.RelatedEvent.forEach((relatedEvent) => {
+      if ('Event' in relatedEvent) {
+        if (!(Array.isArray(relatedEvent.Event))) relatedEvent.Event = [relatedEvent.Event]
+        relatedEvent.Event.forEach((event) => {
+          if ('EventID' in event) {
+            if (!(Array.isArray(event.EventID))) event.EventID = [event.EventID]
+            event.EventID.forEach((eventID) => {
+              if (!newItem.relatedEvents.includes(eventID)) newItem.relatedEvents.push(eventID)
+            })
+          }
+        })
+      }
+    })
+  }
+
+  if ('ExhCitationEN' in item || 'ExhCitationTC' in item) {
+    newItem.exhCitationOnline = {
+      en: null,
+      'zh-hant': null
+    }
+    if ('ExhCitationEN' in item) newItem.exhCitationOnline['en'] = item.ExhCitationEN
+    if ('ExhCitationTC' in item) newItem.exhCitationOnline['zh-hant'] = item.ExhCitationTC
   }
 
   if ('ExhTitle' in item) newItem.title['en'] = item.ExhTitle
