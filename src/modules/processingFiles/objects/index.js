@@ -391,6 +391,8 @@ const getExhibitionLabelText = labelText => {
         const newThing = {
           'purpose': label.Purpose
         }
+        if (label.ExhibitionID) newThing.exhibitionID = label.ExhibitionID
+        if (label.Date) newThing.date = label.Date
         if (label.EL) newThing.text = label.EL
         if (label.ELHTML) newThing.html = label.ELHTML
         return newThing
