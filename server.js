@@ -538,6 +538,7 @@ if (buildOnly === false) {
   const makeLookups = require('./app/modules/makeLookups')
   makeLookups.constituentRoles.startFindConstituentRoles()
   makeLookups.constituentMakers.startUpdateConstituentsAsMakers()
+  makeLookups.generatedMakerBio.startMakeMakersBio()
   makeLookups.randomObjects.startCreatingRandomSelection()
   makeLookups.autocomplete.startMakeAutocomplete()
   makeLookups.objectExtraDetails.startExtraDetails()
