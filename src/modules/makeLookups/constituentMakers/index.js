@@ -77,6 +77,8 @@ const updateConstituentsAsMakers = async (tms) => {
   //  they are connected to
   const constituents = {}
   const tmsProcessedDir = path.join(rootDir, 'imports', 'Objects', tms, 'processed')
+  const notObjectNames = ['Fonds', 'Series', 'Sub-fonds', 'Sub-subseries', 'Subseries']
+
   if (fs.existsSync(tmsProcessedDir)) {
     const subFolders = fs.readdirSync(tmsProcessedDir)
     subFolders.forEach((subFolder) => {
@@ -121,8 +123,18 @@ const updateConstituentsAsMakers = async (tms) => {
               }
             }
 
-            constituents[role.id].objectCount++ // Tally up the number of objects "made" by this constituent
-            if ('publicAccess' in objectJSON && objectJSON.publicAccess === true) constituents[role.id].objectCountPublic++
+            //  Only add the objects if it's not a fond, or whatever
+            let isObject = true
+            if (objectJSON.archivalLevel && objectJSON.archivalLevel.lang && objectJSON.archivalLevel.lang.en && objectJSON.archivalLevel.lang.en.title) {
+              objectJSON.archivalLevel.lang.en.title.forEach((title) => {
+                if (notObjectNames.includes(title)) isObject = false
+              })
+            }
+            if (isObject === true) {
+              constituents[role.id].objectCount++ // Tally up the number of objects "made" by this constituent
+              if ('publicAccess' in objectJSON && objectJSON.publicAccess === true) constituents[role.id].objectCountPublic++
+            }
+
             let isMakerOfObject = false
             if (role.roles) {
               Object.entries(role.roles).forEach((langRole) => {
@@ -139,7 +151,7 @@ const updateConstituentsAsMakers = async (tms) => {
             }
 
             //  If we are the maker of this object then we need to update the agg counts at the same time
-            if (objectJSON.publicAccess === true && isMakerOfObject === true) {
+            if (objectJSON.publicAccess === true && isMakerOfObject === true && isObject) {
               if (objectJSON.classification) {
                 //  Categories
                 if (objectJSON.classification.category && Array.isArray(objectJSON.classification.category)) {
