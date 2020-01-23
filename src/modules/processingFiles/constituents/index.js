@@ -168,7 +168,7 @@ const parseItem = item => {
       'zh-hant': null
     }
     if ('BiographyEN' in item) newItem.biography['en'] = item.BiographyEN
-    if ('BiographyTC' in item) newItem.biography['zh-hant'] = item.BiographyEN
+    if ('BiographyTC' in item) newItem.biography['zh-hant'] = item.BiographyTC
   }
 
   if (Object.entries(newItem.name).length === 0) newItem.name = null
