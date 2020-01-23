@@ -15,24 +15,29 @@ const getBiography = biographies => {
   if (biographies === null || biographies === undefined) return null
   if (!Array.isArray(biographies)) biographies = [biographies]
   biographies = biographies.map((biography) => {
-    if (biography.Purpose && biography.LabelText) {
-      return {
-        purpose: biography.Purpose,
+    if (biography.LabelText) {
+      const newThing = {
         text: biography.LabelText
       }
+      if (biography.Purpose) newThing.purpose = biography.Purpose
+      if (biography.Date) newThing.date = biography.Date
+      if (biography.ExhibitionID) newThing.exhibitionID = biography.ExhibitionID
+      return newThing
     }
-    if (biography.Purpose && (biography.EB || biography.EBHTML)) {
-      const newThing = {
-        purpose: biography.Purpose
-      }
+    if (biography.EB || biography.EBHTML) {
+      const newThing = {}
+      if (biography.Purpose) newThing.purpose = biography.Purpose
+      if (biography.Date) newThing.date = biography.Date
+      if (biography.ExhibitionID) newThing.exhibitionID = biography.ExhibitionID
       if (biography.EB) newThing.text = biography.EB
       if (biography.EBHTML) newThing.html = biography.EBHTML
       return newThing
     }
-    if (biography.Purpose && (biography.EBTC || biography.EBTCHTML)) {
-      const newThing = {
-        purpose: biography.Purpose
-      }
+    if (biography.EBTC || biography.EBTCHTML) {
+      const newThing = {}
+      if (biography.Purpose) newThing.purpose = biography.Purpose
+      if (biography.Date) newThing.date = biography.Date
+      if (biography.ExhibitionID) newThing.exhibitionID = biography.ExhibitionID
       if (biography.EBTC) newThing.text = biography.EBTC
       if (biography.EBTCHTML) newThing.html = biography.EBTCHTML
       return newThing
@@ -46,6 +51,24 @@ const getBiographyPurpose = biographies => {
   if (!Array.isArray(biographies)) biographies = [biographies]
   biographies = biographies.map((biography) => {
     return biography.Purpose
+  })
+  return biographies
+}
+
+const getBiographyExhibitionID = biographies => {
+  if (biographies === null || biographies === undefined) return null
+  if (!Array.isArray(biographies)) biographies = [biographies]
+  biographies = biographies.map((biography) => {
+    return biography.ExhibitionID
+  })
+  return biographies
+}
+
+const getBiographyDate = biographies => {
+  if (biographies === null || biographies === undefined) return null
+  if (!Array.isArray(biographies)) biographies = [biographies]
+  biographies = biographies.map((biography) => {
+    return biography.Date
   })
   return biographies
 }
@@ -74,7 +97,9 @@ const parseItem = item => {
     endDate: null,
     exhibitions: {
       biographies: {},
-      purpose: {}
+      purpose: {},
+      exhibitionID: {},
+      date: {}
     },
     biography: null,
     id: parseInt(item.AuthorID, 10)
@@ -129,8 +154,13 @@ const parseItem = item => {
 
   if ('ExhibitionBiography' in item) newItem.exhibitions.biographies['en'] = getBiography(item.ExhibitionBiography)
   if ('ExhibitionBiography' in item) newItem.exhibitions.purpose['en'] = getBiographyPurpose(item.ExhibitionBiography)
+  if ('ExhibitionBiography' in item) newItem.exhibitions.exhibitionID['en'] = getBiographyExhibitionID(item.ExhibitionBiography)
+  if ('ExhibitionBiography' in item) newItem.exhibitions.date['en'] = getBiographyDate(item.ExhibitionBiography)
+
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.biographies['zh-hant'] = getBiography(item.ExhibitionBiographyTC)
   if ('ExhibitionBiographyTC' in item) newItem.exhibitions.purpose['zh-hant'] = getBiographyPurpose(item.ExhibitionBiographyTC)
+  if ('ExhibitionBiography' in item) newItem.exhibitions.exhibitionID['zh-hant'] = getBiographyExhibitionID(item.ExhibitionBiographyTC)
+  if ('ExhibitionBiography' in item) newItem.exhibitions.date['zh-hant'] = getBiographyDate(item.ExhibitionBiographyTC)
 
   if ('BiographyEN' in item || 'BiographyTC' in item) {
     newItem.biography = {
@@ -151,6 +181,8 @@ const parseItem = item => {
   if (Object.entries(newItem.deathCity).length === 0) newItem.deathCity = null
   if (Object.entries(newItem.exhibitions.biographies).length === 0) newItem.exhibitions.biographies = null
   if (Object.entries(newItem.exhibitions.purpose).length === 0) newItem.exhibitions.purpose = null
+  if (Object.entries(newItem.exhibitions.exhibitionID).length === 0) newItem.exhibitions.exhibitionID = null
+  if (Object.entries(newItem.exhibitions.date).length === 0) newItem.exhibitions.date = null
 
   return newItem
 }
