@@ -387,14 +387,16 @@ const getExhibitionLabelText = labelText => {
           'text': label._
         }
       }
-      if ((label.EL || label.ELHTML) && label.Purpose) {
+      if ((label.EL || label.ELHTML || label.ELTC || label.ELTCHTML) && label.Purpose) {
         const newThing = {
           'purpose': label.Purpose
         }
         if (label.ExhibitionID) newThing.exhibitionID = label.ExhibitionID
         if (label.Date) newThing.date = label.Date
         if (label.EL) newThing.text = label.EL
+        if (label.ELTC) newThing.text = label.ELTC
         if (label.ELHTML) newThing.html = label.ELHTML
+        if (label.ELTCHTML) newThing.html = label.ELTCHTML
         return newThing
       }
     }
