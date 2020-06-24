@@ -118,7 +118,9 @@ const parseItem = item => {
 
   // Grab extra name information
   if ('Name' in item) {
-    newItem.slug = `${utils.slugify(item.Name)}-${parseInt(item.AuthorID, 10)}`
+    newItem.slug = `${utils.slugify(item.Name)}`
+    const forceId = [4484, 1495, 311, 572]
+    if (forceId.includes(parseInt(item.AuthorID, 10))) newItem.slug = `${utils.slugify(item.Name)}-${parseInt(item.AuthorID, 10)}`
     newItem.name['en'] = {
       'displayName': item.Name
     }
