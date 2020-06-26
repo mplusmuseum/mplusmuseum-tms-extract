@@ -498,7 +498,10 @@ const parseItem = item => {
     relatedConceptIds: forceIDArray(item.RelatedConceptID),
     references: getReferences(item.ReferenceID),
     allORC: item.AllORC,
-    title: {},
+    title: {
+      'en': null,
+      'zh-hant': null
+    },
     titleSlug: {},
     objectStatus: {},
     objectStatusSlug: {},
