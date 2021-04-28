@@ -529,19 +529,20 @@ const parseItem = item => {
   }
 
   //  Now drop in all the languages
-  if ('TitleEN' in item && 'ObjectNumber' in item) newItem.slug = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
   if ('TitleEN' in item) newItem.title['en'] = item.TitleEN
   if ('TitleTC' in item) newItem.title['zh-hant'] = item.TitleTC
+
+  const objectNumberSlug = utils.slugify(item.ObjectNumber)
+  newItem.slug = `${objectNumberSlug}`
+  newItem.titleSlug['en'] = `${objectNumberSlug}`
+  newItem.titleSlug['zh-hant'] = `${objectNumberSlug}`
+
   if ('TitleEN' in item) {
-    newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${utils.slugify(item.ObjectNumber)}`
-  } else {
-    newItem.titleSlug['en'] = `${utils.slugify(item.ObjectNumber)}`
+    newItem.slug = `${utils.slugify(item.TitleEN)}-${newItem.slug}`
+    newItem.titleSlug['en'] = `${utils.slugify(item.TitleEN)}-${newItem.titleSlug['en']}`
   }
-  if ('TitleTC' in item) {
-    newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${utils.slugify(item.ObjectNumber)}`
-  } else {
-    newItem.titleSlug['zh-hant'] = `${utils.slugify(item.ObjectNumber)}`
-  }
+  if ('TitleTC' in item) newItem.titleSlug['zh-hant'] = `${utils.slugify(item.TitleTC)}-${newItem.titleSlug['zh-hant']}`
+
   if ('Objectstatus' in item) newItem.objectStatus['en'] = item.Objectstatus
   if ('ObjectstatusTC' in item) newItem.objectStatus['zh-hant'] = item.ObjectstatusTC
   if ('Objectstatus' in item) newItem.objectStatusSlug['en'] = utils.slugify(item.Objectstatus)
