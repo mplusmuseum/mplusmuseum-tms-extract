@@ -569,7 +569,7 @@ const parseItem = item => {
   if ('ObjectNameTC' in item) newItem.objectNameSlug['zh-hant'] = item.ObjectNameTC
 
   if ('ScopeNContent' in item) {
-    //  If we have languages within the baselineDescription then we need to handle it
+    //  If we have languages within the ScopeNContent then we need to handle it
     if (typeof (item.ScopeNContent) === 'string') {
       newItem.scopeNContent['en'] = item.ScopeNContent
     } else {
@@ -582,7 +582,7 @@ const parseItem = item => {
   }
 
   if ('ScopeNContentTC' in item) {
-    //  If we have languages within the baselineDescription then we need to handle it
+    //  If we have languages within the ScopeNContentTC then we need to handle it
     if (typeof (item.ScopeNContentTC) === 'string') {
       newItem.scopeNContent['zh-hant'] = item.ScopeNContentTC
     } else {
@@ -595,7 +595,7 @@ const parseItem = item => {
   }
 
   if ('RandomFact' in item) {
-    //  If we have languages within the baselineDescription then we need to handle it
+    //  If we have languages within the RandomFact then we need to handle it
     if (typeof (item.RandomFact) === 'string') {
       newItem.randomFact['en'] = item.RandomFact
     } else {
@@ -608,7 +608,7 @@ const parseItem = item => {
   }
 
   if ('RandomFactTC' in item) {
-    //  If we have languages within the baselineDescription then we need to handle it
+    //  If we have languages within the RandomFactTC then we need to handle it
     if (typeof (item.RandomFactTC) === 'string') {
       newItem.randomFact['zh-hant'] = item.RandomFactTC
     } else {
@@ -634,7 +634,7 @@ const parseItem = item => {
   }
 
   if ('BaselineDescriptionTC' in item) {
-    //  If we have languages within the baselineDescription then we need to handle it
+    //  If we have languages within the BaselineDescriptionTC then we need to handle it
     if (typeof (item.BaselineDescriptionTC) === 'string') {
       newItem.baselineDescription['zh-hant'] = item.BaselineDescriptionTC
     } else {
@@ -684,7 +684,9 @@ const parseItem = item => {
 
   //  Clean up empty fields
   const emptyJSON = '{}'
-  const fieldsToScrub = ['scopeNContent', 'scopeNContentHTML']
+  const fieldsToScrub = ['scopeNContent', 'scopeNContentHTML', 
+                        'baselineDescription', 'baselineDescriptionHTML', 
+                        'randomFact', 'randomFactHTML']
   fieldsToScrub.forEach((field) => {
     if (newItem[field] && JSON.stringify(newItem[field]) === emptyJSON) newItem[field] = null
   })
