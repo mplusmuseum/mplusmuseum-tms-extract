@@ -691,6 +691,12 @@ const parseItem = item => {
     if (newItem[field] && JSON.stringify(newItem[field]) === emptyJSON) newItem[field] = null
   })
 
+  // clean up exhibitionLabelText
+  if (newItem['exhibition'] && 
+      newItem['exhibition']['exhibitionLabelText'] && 
+      JSON.stringify(newItem['exhibition']['exhibitionLabelText']) === emptyJSON)
+    newItem['exhibition']['exhibitionLabelText'] = null
+
   return newItem
 }
 
