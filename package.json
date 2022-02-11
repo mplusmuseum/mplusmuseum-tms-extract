@@ -22,7 +22,7 @@
     "dotenv": "^5.0.0",
     "elasticsearch": "^13.3.1",
     "express": "^4.17.1",
-    "express-handlebars": "^3.1.0",
+    "express-handlebars": "^5.3.1",
     "express-session": "^1.15.6",
     "formidable": "^1.2.1",
     "get-stdin": "^5.0.1",
