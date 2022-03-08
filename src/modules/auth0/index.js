@@ -82,7 +82,7 @@ const getAllUserTokens = async (page) => {
     fields: 'user_id,user_metadata',
     per_page: 100,
     page: page,
-    search_engine: 'v2'
+    search_engine: 'v3'
   }
   const users = await request({
     url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,

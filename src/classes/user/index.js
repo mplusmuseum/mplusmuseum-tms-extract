@@ -23,6 +23,9 @@ const getUserSync = async id => {
 
   const user = await request({
       url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+      qs: {
+        search_engine: 'v3'
+      },
       method: 'GET',
       headers: {
         'content-type': 'application/json',
@@ -67,6 +70,9 @@ const setApiToken = async id => {
 
   const user = await request({
       url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+      qs: {
+        search_engine: 'v3'
+      },
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
@@ -113,6 +119,9 @@ const setRoles = async (id, roles) => {
 
   const user = await request({
       url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+      qs: {
+        search_engine: 'v3'
+      },
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
@@ -145,6 +154,9 @@ const setLang = async (id, lang) => {
 
   const user = await request({
       url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users/${id}`,
+      qs: {
+        search_engine: 'v3'
+      },
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',

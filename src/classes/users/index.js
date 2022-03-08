@@ -25,7 +25,8 @@ class Users {
     for (const page of pages) {
       const qs = {
         per_page: perPage,
-        page
+        page,
+        search_engine: 'v3'
       }
       const users = await request({
         url: `https://${auth0info.AUTH0_DOMAIN}/api/v2/users`,
